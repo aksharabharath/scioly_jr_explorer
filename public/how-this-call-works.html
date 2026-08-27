@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>How the practice phone call works</title>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+
+      const notes = {
+        tap: {
+          title: "You tap Call me",
+          body: "You type a phone number and press the button. That is you saying: please ring this phone.",
+          derived:
+            "We put a Call me box on the home page because you asked for a real phone call, not just a quiz on the screen.",
+          parallel:
+            "Nothing else has started yet. This is the first tap.",
+        },
+        lookup: {
+          title: "The app peeks at today's practice",
+          body: "The app looks in its notebook: did you answer any Science Olympiad questions today?",
+          derived:
+            "The notebook is the saved list of answers. “Today” means this calendar day.",
+          parallel:
+            "This peek happens at the same time as gathering your name, your events, and your streak.",
+        },
+        robot: {
+          title: "The phone robot gets a script",
+          body: "Vapi is a phone robot company. We send it a short script: be kind, ask if they practiced, then quiz or remind.",
+          derived:
+            "We do not write a new robot for every kid. We fill in your name, events, and whether the notebook already shows practice.",
+          parallel:
+            "While the script is built, the app also picks which Vapi phone number will place the call.",
+        },
+        ring: {
+          title: "Your phone rings",
+          body: "Vapi dials the number you typed. You pick up, like a normal call.",
+          derived:
+            "A call needs three things: the script, a Vapi number to call FROM, and your number to call TO.",
+          parallel:
+            "You wait for the ring. The robot is already on the line, ready to talk.",
+        },
+        ask: {
+          title: "Did you practice today?",
+          body: "The coach asks you out loud. Even if the notebook already knows, it still asks, in case the notebook is wrong.",
+          derived:
+            "You said the call should check in first. So the first spoken question is always about practice, not a science fact.",
+          parallel:
+            "You talk. The robot listens and chooses the next branch.",
+        },
+        quiz: {
+          title: "If yes: talk about what you did",
+          body: "The coach asks which event, one thing you learned, and one thing that felt tricky. Then it cheers you.",
+          derived:
+            "You asked for a few questions about whatever they practiced, not a full 10-question test on the phone.",
+          parallel:
+            "The reminder path is not used. Only this yes path runs.",
+        },
+        remind: {
+          title: "If no: a kind reminder",
+          body: "The coach does not scold. It says: open Jr. Explorer, pick an event, tap Practice, try 10 questions.",
+          derived:
+            "You asked for a reminder when they have not practiced yet. Kind words keep kids coming back.",
+          parallel:
+            "The quiz path is not used. Only this no path runs.",
+        },
+        bye: {
+          title: "The call ends",
+          body: "The coach says goodbye. The call is meant to stay short, about two minutes.",
+          derived:
+            "A short check-in is easier for a kid than a long lecture.",
+          parallel:
+            "Nothing else is running. You can practice in the app next, if you want.",
+        },
+        key: {
+          title: "The secret key",
+          body: "The key is a password for Vapi. It lives in a hidden file named .env.local. It is not in the public code.",
+          derived:
+            "If we put the key on the web page, anyone could steal it and make calls on your account.",
+          parallel:
+            "The key is only used on the server when you tap Call me. Your browser never sees it.",
+        },
+        together: {
+          title: "What happens at the same time",
+          body: "After you tap Call me, the app does a bundle of homework together: notebook peek, your name, your events, your streak, then it asks Vapi to dial.",
+          derived:
+            "Doing those reads together is faster than doing them one by one. The phone still rings only after that homework is done.",
+          parallel:
+            "This is the “in parallel” part: several looks happen together, then one call starts.",
+        },
+      };
+
+      const aliases = {
+        lookup2: "together",
+        robot2: "robot",
+        name: "together",
+        events: "together",
+        streak: "together",
+      };
+
+      function show(id) {
+        const resolved = aliases[id] ?? id;
+        const note = notes[resolved];
+        if (!note) return;
+        document.getElementById("note-title").textContent = note.title;
+        document.getElementById("note-body").textContent = note.body;
+        document.getElementById("note-derived").textContent = note.derived;
+        document.getElementById("note-parallel").textContent = note.parallel;
+        document.querySelectorAll("[data-topic]").forEach((btn) => {
+          btn.setAttribute(
+            "aria-pressed",
+            btn.getAttribute("data-topic") === resolved ? "true" : "false",
+          );
+        });
+      }
+
+      window.showNote = show;
+
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: "loose",
+        theme: "base",
+        themeVariables: {
+          primaryColor: "#d7efe8",
+          primaryTextColor: "#1e2d29",
+          primaryBorderColor: "#1f6f68",
+          lineColor: "#134e49",
+          secondaryColor: "#fff6d8",
+          tertiaryColor: "#fffdf8",
+          fontFamily: "Georgia, serif",
+        },
+      });
+
+      await mermaid.run();
+      show("tap");
+    </script>
+    <style>
+      :root {
+        --parchment: #f3efe4;
+        --surface: #fffdf8;
+        --ink: #1e2d29;
+        --teal: #1f6f68;
+        --teal-dark: #134e49;
+        --gold: #d9a21b;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        background: var(--parchment);
+        color: var(--ink);
+        line-height: 1.45;
+      }
+      main {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 28px 18px 64px;
+      }
+      h1,
+      h2 {
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+      }
+      h1 {
+        font-size: 2rem;
+        margin: 0.2rem 0 0.6rem;
+      }
+      h2 {
+        font-size: 1.35rem;
+        margin: 2rem 0 0.6rem;
+      }
+      p {
+        margin: 0.4rem 0 0.8rem;
+        font-size: 1.05rem;
+      }
+      .kicker {
+        color: var(--teal);
+        font-weight: 700;
+        font-size: 0.95rem;
+      }
+      .panel {
+        background: var(--surface);
+        border: 1px solid rgba(30, 45, 41, 0.12);
+        border-radius: 24px;
+        padding: 18px;
+        margin: 16px 0;
+      }
+      .diagram {
+        overflow-x: auto;
+      }
+      .buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 12px 0 0;
+      }
+      button[data-topic] {
+        border: 1px solid rgba(30, 45, 41, 0.15);
+        background: #fff;
+        color: var(--ink);
+        border-radius: 999px;
+        padding: 8px 14px;
+        font: inherit;
+        font-size: 0.95rem;
+        cursor: pointer;
+      }
+      button[data-topic][aria-pressed="true"] {
+        background: var(--teal-dark);
+        color: var(--parchment);
+        border-color: var(--teal-dark);
+      }
+      .explain {
+        background: #fff6d8;
+        border-radius: 20px;
+        padding: 16px 18px;
+        margin-top: 12px;
+      }
+      .explain h3 {
+        margin: 0 0 8px;
+        font-size: 1.25rem;
+      }
+      .label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: var(--teal-dark);
+        margin-top: 10px;
+      }
+      a {
+        color: var(--teal-dark);
+        font-weight: 700;
+      }
+      .tiny {
+        font-size: 0.92rem;
+        color: #5c6562;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="kicker">Jr. Explorer · picture page</p>
+      <h1>How the practice phone call works</h1>
+      <p>
+        This page is a picture of the new call. Click a round button, or a box
+        in the picture. You will see what it means, why we made it, and what
+        else is happening at the same time.
+      </p>
+      <p class="tiny">
+        You can open this picture even before you log in. Then go to the home
+        page to try the call.
+        <a href="/">Go back to Jr. Explorer</a>
+      </p>
+
+      <section class="panel">
+        <h2>The whole path</h2>
+        <p class="tiny">
+          Start at the top. Follow the arrows. Yes goes left. No goes right.
+        </p>
+        <div class="diagram">
+          <pre class="mermaid">
+flowchart TB
+  tap["1. You tap Call me"]
+  lookup["2. App peeks at today's practice"]
+  robot["3. Phone robot gets a script"]
+  ring["4. Your phone rings"]
+  ask{"5. Did you practice today?"}
+  quiz["6a. Yes: talk about what you did"]
+  remind["6b. No: kind reminder"]
+  bye["7. Call ends"]
+
+  tap --> lookup --> robot --> ring --> ask
+  ask -->|Yes| quiz --> bye
+  ask -->|No| remind --> bye
+
+  click tap showNote
+  click lookup showNote
+  click robot showNote
+  click ring showNote
+  click ask showNote
+  click quiz showNote
+  click remind showNote
+  click bye showNote
+          </pre>
+        </div>
+        <div class="buttons" role="group" aria-label="Path buttons">
+          <button type="button" data-topic="tap" onclick="showNote('tap')">1. Call me</button>
+          <button type="button" data-topic="lookup" onclick="showNote('lookup')">2. Peek at practice</button>
+          <button type="button" data-topic="robot" onclick="showNote('robot')">3. Phone robot</button>
+          <button type="button" data-topic="ring" onclick="showNote('ring')">4. Phone rings</button>
+          <button type="button" data-topic="ask" onclick="showNote('ask')">5. Did you practice?</button>
+          <button type="button" data-topic="quiz" onclick="showNote('quiz')">6a. Yes path</button>
+          <button type="button" data-topic="remind" onclick="showNote('remind')">6b. No path</button>
+          <button type="button" data-topic="bye" onclick="showNote('bye')">7. Call ends</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>What happens at the same time</h2>
+        <p class="tiny">
+          After you tap the button, the app does homework as a bundle. Then it
+          asks the phone robot to dial. Click a box.
+        </p>
+        <div class="diagram">
+          <pre class="mermaid">
+flowchart LR
+  subgraph bundle["These looks happen together"]
+    lookup2["Today's answers"]
+    name["Your name"]
+    events["Your events"]
+    streak["Your streak"]
+  end
+  robot2["Then the phone robot dials"]
+  bundle --> robot2
+  click lookup2 showNote
+  click name showNote
+  click events showNote
+  click streak showNote
+  click robot2 showNote
+          </pre>
+        </div>
+        <div class="buttons">
+          <button type="button" data-topic="together" onclick="showNote('together')">
+            The bundle
+          </button>
+          <button type="button" data-topic="key" onclick="showNote('key')">
+            Secret key
+          </button>
+        </div>
+      </section>
+
+      <section class="explain" aria-live="polite">
+        <h3 id="note-title">You tap Call me</h3>
+        <p id="note-body"></p>
+        <p class="label">Why we made it this way</p>
+        <p id="note-derived"></p>
+        <p class="label">What is happening at the same time</p>
+        <p id="note-parallel"></p>
+      </section>
+
+      <section class="panel">
+        <h2>What you still need</h2>
+        <p>
+          The app part is ready. A real ring still needs two phone numbers.
+        </p>
+        <p>
+          <strong>You type:</strong> the number that should ring (your phone).
+        </p>
+        <p>
+          <strong>A grown-up sets:</strong> a Vapi number to call FROM. If the
+          Vapi account has none, add one in the Vapi dashboard, then put
+          VAPI_PHONE_NUMBER_ID in the hidden file named .env.local.
+        </p>
+        <p class="tiny">
+          The secret Vapi key is already in that hidden file. It is not on this
+          page. To open this picture later, go to
+          <a href="/how-this-call-works.html">/how-this-call-works.html</a>
+          while the app is running, or click “How the call works” after you log
+          in.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
