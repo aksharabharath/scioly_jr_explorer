@@ -1,14 +1,17 @@
-import { BadgeShelf } from "@/components/BadgeShelf";
+import { DailyMissionCard } from "@/components/DailyMissionCard";
 import { EventCard } from "@/components/EventCard";
 import { ExplorerProgress } from "@/components/ExplorerProgress";
 import { OverallProgressCard } from "@/components/OverallProgressCard";
-import { PracticeCheckInCall } from "@/components/PracticeCheckInCall";
+import { RecentAchievements } from "@/components/RecentAchievements";
 import { displayNameFromUser, requireUser } from "@/lib/auth/session";
-import { getEarnedBadgeIds } from "@/lib/badges";
+import {
+  completedSessionCountForEvent,
+  uniqueQuestionsPracticed,
+} from "@/lib/expeditions";
 import { explorerProfileFromGamification } from "@/lib/gamification";
 import { getAllQuestions } from "@/lib/mock/curriculum";
 import { getDashboardData } from "@/lib/mock/explorer";
-import { practicedTodayUtc } from "@/lib/practice-check-in";
+import { isPlayablePracticeEvent } from "@/lib/mock/events";
 import {
   getMyGamification,
   getMyPracticeAttempts,
@@ -18,7 +21,6 @@ import {
   requireEventSelection,
   resolveSelectedEvents,
 } from "@/lib/student-events";
-import { getVapiCustomerNumber } from "@/lib/vapi/env";
 
 export const dynamic = "force-dynamic";
 
@@ -37,10 +39,6 @@ export default async function Home() {
   );
   const practiceProgress = calculateOverallProgress(attempts, questions);
   const selectedEvents = resolveSelectedEvents(events, selectedEventIds);
-  const earnedBadgeIds = getEarnedBadgeIds({
-    attempts,
-    questions,
-  });
 
   return (
     <main className="flex flex-1 flex-col">
@@ -60,6 +58,10 @@ export default async function Home() {
           <ExplorerProgress explorer={explorerWithIdentity} />
         </div>
 
+        <div className="mt-8">
+          <DailyMissionCard attempts={attempts} />
+        </div>
+
         <section aria-labelledby="events-heading" className="mt-8">
           <h2
             id="events-heading"
@@ -73,29 +75,44 @@ export default async function Home() {
           </p>
 
           <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {selectedEvents.map((event) => (
-              <EventCard
-                key={event.id}
-                event={event}
-                href={`/events/${event.id}`}
-              />
-            ))}
+            {selectedEvents.map((event) => {
+              const unique = uniqueQuestionsPracticed(
+                event.id,
+                attempts,
+                questions,
+              );
+              const expeditions = completedSessionCountForEvent(
+                event.id,
+                attempts,
+                questions,
+              );
+              const progressLine = isPlayablePracticeEvent(event)
+                ? unique > 0 || expeditions > 0
+                  ? `${unique} unique questions tried · ${expeditions} expeditions`
+                  : "Not practiced yet"
+                : undefined;
+              return (
+                <EventCard
+                  key={event.id}
+                  event={event}
+                  href={`/events/${event.id}`}
+                  progressLine={progressLine}
+                />
+              );
+            })}
           </div>
         </section>
-
-        <div className="mt-8">
-          <PracticeCheckInCall
-            practicedToday={practicedTodayUtc(attempts)}
-            defaultPhone={getVapiCustomerNumber() ?? ""}
-          />
-        </div>
 
         <div className="mt-8">
           <OverallProgressCard progress={practiceProgress} />
         </div>
 
         <div className="mt-8">
-          <BadgeShelf earnedIds={earnedBadgeIds} />
+          <RecentAchievements
+            attempts={attempts}
+            questions={questions}
+            streakDays={gamification.streakDays}
+          />
         </div>
       </div>
     </main>

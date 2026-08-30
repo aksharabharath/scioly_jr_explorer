@@ -1,13 +1,21 @@
 import { EventPracticeProgress } from "@/components/EventPracticeProgress";
 import { getCurrentUser } from "@/lib/auth/session";
 import {
+  completedSessionCountForEvent,
+  uniqueQuestionsPracticed,
+} from "@/lib/expeditions";
+import {
   toLearningAttempts,
   topicsNeedingRevisit,
 } from "@/lib/learning/adaptive";
-import { getAllQuestions, getEventPageData } from "@/lib/mock/curriculum";
+import { getAllQuestions, getEventPageData, isLivePracticeQuestion } from "@/lib/mock/curriculum";
 import { isStudentCatalogEventId } from "@/lib/mock/events";
-import { getMyPracticeAttempts } from "@/lib/practice-attempts";
+import {
+  getMyPracticeAttempts,
+  getMyRecentPracticeAttempts,
+} from "@/lib/practice-attempts";
 import { calculateEventProgress } from "@/lib/progress";
+import { requireSelectedEvent } from "@/lib/student-events";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -35,6 +43,7 @@ export default async function EventPage({ params }: EventRouteProps) {
   if (!isStudentCatalogEventId(eventId)) {
     notFound();
   }
+  await requireSelectedEvent(eventId);
   const data = await getEventPageData(eventId);
 
   if (!data) {
@@ -43,24 +52,28 @@ export default async function EventPage({ params }: EventRouteProps) {
 
   const { event, overview, topics, hasPractice } = data;
   const user = await getCurrentUser();
-  const [attempts, questions] = await Promise.all([
+  const [attempts, recentAttempts, questions] = await Promise.all([
     getMyPracticeAttempts(),
+    getMyRecentPracticeAttempts(),
     getAllQuestions(),
   ]);
-  const eventProgress = calculateEventProgress(
-    event.id,
-    attempts,
-    questions,
-    topics.length,
-  );
   const eventQuestions = questions.filter(
     (question) => question.eventId === event.id,
   );
+  const eventProgress = {
+    ...calculateEventProgress(
+      event.id,
+      attempts,
+      questions,
+      topics.length,
+    ),
+    uniqueQuestions: uniqueQuestionsPracticed(event.id, attempts, questions),
+  };
   const topicNames = new Map(topics.map((topic) => [topic.id, topic.name]));
   const weakTopicNames =
     user && hasPractice
       ? topicsNeedingRevisit(
-          toLearningAttempts(attempts, eventQuestions),
+          toLearningAttempts(recentAttempts, eventQuestions),
         )
           .map((topicId) => topicNames.get(topicId))
           .filter((name): name is string => Boolean(name))
@@ -101,6 +114,14 @@ export default async function EventPage({ params }: EventRouteProps) {
             <EventPracticeProgress
               eventName={event.name}
               progress={eventProgress}
+              expeditionsCompleted={completedSessionCountForEvent(
+                event.id,
+                attempts,
+                questions,
+              )}
+              liveBankSize={
+                eventQuestions.filter(isLivePracticeQuestion).length
+              }
             />
 
             {weakTopicNames.length > 0 ? (
@@ -114,6 +135,10 @@ export default async function EventPage({ params }: EventRouteProps) {
                 >
                   Worth revisiting
                 </h2>
+                <p className="mt-2 text-sm text-stone-600">
+                  A miss marks a topic as tricky. Three later correct answers
+                  in that topic mark it strong again.
+                </p>
                 <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-stone-600">
                   {weakTopicNames.map((name) => (
                     <li key={name}>{name}</li>

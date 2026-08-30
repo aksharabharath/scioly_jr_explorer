@@ -1,7 +1,7 @@
 "use client";
 
 import { savePracticeAttempt } from "@/app/practice/actions";
-import { BadgeCelebration } from "@/components/BadgeCelebration";
+import { ExpeditionRewardsOverlay } from "@/components/ExpeditionRewardsOverlay";
 import { XpAwardFeedback } from "@/components/XpAwardFeedback";
 import {
   PRACTICE_SET_SIZE,
@@ -29,8 +29,13 @@ import {
   calculateLevelFromXp,
   formatXpGain,
   localCalendarDate,
+  newlyReachedStreakMilestone,
   streakLabel,
+  type StreakMilestone,
 } from "@/lib/gamification";
+import {
+  hasCompletedExpeditionOnLocalDate,
+} from "@/lib/expeditions";
 import type { PracticeFollowUp, PracticeSummary, Question } from "@/lib/types";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -43,6 +48,8 @@ type PracticeQuizProps = {
   priorBadgeAttempts: BadgeProgressAttempt[];
   allQuestions: Question[];
   initialAttemptCount: number;
+  initialXp?: number;
+  initialStreakDays?: number;
   mode?: PracticeMode;
 };
 
@@ -58,6 +65,7 @@ type ActiveQuizState = {
   history: LearningAttempt[];
   saveError: string | null;
   saved: boolean;
+  saving: boolean;
   attemptCount: number;
   /** Server-reported award for the current answer. Null until save succeeds. */
   xpAward: {
@@ -76,6 +84,9 @@ type CompleteQuizState = {
   /** Persisted total XP after the last successful save. Null if none. */
   totalXp: number | null;
   newlyEarnedIds: BadgeId[];
+  leveledUpTo: number | null;
+  streakMilestone: StreakMilestone | null;
+  dailyMissionComplete: boolean;
 };
 
 type QuizState = ActiveQuizState | CompleteQuizState;
@@ -105,6 +116,9 @@ function beginSet(
       streakDays: 0,
       totalXp: null,
       newlyEarnedIds: [],
+      leveledUpTo: null,
+      streakMilestone: null,
+      dailyMissionComplete: false,
     };
   }
 
@@ -120,6 +134,7 @@ function beginSet(
     history,
     saveError: null,
     saved: false,
+    saving: false,
     attemptCount,
     xpAward: null,
   };
@@ -130,11 +145,15 @@ function newlyEarnedForSession(
   records: AnswerRecord[],
   sessionId: string,
   bank: Question[],
+  streakDaysBefore: number,
+  streakDaysAfter: number,
 ): BadgeId[] {
   return getNewlyEarnedBadgesFromAttempts(
     prior,
     [...prior, ...toSessionBadgeAttempts(records, sessionId)],
     bank,
+    streakDaysBefore,
+    streakDaysAfter,
   );
 }
 
@@ -146,6 +165,8 @@ export function PracticeQuiz({
   priorBadgeAttempts,
   allQuestions,
   initialAttemptCount,
+  initialXp = 0,
+  initialStreakDays = 0,
   mode = "normal",
 }: PracticeQuizProps) {
   const [state, setState] = useState<QuizState>(() =>
@@ -158,13 +179,71 @@ export function PracticeQuiz({
   const streakDaysRef = useRef(0);
   const totalXpRef = useRef<number | null>(null);
   const badgeAttemptsRef = useRef(priorBadgeAttempts);
+  const baselineXpRef = useRef(initialXp);
+  const baselineStreakRef = useRef(initialStreakDays);
 
   function startNewSession() {
+    if (totalXpRef.current != null) {
+      baselineXpRef.current = totalXpRef.current;
+    }
+    if (streakDaysRef.current > 0) {
+      baselineStreakRef.current = streakDaysRef.current;
+    }
     sessionIdRef.current = crypto.randomUUID();
     attemptIdRef.current = null;
     sessionXpRef.current = 0;
     streakDaysRef.current = 0;
     totalXpRef.current = null;
+  }
+
+  function finishSet(
+    nextRecords: AnswerRecord[],
+    nextHistory: LearningAttempt[],
+    attemptCount: number,
+  ): CompleteQuizState {
+    const streakAfter = streakDaysRef.current;
+    const newlyEarnedIds = newlyEarnedForSession(
+      badgeAttemptsRef.current,
+      nextRecords,
+      sessionIdRef.current,
+      allQuestions,
+      baselineStreakRef.current,
+      streakAfter,
+    );
+    const alreadyCompletedToday = hasCompletedExpeditionOnLocalDate(
+      badgeAttemptsRef.current,
+      localCalendarDate(),
+    );
+    badgeAttemptsRef.current = [
+      ...badgeAttemptsRef.current,
+      ...toSessionBadgeAttempts(
+        nextRecords,
+        sessionIdRef.current,
+        new Date().toISOString(),
+      ),
+    ];
+    const previousLevel = calculateLevelFromXp(baselineXpRef.current);
+    const nextLevel =
+      totalXpRef.current == null
+        ? previousLevel
+        : calculateLevelFromXp(totalXpRef.current);
+    return {
+      status: "complete",
+      records: nextRecords,
+      history: nextHistory,
+      attemptCount,
+      sessionXp: sessionXpRef.current,
+      streakDays: streakAfter,
+      totalXp: totalXpRef.current,
+      newlyEarnedIds,
+      leveledUpTo: nextLevel > previousLevel ? nextLevel : null,
+      streakMilestone: newlyReachedStreakMilestone(
+        baselineStreakRef.current,
+        streakAfter,
+      ),
+      dailyMissionComplete:
+        nextRecords.length >= PRACTICE_SET_SIZE && !alreadyCompletedToday,
+    };
   }
 
   if (state.status === "complete") {
@@ -188,6 +267,9 @@ export function PracticeQuiz({
         streakDays={state.streakDays}
         totalXp={state.totalXp}
         newlyEarned={definitionsForIds(state.newlyEarnedIds)}
+        leveledUpTo={state.leveledUpTo}
+        streakMilestone={state.streakMilestone}
+        dailyMissionComplete={state.dailyMissionComplete}
       />
     );
   }
@@ -211,15 +293,17 @@ export function PracticeQuiz({
   async function checkAnswer() {
     // Duplicate protection (UI): ignore extra Check answer clicks.
     // The server still uses the same attemptId + unique award row.
-    if (
-      state.status !== "active" ||
-      !state.selectedChoiceId ||
-      savingRef.current
-    ) {
+    if (state.status !== "active" || !state.selectedChoiceId) {
       return;
     }
-    if (state.submitted && !state.saveError) {
+    if (state.saved) {
       return;
+    }
+    if (savingRef.current) {
+      if (!(state.submitted && !state.saved && !state.saving)) {
+        return;
+      }
+      savingRef.current = false;
     }
 
     savingRef.current = true;
@@ -231,6 +315,7 @@ export function PracticeQuiz({
       ...state,
       submitted: true,
       saveError: null,
+      saving: true,
       xpAward: null,
     });
 
@@ -247,7 +332,7 @@ export function PracticeQuiz({
       if (!result.ok) {
         setState((current) =>
           current.status === "active"
-            ? { ...current, saveError: result.error }
+            ? { ...current, saveError: result.error, saving: false }
             : current,
         );
       } else {
@@ -263,6 +348,7 @@ export function PracticeQuiz({
                 ...current,
                 saveError: null,
                 saved: true,
+                saving: false,
                 xpAward: {
                   attemptXp: result.attemptXp,
                   sessionBonusXp: result.sessionBonusXp,
@@ -282,11 +368,17 @@ export function PracticeQuiz({
               ...current,
               saveError:
                 "Your answer was checked, but it could not be saved. Try again later.",
+              saving: false,
             }
           : current,
       );
     } finally {
       savingRef.current = false;
+      setState((current) =>
+        current.status === "active" && current.saving && !current.saved
+          ? { ...current, saving: false }
+          : current,
+      );
     }
   }
 
@@ -313,26 +405,7 @@ export function PracticeQuiz({
     attemptIdRef.current = null;
 
     if (isLast) {
-      const newlyEarnedIds = newlyEarnedForSession(
-        badgeAttemptsRef.current,
-        nextRecords,
-        sessionIdRef.current,
-        allQuestions,
-      );
-      badgeAttemptsRef.current = [
-        ...badgeAttemptsRef.current,
-        ...toSessionBadgeAttempts(nextRecords, sessionIdRef.current),
-      ];
-      setState({
-        status: "complete",
-        records: nextRecords,
-        history: nextHistory,
-        attemptCount: state.attemptCount,
-        sessionXp: sessionXpRef.current,
-        streakDays: streakDaysRef.current,
-        totalXp: totalXpRef.current,
-        newlyEarnedIds,
-      });
+      setState(finishSet(nextRecords, nextHistory, state.attemptCount));
       return;
     }
 
@@ -346,26 +419,7 @@ export function PracticeQuiz({
     });
 
     if (!nextQuestion) {
-      const newlyEarnedIds = newlyEarnedForSession(
-        badgeAttemptsRef.current,
-        nextRecords,
-        sessionIdRef.current,
-        allQuestions,
-      );
-      badgeAttemptsRef.current = [
-        ...badgeAttemptsRef.current,
-        ...toSessionBadgeAttempts(nextRecords, sessionIdRef.current),
-      ];
-      setState({
-        status: "complete",
-        records: nextRecords,
-        history: nextHistory,
-        attemptCount: state.attemptCount,
-        sessionXp: sessionXpRef.current,
-        streakDays: streakDaysRef.current,
-        totalXp: totalXpRef.current,
-        newlyEarnedIds,
-      });
+      setState(finishSet(nextRecords, nextHistory, state.attemptCount));
       return;
     }
 
@@ -381,6 +435,7 @@ export function PracticeQuiz({
       history: nextHistory,
       saveError: null,
       saved: false,
+      saving: false,
       attemptCount: state.attemptCount,
       xpAward: null,
     });
@@ -394,7 +449,7 @@ export function PracticeQuiz({
         </p>
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm text-stone-500">
-            You&apos;ve answered {state.attemptCount} questions
+            You&apos;ve answered {state.attemptCount} questions in total
           </span>
           <span className="rounded-full bg-indigo-100 px-2.5 py-1 text-xs font-semibold text-indigo-800">
             {DIFFICULTY_LEVEL_LABEL[question.difficulty]}
@@ -478,6 +533,14 @@ export function PracticeQuiz({
               ? "That's right — nice exploring."
               : "Good try! Mistakes don't take anything away. Here's the idea:"}
           </p>
+          {state.saved && state.xpAward ? (
+            <XpAwardFeedback
+              attemptXp={state.xpAward.attemptXp}
+              sessionBonusXp={state.xpAward.sessionBonusXp}
+              isCorrect={isCorrect}
+              hintUsed={state.revealedHint}
+            />
+          ) : null}
           <p className="text-sm leading-relaxed text-stone-700">
             {question.explanation}
           </p>
@@ -487,30 +550,30 @@ export function PracticeQuiz({
               {question.hint}
             </p>
           ) : null}
-          {state.saveError ? (
+          {!state.saved ? (
             <div className="space-y-3">
-              <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-950">
-                {state.saveError}
-              </p>
-              <button
-                type="button"
-                onClick={checkAnswer}
-                className="text-sm font-medium text-teal underline-offset-4 hover:underline"
-              >
-                Try saving again
-              </button>
+              {state.saveError ? (
+                <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-950">
+                  {state.saveError}
+                </p>
+              ) : state.saving ? (
+                <p className="text-sm text-stone-500">Saving your answer…</p>
+              ) : (
+                <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-950">
+                  Your answer was checked, but it could not be saved. Try
+                  saving again to continue.
+                </p>
+              )}
+              {!state.saving ? (
+                <button
+                  type="button"
+                  onClick={checkAnswer}
+                  className="text-sm font-medium text-teal underline-offset-4 hover:underline"
+                >
+                  Try saving again
+                </button>
+              ) : null}
             </div>
-          ) : null}
-          {!state.saved && !state.saveError ? (
-            <p className="text-sm text-stone-500">Saving your answer…</p>
-          ) : null}
-          {state.saved && state.xpAward ? (
-            <XpAwardFeedback
-              attemptXp={state.xpAward.attemptXp}
-              sessionBonusXp={state.xpAward.sessionBonusXp}
-              isCorrect={isCorrect}
-              hintUsed={state.revealedHint}
-            />
           ) : null}
           <div className="flex justify-end">
             <button
@@ -539,6 +602,9 @@ type ResultsCardProps = {
   streakDays: number;
   totalXp: number | null;
   newlyEarned: BadgeDefinition[];
+  leveledUpTo: number | null;
+  streakMilestone: StreakMilestone | null;
+  dailyMissionComplete: boolean;
 };
 
 function ResultsCard({
@@ -552,29 +618,41 @@ function ResultsCard({
   streakDays,
   totalXp,
   newlyEarned,
+  leveledUpTo,
+  streakMilestone,
+  dailyMissionComplete,
 }: ResultsCardProps) {
   const explorerLevel =
     totalXp == null ? null : calculateLevelFromXp(totalXp);
   const streak = streakLabel(streakDays);
-  const [showCelebration, setShowCelebration] = useState(newlyEarned.length > 0);
+  const hasRewards =
+    leveledUpTo != null ||
+    streakMilestone != null ||
+    dailyMissionComplete ||
+    newlyEarned.length > 0;
+  const [showCelebration, setShowCelebration] = useState(hasRewards);
 
   return (
     <section className="rounded-3xl border border-stone-200/80 bg-surface p-5 shadow-[0_8px_30px_rgba(28,45,41,0.05)] sm:p-7">
       {showCelebration ? (
-        <BadgeCelebration
+        <ExpeditionRewardsOverlay
           eventName={eventName}
+          sessionXp={sessionXp}
+          leveledUpTo={leveledUpTo}
+          streakMilestone={streakMilestone}
+          dailyMissionComplete={dailyMissionComplete}
           badges={newlyEarned}
           onClose={() => setShowCelebration(false)}
         />
       ) : null}
       <h2 className="font-display text-3xl font-semibold tracking-tight text-ink">
-        Practice complete!
+        Expedition complete!
       </h2>
       <p className="mt-2 text-sm text-stone-600">
         You finished this {eventName} set. No XP was removed.
       </p>
 
-      <dl className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <dl className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="rounded-2xl bg-parchment/80 px-4 py-3">
           <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
             Questions answered
@@ -585,18 +663,10 @@ function ResultsCard({
         </div>
         <div className="rounded-2xl bg-parchment/80 px-4 py-3">
           <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
-            Correct answers
+            Correct
           </dt>
           <dd className="mt-1 font-display text-2xl font-semibold text-ink">
-            {summary.correctAnswers}
-          </dd>
-        </div>
-        <div className="rounded-2xl bg-parchment/80 px-4 py-3">
-          <dt className="text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
-            Accuracy
-          </dt>
-          <dd className="mt-1 font-display text-2xl font-semibold text-ink">
-            {summary.accuracyPercent}%
+            {summary.correctAnswers} of {summary.questionsAnswered}
           </dd>
         </div>
       </dl>
@@ -611,18 +681,36 @@ function ResultsCard({
             Your answers were saved.
           </p>
         )}
-        {explorerLevel != null ? (
+        {leveledUpTo != null ? (
+          <p className="mt-2 text-sm font-medium text-ink">
+            ⭐ Explorer Level {leveledUpTo}
+          </p>
+        ) : explorerLevel != null ? (
           <p className="mt-2 font-display text-xl font-semibold text-ink">
             Explorer Level {explorerLevel}
           </p>
         ) : null}
-        {streak ? (
+        {streakMilestone != null ? (
+          <p className="mt-2 text-sm font-medium text-ink">
+            🔥 {streakMilestone}-day streak milestone
+          </p>
+        ) : streak ? (
           <p className="mt-2 text-sm font-medium text-ink">🔥 {streak}</p>
         ) : (
           <p className="mt-2 text-sm text-stone-600">
-            Come back tomorrow to start a streak.
+            Practice today to start a streak.
           </p>
         )}
+        {dailyMissionComplete ? (
+          <p className="mt-2 text-sm font-medium text-ink">
+            Daily mission complete
+          </p>
+        ) : null}
+        {newlyEarned.length > 0 ? (
+          <p className="mt-2 text-sm font-medium text-ink">
+            {newlyEarned.length > 1 ? "New badges unlocked" : "New badge unlocked"}
+          </p>
+        ) : null}
       </div>
 
       <div className="mt-6 rounded-2xl bg-teal-dark px-5 py-4 text-parchment">

@@ -5,6 +5,7 @@ import {
   resolvePracticeDate,
   type GamificationState,
 } from "@/lib/gamification";
+import { WEAK_TOPIC_ATTEMPT_WINDOW } from "@/lib/learning/adaptive";
 import { getQuestionById } from "@/lib/mock/curriculum";
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
@@ -67,7 +68,7 @@ export async function getMyRecentPracticeAttempts(): Promise<
     .select("question_id, is_correct, hint_used, session_id, answered_at")
     .eq("student_id", user.id)
     .order("answered_at", { ascending: false })
-    .limit(40);
+    .limit(WEAK_TOPIC_ATTEMPT_WINDOW);
 
   if (error || !data) {
     return [];
@@ -208,8 +209,11 @@ export async function insertPracticeAttempt(
   }
 
   const awarded = parseAwardResult(data);
+  // Refresh dashboard XP/streak and the event hub. Do not revalidate the
+  // `/events` layout — that refetches the in-progress practice page and can
+  // leave Next question disabled after Check answer.
   revalidatePath("/");
-  revalidatePath("/events", "layout");
+  revalidatePath(`/events/${question.eventId}`);
   return { ok: true, ...awarded };
 }
 

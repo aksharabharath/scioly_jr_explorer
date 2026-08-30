@@ -145,12 +145,31 @@ export function formatXpGain(amount: number): string {
   return `+${Math.max(0, Math.floor(amount))} XP`;
 }
 
+export const STREAK_MILESTONES = [3, 7, 14, 30] as const;
+
+export type StreakMilestone = (typeof STREAK_MILESTONES)[number];
+
 export function streakLabel(streakDays: number): string | null {
   const days = Math.max(0, Math.floor(streakDays));
   if (days <= 0) {
     return null;
   }
   return `${days} day streak`;
+}
+
+/** First listed milestone newly crossed from `before` to `after`. */
+export function newlyReachedStreakMilestone(
+  beforeDays: number,
+  afterDays: number,
+): StreakMilestone | null {
+  const before = Math.max(0, Math.floor(beforeDays));
+  const after = Math.max(0, Math.floor(afterDays));
+  for (const milestone of STREAK_MILESTONES) {
+    if (before < milestone && after >= milestone) {
+      return milestone;
+    }
+  }
+  return null;
 }
 
 /**

@@ -58,7 +58,7 @@ export function ExplorerProgress({ explorer }: ExplorerProgressProps) {
           <p className="mt-3 text-sm font-medium text-ink">{streak}</p>
         ) : (
           <p className="mt-3 text-sm text-stone-500">
-            Practice tomorrow to start a streak.
+            Practice today to start a streak.
           </p>
         )}
       </div>

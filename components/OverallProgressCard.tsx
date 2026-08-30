@@ -36,9 +36,9 @@ export function OverallProgressCard({ progress }: OverallProgressCardProps) {
             </dd>
           </div>
           <div className="rounded-2xl bg-parchment/80 px-4 py-3">
-            <dt className="text-sm text-stone-500">Accuracy</dt>
+            <dt className="text-sm text-stone-500">Correct</dt>
             <dd className="mt-1 font-display text-2xl font-semibold text-ink">
-              {progress.accuracyPercent ?? 0}%
+              {progress.totalCorrect} of {progress.totalQuestions}
             </dd>
           </div>
           <div className="rounded-2xl bg-parchment/80 px-4 py-3">

@@ -6,17 +6,22 @@ import type { DifficultyLevel, Question } from "@/lib/types";
  * History from Supabase (plus this session) is scored per TOPIC, not as a
  * single mastery percent. Then a question is chosen from the chosen topic.
  *
- * Signals:
- * - Recent wrong → strong revisit. Newer attempts weigh more than older ones.
- * - Hint used → moderate revisit (including persisted hint_used from Supabase).
- * - Independent correct → reduces priority, but one success does not wipe a
- *   recent mistake.
- * - Exact recently-seen question IDs are avoided when another item exists.
- * - Consecutive questions prefer a different topic (rotation / spacing).
+ * Weak / strong (Tricky Topics and “worth revisiting”):
+ * - A miss marks that topic weak.
+ * - 3 later correct answers on that topic (hinted or not) mark it strong.
+ * - A new miss resets the recovery count.
+ * - Hint-correct with no miss does not mark the topic weak.
+ * - Membership uses the last 40 attempts (same cap as practice selection).
+ *
+ * Selection still spaces weak topics (~2 intervening questions), prefers a
+ * different topic than the last item, and avoids recently seen question IDs.
  */
 
 export const PRACTICE_SET_SIZE = 10;
-export const RECENT_ATTEMPT_WINDOW = 12;
+/** Matches getMyRecentPracticeAttempts. */
+export const WEAK_TOPIC_ATTEMPT_WINDOW = 40;
+/** Correct answers after the latest miss before a topic is strong again. */
+export const CORRECTS_TO_CLEAR_WEAK_TOPIC = 3;
 export const INTERVENING_QUESTIONS_BEFORE_REVISIT = 2;
 
 export type PracticeMode = "normal" | "weak";
@@ -87,46 +92,32 @@ export function toLearningAttempts(
   return attempts;
 }
 
+export function isTopicWeak(
+  history: LearningAttempt[],
+  topicId: string,
+): boolean {
+  return remainingCorrectsToClear(history, topicId) > 0;
+}
+
 /**
- * Recency-weighted topic score. Position 1 is the oldest attempt on this
- * topic in the window; newer attempts count more.
- *
- * Wrong: +3 * recency. Hint: +2 * recency. Independent correct: -1 * recency.
+ * How many more correct answers on this topic are needed after the latest
+ * miss. 0 means the topic is strong (no unrecovered miss in the window).
  */
 export function topicRevisitScore(
   history: LearningAttempt[],
   topicId: string,
 ): number {
-  const window = history.slice(-RECENT_ATTEMPT_WINDOW);
-  const topicAttempts = window.filter((attempt) => attempt.topicId === topicId);
-  if (topicAttempts.length === 0) {
-    return 0;
-  }
-
-  let score = 0;
-  for (let index = 0; index < topicAttempts.length; index += 1) {
-    const recency = index + 1;
-    const attempt = topicAttempts[index];
-    if (!attempt.isCorrect) {
-      score += 3 * recency;
-    } else if (attempt.hintUsed) {
-      score += 2 * recency;
-    } else {
-      score -= 1 * recency;
-    }
-  }
-
-  return score;
+  return remainingCorrectsToClear(history, topicId);
 }
 
 export function topicsNeedingRevisit(history: LearningAttempt[]): string[] {
-  const topicIds = [...new Set(history.map((attempt) => attempt.topicId))];
+  const window = windowedHistory(history);
+  const topicIds = [...new Set(window.map((attempt) => attempt.topicId))];
   return topicIds
-    .filter((topicId) => topicRevisitScore(history, topicId) > 0)
+    .filter((topicId) => isTopicWeak(window, topicId))
     .sort((a, b) => {
-      const scoreDiff =
-        topicRevisitScore(history, b) - topicRevisitScore(history, a);
-      return scoreDiff !== 0 ? scoreDiff : a.localeCompare(b);
+      const recencyDiff = lastMissIndex(window, b) - lastMissIndex(window, a);
+      return recencyDiff !== 0 ? recencyDiff : a.localeCompare(b);
     });
 }
 
@@ -193,6 +184,44 @@ export function friendlyRevisitNote(history: LearningAttempt[]): string | null {
     return null;
   }
   return "Some topics are worth revisiting next time.";
+}
+
+function windowedHistory(history: LearningAttempt[]): LearningAttempt[] {
+  return history.slice(-WEAK_TOPIC_ATTEMPT_WINDOW);
+}
+
+function lastMissIndex(
+  history: LearningAttempt[],
+  topicId: string,
+): number {
+  for (let index = history.length - 1; index >= 0; index -= 1) {
+    if (
+      history[index].topicId === topicId &&
+      !history[index].isCorrect
+    ) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+function remainingCorrectsToClear(
+  history: LearningAttempt[],
+  topicId: string,
+): number {
+  const window = windowedHistory(history);
+  const missIndex = lastMissIndex(window, topicId);
+  if (missIndex === -1) {
+    return 0;
+  }
+  let laterCorrect = 0;
+  for (let index = missIndex + 1; index < window.length; index += 1) {
+    const attempt = window[index];
+    if (attempt.topicId === topicId && attempt.isCorrect) {
+      laterCorrect += 1;
+    }
+  }
+  return Math.max(0, CORRECTS_TO_CLEAR_WEAK_TOPIC - laterCorrect);
 }
 
 function availableQuestions(input: SelectNextQuestionInput): Question[] {
@@ -284,7 +313,7 @@ function isWaitingToRevisit(
   history: LearningAttempt[],
   sessionTopicSequence: string[],
 ): boolean {
-  if (topicRevisitScore(history, topicId) <= 0) {
+  if (!isTopicWeak(history, topicId)) {
     return false;
   }
   return (

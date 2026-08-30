@@ -7,6 +7,7 @@ import {
 } from "@/lib/mock/astronomy";
 import {
   PRACTICE_SET_SIZE,
+  hasWeakTopics,
   parsePracticeMode,
   selectNextQuestion,
   targetDifficulty,
@@ -158,10 +159,9 @@ const hintHistory = toLearningAttempts(
   [{ questionId: "astro-q3", isCorrect: true, hintUsed: true }],
   bank,
 );
-const afterHint = next(hintHistory, [], [], "weak");
 check(
-  "hint-assisted history contributes to weak-point selection",
-  hintHistory[0]?.hintUsed === true && afterHint.topicId === "the-moon",
+  "hint-correct history without a miss is not a weak-point set",
+  hintHistory[0]?.hintUsed === true && !hasWeakTopics(hintHistory),
 );
 
 const persistedWrong = toLearningAttempts(
@@ -170,7 +170,7 @@ const persistedWrong = toLearningAttempts(
 );
 const afterPersisted = next(persistedWrong, [], [], "weak");
 check(
-  "cross-session saved attempts influence Work on Weak Points",
+  "cross-session saved misses influence Work on Weak Points",
   afterPersisted.topicId === "the-moon" && afterPersisted.id !== "astro-q3",
 );
 

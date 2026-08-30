@@ -1,5 +1,7 @@
 import { LoginForm } from "@/app/login/login-form";
+import { getCurrentUser } from "@/lib/auth/session";
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Log in · Jr. Explorer",
@@ -12,6 +14,10 @@ type LoginPageProps = {
 };
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
+  const user = await getCurrentUser();
+  if (user) {
+    redirect("/");
+  }
   const { error } = await searchParams;
 
   return (

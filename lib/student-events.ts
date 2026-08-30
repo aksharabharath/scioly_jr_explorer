@@ -111,11 +111,20 @@ export async function setMySelectedEvents(
   return { ok: true, eventIds: normalized.eventIds };
 }
 
-/** Dashboard and event routes: students with no selections go to onboarding. */
+/** Dashboard, event routes, and explorer pages: no selections → onboarding. */
 export async function requireEventSelection(): Promise<string[]> {
   const ids = await getMySelectedEventIds();
   if (ids.length === 0) {
     redirect("/onboarding/events");
+  }
+  return ids;
+}
+
+/** Practice and event hubs: only events on the student's list. */
+export async function requireSelectedEvent(eventId: string): Promise<string[]> {
+  const ids = await requireEventSelection();
+  if (!ids.includes(eventId)) {
+    redirect("/");
   }
   return ids;
 }

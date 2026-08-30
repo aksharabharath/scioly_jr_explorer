@@ -131,8 +131,24 @@ check(
 
 const emptyEvent = calculateEventProgress("astronomy", [], questions, 4);
 check("new student event: 0 questions", emptyEvent.totalQuestions === 0);
+check("new student event: unique questions 0", emptyEvent.uniqueQuestions === 0);
 check("new student event: accuracy is null", emptyEvent.accuracyPercent === null);
 check("new student event: 0 topics practiced", emptyEvent.topicsPracticed === 0);
+
+const repeatSame = calculateEventProgress(
+  "astronomy",
+  [
+    { questionId: "astro-q1", isCorrect: true },
+    { questionId: "astro-q1", isCorrect: false },
+    { questionId: "astro-q1", isCorrect: true },
+  ],
+  questions,
+  4,
+);
+check(
+  "repeat attempts count separately but unique questions stay 1",
+  repeatSame.totalQuestions === 3 && repeatSame.uniqueQuestions === 1,
+);
 
 if (failures.length > 0) {
   throw new Error(`Progress checks failed:\n- ${failures.join("\n- ")}`);

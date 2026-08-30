@@ -16,6 +16,7 @@ export type OverallProgress = {
 export type EventProgress = {
   eventId: string;
   totalQuestions: number;
+  uniqueQuestions: number;
   totalCorrect: number;
   accuracyPercent: number | null;
   topicsPracticed: number;
@@ -68,6 +69,7 @@ export function calculateEventProgress(
 ): EventProgress {
   const byId = questionMap(questions);
   const topicIds = new Set<string>();
+  const uniqueIds = new Set<string>();
   let totalQuestions = 0;
   let totalCorrect = 0;
 
@@ -77,6 +79,7 @@ export function calculateEventProgress(
       continue;
     }
     totalQuestions += 1;
+    uniqueIds.add(attempt.questionId);
     if (attempt.isCorrect) {
       totalCorrect += 1;
     }
@@ -86,6 +89,7 @@ export function calculateEventProgress(
   return {
     eventId,
     totalQuestions,
+    uniqueQuestions: uniqueIds.size,
     totalCorrect,
     accuracyPercent: accuracyPercent(totalQuestions, totalCorrect),
     topicsPracticed: topicIds.size,

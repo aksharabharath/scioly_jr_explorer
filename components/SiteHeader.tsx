@@ -46,18 +46,20 @@ export async function SiteHeader() {
             <span className="max-w-[10rem] truncate text-sm font-medium text-ink sm:max-w-none">
               {displayNameFromUser(user)}
             </span>
-            <Link
-              href="/how-this-call-works.html"
-              className="text-sm font-semibold text-teal hover:underline"
-            >
-              How the call works
-            </Link>
-            <Link
-              href="/profile/events"
-              className="text-sm font-semibold text-teal hover:underline"
-            >
-              My Events
-            </Link>
+            <nav className="flex flex-wrap items-center justify-end gap-x-3 gap-y-1 text-sm font-semibold text-teal">
+              <Link href="/map" className="hover:underline">
+                Map
+              </Link>
+              <Link href="/log" className="hover:underline">
+                Log
+              </Link>
+              <Link href="/badges" className="hover:underline">
+                Badges
+              </Link>
+              <Link href="/profile/events" className="hover:underline">
+                My Events
+              </Link>
+            </nav>
             <form action={signOut}>
               <button
                 type="submit"

@@ -38,7 +38,7 @@ export function XpAwardFeedback({
             key={`${line.amount}-${line.reason}`}
             className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5"
           >
-            <span className="font-display text-2xl font-semibold tabular-nums text-ink">
+            <span className="xp-float font-display text-2xl font-semibold tabular-nums text-ink">
               {formatXpGain(line.amount)}
             </span>
             <span className="text-sm font-medium text-stone-700">

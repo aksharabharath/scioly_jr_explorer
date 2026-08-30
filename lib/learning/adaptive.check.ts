@@ -6,7 +6,10 @@ import {
   MOCK_ASTRONOMY_QUESTIONS as bank,
 } from "@/lib/mock/astronomy";
 import {
+  CORRECTS_TO_CLEAR_WEAK_TOPIC,
   PRACTICE_SET_SIZE,
+  WEAK_TOPIC_ATTEMPT_WINDOW,
+  isTopicWeak,
   selectNextQuestion,
   targetDifficulty,
   toLearningAttempts,
@@ -91,9 +94,14 @@ function check(name: string, ok: boolean) {
 
 const missed = attempt("astro-q1", false);
 check(
-  "a wrong answer increases that topic's priority",
-  topicRevisitScore([missed], "sun-and-stars") >
-    topicRevisitScore([], "sun-and-stars"),
+  "a wrong answer marks that topic weak",
+  isTopicWeak([missed], "sun-and-stars") &&
+    topicRevisitScore([missed], "sun-and-stars") === CORRECTS_TO_CLEAR_WEAK_TOPIC,
+);
+check(
+  "an unused topic is not weak",
+  !isTopicWeak([missed], "the-moon") &&
+    topicRevisitScore([], "sun-and-stars") === 0,
 );
 
 const afterWrong = next([missed], [missed.questionId], [missed.topicId], true);
@@ -150,9 +158,9 @@ check(
 
 const afterOneRecovery = topicRevisitScore(laterSessionHistory, "sun-and-stars");
 check(
-  "one independent correct lowers priority but does not wipe a recent miss",
-  afterOneRecovery > 0 &&
-    afterOneRecovery < topicRevisitScore([missed], "sun-and-stars"),
+  "one later correct lowers remaining recovery but does not clear a miss",
+  isTopicWeak(laterSessionHistory, "sun-and-stars") &&
+    afterOneRecovery === CORRECTS_TO_CLEAR_WEAK_TOPIC - 1,
 );
 
 const twoRecoveries: LearningAttempt[] = [
@@ -161,8 +169,43 @@ const twoRecoveries: LearningAttempt[] = [
   attempt("astro-q11", true),
 ];
 check(
-  "two later independent corrects can clear a single miss",
-  topicRevisitScore(twoRecoveries, "sun-and-stars") <= 0,
+  "two later corrects still leave the topic weak",
+  isTopicWeak(twoRecoveries, "sun-and-stars") &&
+    topicRevisitScore(twoRecoveries, "sun-and-stars") === 1,
+);
+
+const threeRecoveries: LearningAttempt[] = [
+  ...twoRecoveries,
+  attempt("astro-q12", true),
+];
+check(
+  "three later corrects on that topic mark it strong",
+  !isTopicWeak(threeRecoveries, "sun-and-stars") &&
+    topicRevisitScore(threeRecoveries, "sun-and-stars") === 0,
+);
+
+const hintedRecoveries: LearningAttempt[] = [
+  missed,
+  attempt("astro-q10", true, true),
+  attempt("astro-q11", true, true),
+  attempt("astro-q12", true, true),
+];
+check(
+  "hinted corrects still count toward clearing a weak topic",
+  !isTopicWeak(hintedRecoveries, "sun-and-stars"),
+);
+
+const resetAfterProgress: LearningAttempt[] = [
+  missed,
+  attempt("astro-q10", true),
+  attempt("astro-q11", true),
+  attempt("astro-q12", false),
+];
+check(
+  "a new miss resets recovery on that topic",
+  isTopicWeak(resetAfterProgress, "sun-and-stars") &&
+    topicRevisitScore(resetAfterProgress, "sun-and-stars") ===
+      CORRECTS_TO_CLEAR_WEAK_TOPIC,
 );
 
 const repeatedMisses: LearningAttempt[] = [
@@ -170,9 +213,19 @@ const repeatedMisses: LearningAttempt[] = [
   attempt("astro-q10", false),
 ];
 check(
-  "repeated mistakes keep the topic high priority",
-  topicRevisitScore(repeatedMisses, "sun-and-stars") >
-    topicRevisitScore([missed], "sun-and-stars"),
+  "repeated mistakes keep the topic weak",
+  isTopicWeak(repeatedMisses, "sun-and-stars"),
+);
+
+const agedOutMiss: LearningAttempt[] = [
+  missed,
+  ...Array.from({ length: WEAK_TOPIC_ATTEMPT_WINDOW }, () =>
+    attempt("astro-q3", true),
+  ),
+];
+check(
+  "a miss older than the 40-attempt window is no longer weak",
+  !isTopicWeak(agedOutMiss, "sun-and-stars"),
 );
 
 const staleMissThenRecoveries: LearningAttempt[] = [
@@ -270,21 +323,22 @@ const eightAfterHint = playSet([], [
   { isCorrect: true },
 ]);
 check(
-  "hint evidence still spaces then revisits a different question from the same topic",
-  eightAfterHint.questions[0].topicId === eightAfterHint.questions[3].topicId &&
-    eightAfterHint.questions[0].id !== eightAfterHint.questions[3].id &&
-    eightAfterHint.questions[1].topicId !== eightAfterHint.questions[0].topicId &&
-    eightAfterHint.questions[2].topicId !== eightAfterHint.questions[0].topicId,
+  "a 10-question set still completes after an opening hint-correct",
+  eightAfterHint.questions.length === PRACTICE_SET_SIZE &&
+    new Set(eightAfterHint.questions.map((question) => question.id)).size ===
+      PRACTICE_SET_SIZE,
 );
 
 const hintOnly = [attempt("astro-q1", true, true)];
 check(
-  "hint use raises topic priority even when the answer is correct",
-  topicRevisitScore(hintOnly, "sun-and-stars") > 0,
+  "hint-correct without a miss does not mark the topic weak",
+  !isTopicWeak(hintOnly, "sun-and-stars") &&
+    topicRevisitScore(hintOnly, "sun-and-stars") === 0 &&
+    topicsNeedingRevisit(hintOnly).length === 0,
 );
 const afterHint = next(hintOnly, ["astro-q1"], ["sun-and-stars"], true);
 check(
-  "hint use does not immediately repeat the topic",
+  "hint-correct without a miss still rotates away from that topic next",
   afterHint.topicId !== "sun-and-stars",
 );
 
@@ -323,45 +377,38 @@ const wrongNoHint = attempt("astro-q1", false, false);
 const wrongWithHint = attempt("astro-q1", false, true);
 
 check(
-  "correct + no hint produces independent-success (negative revisit)",
-  topicRevisitScore([independentCorrect], "sun-and-stars") < 0,
+  "correct + no hint is not a weak topic",
+  !isTopicWeak([independentCorrect], "sun-and-stars") &&
+    topicRevisitScore([independentCorrect], "sun-and-stars") === 0,
 );
 check(
-  "correct + hint produces a stronger revisit signal than independent correct",
-  topicRevisitScore([hintCorrect], "sun-and-stars") >
-    topicRevisitScore([independentCorrect], "sun-and-stars"),
+  "correct + hint is not a weak topic",
+  !isTopicWeak([hintCorrect], "sun-and-stars"),
 );
 check(
-  "wrong + no hint remains a strong struggle signal",
-  topicRevisitScore([wrongNoHint], "sun-and-stars") >
-    topicRevisitScore([hintCorrect], "sun-and-stars"),
+  "wrong + no hint is a weak topic",
+  isTopicWeak([wrongNoHint], "sun-and-stars") &&
+    topicRevisitScore([wrongNoHint], "sun-and-stars") ===
+      CORRECTS_TO_CLEAR_WEAK_TOPIC,
 );
 check(
-  "wrong + hint remains a strong struggle signal",
-  topicRevisitScore([wrongWithHint], "sun-and-stars") ===
-    topicRevisitScore([wrongNoHint], "sun-and-stars") &&
-    topicRevisitScore([wrongWithHint], "sun-and-stars") >
-      topicRevisitScore([hintCorrect], "sun-and-stars"),
+  "wrong + hint is still a miss",
+  isTopicWeak([wrongWithHint], "sun-and-stars") &&
+    topicRevisitScore([wrongWithHint], "sun-and-stars") ===
+      topicRevisitScore([wrongNoHint], "sun-and-stars"),
 );
 
 const persistedHintHistory = toLearningAttempts(
   [{ questionId: "astro-q1", isCorrect: true, hintUsed: true }],
   bank,
 );
-const afterPersistedHint = next(persistedHintHistory, [], [], false);
 check(
-  "hint history from a previous session affects later topic selection",
-  persistedHintHistory[0]?.hintUsed === true &&
-    afterPersistedHint.topicId === "sun-and-stars",
+  "hint history from a previous session is still recorded",
+  persistedHintHistory[0]?.hintUsed === true,
 );
 check(
-  "a flagged hint topic does not immediately repeat the same question",
-  afterPersistedHint.id !== "astro-q1",
-);
-check(
-  "a different question from the flagged topic can return later",
-  afterPersistedHint.topicId === "sun-and-stars" &&
-    afterPersistedHint.id !== "astro-q1",
+  "a hint-only prior session does not force that topic next",
+  !isTopicWeak(persistedHintHistory, "sun-and-stars"),
 );
 
 const legacyRow = toLearningAttempts(
@@ -371,8 +418,7 @@ const legacyRow = toLearningAttempts(
 check(
   "existing attempts without hint_used continue as hint_used = false",
   legacyRow[0]?.hintUsed === false &&
-    topicRevisitScore(legacyRow, "sun-and-stars") ===
-      topicRevisitScore([independentCorrect], "sun-and-stars"),
+    !isTopicWeak(legacyRow, "sun-and-stars"),
 );
 
 if (failures.length > 0) {

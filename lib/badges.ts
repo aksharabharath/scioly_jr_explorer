@@ -1,21 +1,32 @@
 /**
  * Real MVP badges from persisted practice.
  *
- * Unlocks are computed from saved attempts. Nothing here uses mock Event
- * Level or fake mastery. Historical attempts still count after an event is
- * removed from the current selection.
+ * Unlocks are computed from saved attempts (and streak days). Nothing here
+ * uses mock Event Level or fake mastery. Historical attempts still count
+ * after an event is removed from the current selection.
  */
-import { PRACTICE_SET_SIZE } from "@/lib/learning/adaptive";
+import {
+  completedSessionCount,
+  completedSessionCountForEvent,
+} from "@/lib/expeditions";
 import type { Question } from "@/lib/types";
 
 export type BadgeId =
   | "first-try"
   | "first-discovery"
   | "event-explorer"
+  | "three-event-explorer"
   | "tricky-topic-tamer"
   | "practice-regular"
   | "question-crusher"
-  | "explorer";
+  | "curious-mind"
+  | "water-watcher"
+  | "entomologist"
+  | "body-explorer"
+  | "ecosystem-explorer"
+  | "crime-scene-rookie"
+  | "consistent-explorer"
+  | "dedicated-explorer";
 
 export type BadgeDefinition = {
   id: BadgeId;
@@ -38,7 +49,20 @@ export type BadgeProgressAttempt = {
 export type BadgeInput = {
   attempts: BadgeProgressAttempt[];
   questions: Question[];
+  streakDays?: number;
 };
+
+const EVENT_SET_BADGES: Array<{
+  id: BadgeId;
+  eventId: string;
+  sets: number;
+}> = [
+  { id: "water-watcher", eventId: "water-quality", sets: 5 },
+  { id: "entomologist", eventId: "entomology", sets: 5 },
+  { id: "body-explorer", eventId: "anatomy-physiology", sets: 5 },
+  { id: "ecosystem-explorer", eventId: "ecology", sets: 5 },
+  { id: "crime-scene-rookie", eventId: "crime-busters", sets: 5 },
+];
 
 export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   {
@@ -50,8 +74,8 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   },
   {
     id: "first-discovery",
-    name: "First Discovery",
-    description: "You completed your first full practice session.",
+    name: "First Expedition",
+    description: "You completed your first full practice expedition.",
     requirement: "Finish a full practice set",
     emoji: "🔎",
   },
@@ -61,6 +85,13 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
     description: "You practiced 2 different events.",
     requirement: "Practice 2 different events",
     emoji: "🗺️",
+  },
+  {
+    id: "three-event-explorer",
+    name: "Explorer",
+    description: "You practiced 3 different events.",
+    requirement: "Practice 3 different events",
+    emoji: "🧭",
   },
   {
     id: "tricky-topic-tamer",
@@ -84,33 +115,65 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
     emoji: "📚",
   },
   {
-    id: "explorer",
-    name: "Explorer",
+    id: "curious-mind",
+    name: "Curious Mind",
     description: "You tried 100 practice questions.",
     requirement: "Answer 100 practice questions",
-    emoji: "🧭",
+    emoji: "🧠",
+  },
+  {
+    id: "water-watcher",
+    name: "Water Watcher",
+    description: "You finished 5 Water Quality expeditions.",
+    requirement: "Complete 5 Water Quality sets",
+    emoji: "💧",
+  },
+  {
+    id: "entomologist",
+    name: "Entomologist",
+    description: "You finished 5 Entomology expeditions.",
+    requirement: "Complete 5 Entomology sets",
+    emoji: "🐛",
+  },
+  {
+    id: "body-explorer",
+    name: "Body Explorer",
+    description: "You finished 5 Anatomy & Physiology expeditions.",
+    requirement: "Complete 5 Anatomy & Physiology sets",
+    emoji: "🫀",
+  },
+  {
+    id: "ecosystem-explorer",
+    name: "Ecosystem Explorer",
+    description: "You finished 5 Ecology expeditions.",
+    requirement: "Complete 5 Ecology sets",
+    emoji: "🌱",
+  },
+  {
+    id: "crime-scene-rookie",
+    name: "Crime Scene Rookie",
+    description: "You finished 5 Crime Busters expeditions.",
+    requirement: "Complete 5 Crime Busters sets",
+    emoji: "🔬",
+  },
+  {
+    id: "consistent-explorer",
+    name: "Consistent Explorer",
+    description: "You reached a 7-day practice streak.",
+    requirement: "Reach a 7-day streak",
+    emoji: "🔥",
+  },
+  {
+    id: "dedicated-explorer",
+    name: "Dedicated Explorer",
+    description: "You reached a 30-day practice streak.",
+    requirement: "Reach a 30-day streak",
+    emoji: "🌟",
   },
 ];
 
 export function getBadgeDefinitions(): BadgeDefinition[] {
   return BADGE_DEFINITIONS;
-}
-
-function completedSessionCount(attempts: BadgeProgressAttempt[]): number {
-  const counts = new Map<string, number>();
-  for (const attempt of attempts) {
-    if (!attempt.sessionId) {
-      continue;
-    }
-    counts.set(attempt.sessionId, (counts.get(attempt.sessionId) ?? 0) + 1);
-  }
-  let complete = 0;
-  for (const count of counts.values()) {
-    if (count >= PRACTICE_SET_SIZE) {
-      complete += 1;
-    }
-  }
-  return complete;
 }
 
 function distinctEventCount(
@@ -164,28 +227,48 @@ function tamedATrickyTopic(
 
 export function getEarnedBadgeIds(input: BadgeInput): BadgeId[] {
   const { attempts, questions } = input;
+  const streakDays = Math.max(0, Math.floor(input.streakDays ?? 0));
   const earned: BadgeId[] = [];
+  const finishedSets = completedSessionCount(attempts);
+  const eventsTried = distinctEventCount(attempts, questions);
 
   if (attempts.length >= 1) {
     earned.push("first-try");
   }
-  if (completedSessionCount(attempts) >= 1) {
+  if (finishedSets >= 1) {
     earned.push("first-discovery");
   }
-  if (distinctEventCount(attempts, questions) >= 2) {
+  if (eventsTried >= 2) {
     earned.push("event-explorer");
+  }
+  if (eventsTried >= 3) {
+    earned.push("three-event-explorer");
   }
   if (tamedATrickyTopic(attempts, questions)) {
     earned.push("tricky-topic-tamer");
   }
-  if (completedSessionCount(attempts) >= 5) {
+  if (finishedSets >= 5) {
     earned.push("practice-regular");
   }
   if (attempts.length >= 50) {
     earned.push("question-crusher");
   }
   if (attempts.length >= 100) {
-    earned.push("explorer");
+    earned.push("curious-mind");
+  }
+  for (const spec of EVENT_SET_BADGES) {
+    if (
+      completedSessionCountForEvent(spec.eventId, attempts, questions) >=
+      spec.sets
+    ) {
+      earned.push(spec.id);
+    }
+  }
+  if (streakDays >= 7) {
+    earned.push("consistent-explorer");
+  }
+  if (streakDays >= 30) {
+    earned.push("dedicated-explorer");
   }
 
   return earned;
@@ -205,10 +288,20 @@ export function getNewlyEarnedBadgesFromAttempts(
   beforeAttempts: BadgeProgressAttempt[],
   afterAttempts: BadgeProgressAttempt[],
   questions: Question[],
+  streakDaysBefore = 0,
+  streakDaysAfter = 0,
 ): BadgeId[] {
   return getNewlyEarnedBadges(
-    getEarnedBadgeIds({ attempts: beforeAttempts, questions }),
-    getEarnedBadgeIds({ attempts: afterAttempts, questions }),
+    getEarnedBadgeIds({
+      attempts: beforeAttempts,
+      questions,
+      streakDays: streakDaysBefore,
+    }),
+    getEarnedBadgeIds({
+      attempts: afterAttempts,
+      questions,
+      streakDays: streakDaysAfter,
+    }),
   );
 }
 
@@ -219,13 +312,14 @@ export function toSessionBadgeAttempts(
     hintUsed: boolean;
   }>,
   sessionId: string,
+  answeredAt: string | null = null,
 ): BadgeProgressAttempt[] {
   return records.map((record) => ({
     questionId: record.questionId,
     isCorrect: record.isCorrect,
     hintUsed: record.hintUsed,
     sessionId,
-    answeredAt: null,
+    answeredAt,
   }));
 }
 

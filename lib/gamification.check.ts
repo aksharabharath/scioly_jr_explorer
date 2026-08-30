@@ -16,6 +16,7 @@ import {
   formatXpGain,
   GAMIFICATION_SESSION_SIZE,
   isPlausiblePracticeDate,
+  newlyReachedStreakMilestone,
   streakLabel,
   xpBarPercent,
   XP_CORRECT,
@@ -242,6 +243,22 @@ check(
 
 check("no streak label at 0", streakLabel(0) === null);
 check("streak label uses persisted days", streakLabel(4) === "4 day streak");
+check(
+  "crossing 3 days is a streak milestone",
+  newlyReachedStreakMilestone(2, 3) === 3,
+);
+check(
+  "staying at 7 days is not a new milestone",
+  newlyReachedStreakMilestone(7, 7) === null,
+);
+check(
+  "jumping from 6 to 8 still celebrates 7",
+  newlyReachedStreakMilestone(6, 8) === 7,
+);
+check(
+  "first practice day is not a listed milestone",
+  newlyReachedStreakMilestone(0, 1) === null,
+);
 
 check(
   "results Explorer Level uses persisted total XP",

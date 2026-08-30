@@ -25,9 +25,11 @@ type EventCardProps = {
   event: ScienceEvent;
   href?: string;
   cta?: string;
+  /** Short activity line, e.g. unique questions and expeditions. */
+  progressLine?: string;
 };
 
-export function EventCard({ event, href, cta }: EventCardProps) {
+export function EventCard({ event, href, cta, progressLine }: EventCardProps) {
   const accent = ACCENTS[event.accent];
   const locked = !event.unlocked;
   const playable = isPlayablePracticeEvent(event);
@@ -59,6 +61,9 @@ export function EventCard({ event, href, cta }: EventCardProps) {
           <p className="mt-1 text-sm leading-relaxed text-stone-600">
             {event.shortDescription}
           </p>
+          {progressLine && !locked && playable ? (
+            <p className="mt-2 text-sm font-medium text-ink">{progressLine}</p>
+          ) : null}
         </div>
       </div>
 

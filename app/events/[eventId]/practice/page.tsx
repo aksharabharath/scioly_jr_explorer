@@ -7,10 +7,12 @@ import {
 import { getAllQuestions, getPracticePageData } from "@/lib/mock/curriculum";
 import { isStudentCatalogEventId } from "@/lib/mock/events";
 import {
+  getMyGamification,
   getMyPracticeAttemptCount,
   getMyPracticeAttempts,
   getMyRecentPracticeAttempts,
 } from "@/lib/practice-attempts";
+import { requireSelectedEvent } from "@/lib/student-events";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -47,6 +49,7 @@ export default async function PracticePage({
   if (!isStudentCatalogEventId(eventId)) {
     notFound();
   }
+  await requireSelectedEvent(eventId);
   const mode = parsePracticeMode((await searchParams).mode);
   const data = await getPracticePageData(eventId);
 
@@ -54,12 +57,13 @@ export default async function PracticePage({
     notFound();
   }
 
-  const [storedAttempts, priorBadgeAttempts, attemptCount, allQuestions] =
+  const [storedAttempts, priorBadgeAttempts, attemptCount, allQuestions, gamification] =
     await Promise.all([
       getMyRecentPracticeAttempts(),
       getMyPracticeAttempts(),
       getMyPracticeAttemptCount(),
       getAllQuestions(),
+      getMyGamification(),
     ]);
   const eventQuestions = allQuestions.filter(
     (question) => question.eventId === data.event.id,
@@ -104,6 +108,8 @@ export default async function PracticePage({
             priorBadgeAttempts={priorBadgeAttempts}
             allQuestions={allQuestions}
             initialAttemptCount={attemptCount}
+            initialXp={gamification.xp}
+            initialStreakDays={gamification.streakDays}
             mode={mode}
           />
         </div>

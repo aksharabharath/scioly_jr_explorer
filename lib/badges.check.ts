@@ -63,13 +63,16 @@ const questions = [
   question("ento-q2", "entomology", "taxonomy"),
   question("eco-q1", "ecology", "habitats"),
   question("astro-q1", "astronomy", "planets"),
+  question("wq-q1", "water-quality", "macros"),
+  question("ap-q1", "anatomy-physiology", "skin"),
+  question("cb-q1", "crime-busters", "fingerprints"),
 ];
 
-check("there are 7 preset badges", BADGE_DEFINITIONS.length === 7);
+check("there are 15 preset badges", BADGE_DEFINITIONS.length === 15);
 check(
   "preset ids are stable",
   BADGE_DEFINITIONS.map((badge) => badge.id).join(",") ===
-    "first-try,first-discovery,event-explorer,tricky-topic-tamer,practice-regular,question-crusher,explorer",
+    "first-try,first-discovery,event-explorer,three-event-explorer,tricky-topic-tamer,practice-regular,question-crusher,curious-mind,water-watcher,entomologist,body-explorer,ecosystem-explorer,crime-scene-rookie,consistent-explorer,dedicated-explorer",
 );
 
 const none = earned([]);
@@ -153,14 +156,17 @@ check(
   !crusher.includes("practice-regular"),
 );
 check(
-  "50 attempts is not Explorer yet",
-  !crusher.includes("explorer"),
+  "50 attempts is not Curious Mind yet",
+  !crusher.includes("curious-mind"),
 );
 
 const hundred = Array.from({ length: 100 }, () =>
   attempt("ento-q1", { sessionId: null }),
 );
-check("100 saved attempts unlock Explorer", earned(hundred).includes("explorer"));
+check(
+  "100 saved attempts unlock Curious Mind",
+  earned(hundred).includes("curious-mind"),
+);
 
 const firstSessionNew = getNewlyEarnedBadges([], discovery);
 check(
@@ -210,6 +216,62 @@ check(
   definitionsForIds(["event-explorer", "first-try"])
     .map((badge) => badge.id)
     .join(",") === "first-try,event-explorer",
+);
+
+const threeEvents = earned([
+  attempt("ento-q1"),
+  attempt("eco-q1"),
+  attempt("wq-q1"),
+]);
+check(
+  "three events unlock Explorer",
+  threeEvents.includes("three-event-explorer") &&
+    threeEvents.includes("event-explorer"),
+);
+check(
+  "two events do not unlock Explorer",
+  !twoEvents.includes("three-event-explorer"),
+);
+
+const fiveWq = Array.from(
+  { length: 5 * PRACTICE_SET_SIZE },
+  (_, index) =>
+    attempt("wq-q1", {
+      sessionId: `wq-${Math.floor(index / PRACTICE_SET_SIZE)}`,
+    }),
+);
+check(
+  "five Water Quality sets unlock Water Watcher",
+  earned(fiveWq).includes("water-watcher"),
+);
+check(
+  "five Water Quality sets do not unlock Entomologist",
+  !earned(fiveWq).includes("entomologist"),
+);
+
+check(
+  "a 7-day streak unlocks Consistent Explorer",
+  getEarnedBadgeIds({
+    attempts: [attempt("ento-q1")],
+    questions,
+    streakDays: 7,
+  }).includes("consistent-explorer"),
+);
+check(
+  "a 6-day streak does not unlock Consistent Explorer",
+  !getEarnedBadgeIds({
+    attempts: [attempt("ento-q1")],
+    questions,
+    streakDays: 6,
+  }).includes("consistent-explorer"),
+);
+check(
+  "a 30-day streak unlocks Dedicated Explorer",
+  getEarnedBadgeIds({
+    attempts: [attempt("ento-q1")],
+    questions,
+    streakDays: 30,
+  }).includes("dedicated-explorer"),
 );
 
 if (failures.length > 0) {
