@@ -60,6 +60,7 @@ Reads (`getMyPracticeAttempts`, `getMyGamification`, etc.) use the same server c
 - Continue exploring / Next steps (components exist; not on the student dashboard)
 - Badge rows (badges are computed, not stored)
 - Explorer Level (derived in app code from `xp`)
+- Curriculum / question images (still TypeScript + static files later)
 - Trial Mode, lessons, AI (none of these exist in the app either)
 
 ## When XP and streak update

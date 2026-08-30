@@ -2,27 +2,31 @@
 
 ## Current state
 
-Jr. Explorer is a Next.js 16 App Router app with Supabase Auth. A signed-in student can choose **Water Quality / Ecology / Entomology**, open Entomology, run a **10-question adaptive practice** set from the **live Entomology pool** (image-required items are held back), use hints, see immediate feedback, and persist each answer to `practice_attempts`. Later sessions reuse that history. **Practice Tricky Topics** prefers struggling topics. **Your Progress** shows real attempt stats and is separate from XP and from **Your Events**.
+Jr. Explorer is a Next.js 16 App Router app with Supabase Auth. A signed-in student can choose **Water Quality, Ecology, Entomology, Anatomy & Physiology, and Crime Busters**, run a **10-question adaptive practice** set from each event’s **live text pool**, use hints, see immediate feedback and a lasting XP line, and persist each answer to `practice_attempts`. Later sessions reuse that history. **Practice Tricky Topics** uses miss → weak / 3 later corrects → strong (last 40 attempts). **Your Progress** shows real attempt stats (**X of N correct**) and is separate from XP and from **Your Events**. Home also has a daily mission (progress only), recent achievements, and links to **Map**, **Log**, and **Badges**.
 
 Astronomy is not a 2027 student catalog event. The bank remains for checks. Student routes `/events/astronomy` 404.
 
-**2027 catalog (9 events):** three open (Water Quality, Ecology, Entomology) and six locked **Coming later**. Only Entomology has a live catalog bank. Water Quality and Ecology have no invented banks. Build events are locked and are not quiz practice.
+**2027 catalog (9 events):** five unlocked quiz events (all with live banks) and four locked **Coming later** (Codebusters + three builds). Entomology live practice is **27** of 60 registered items. Image-required items stay in the bank for history lookup.
 
-**Gamification v1 is real in source:** Explorer XP, Explorer Level (derived from XP), and daily streak. Session size is 10; +20 once per completed session UUID after `20260824_practice_session_size_10.sql` is applied. **No new gamification table** was added for the student-facing display.
+**Gamification v1 is real in source:** Explorer XP, Explorer Level (derived from XP), and daily streak. Session size is 10; +20 once per completed session UUID after `20260824_practice_session_size_10.sql` is applied. Daily mission does not award extra XP.
 
-**Event Selection v1 is real in source:** chosen event IDs live in `student_events`. Only selectable IDs can be saved. Deselecting an event does not delete attempts or XP.
+**Event Selection v1 is real in source:** chosen event IDs live in `student_events`. Only selectable IDs can be saved. Unselected event URLs redirect home. Deselecting an event does not delete attempts or XP.
 
-**Badges are real and computed:** 10 milestones from persisted attempts. No badge table.
+**Badges are real and computed:** 15 milestones from persisted attempts. No badge table.
 
 **Still unused mock fields:** Event Level, mastery, progress % on catalog objects (not shown on student cards). Continue exploring / Next steps components exist but are not on the dashboard.
 
-**Not in the product:** Trial Mode, lessons, AI, leaderboards, practice banks for non-Entomology catalog quiz events, quiz practice for build events, Entomology specimen images.
+**Not in the product:** Trial Mode, lessons, AI, leaderboards, Codebusters practice, quiz practice for build events, Entomology specimen images in live practice, password reset.
 
-Whether hosted migrations are applied is **not recorded in this repo**. The new session-size migration must be run in the SQL Editor.
+Whether hosted migrations are applied is **not recorded in this repo**. The session-size migration must be run in the SQL Editor so hosted +20 matches the 10-question set.
 
-`README.md` is still the Create Next App template, not product documentation.
+Git history in this clone may lag the working tree. Product slices below are marked **Undated** when ship dates are unknown.
 
-Git history in this clone has a single commit (`Initial commit from Create Next App`, 2026-08-24). Later product slices are present in the working tree; their ship dates are **unknown**, so they are marked **Undated**.
+---
+
+## Undated — five-event MVP + expeditions UX + Tricky Topics rule
+
+Unlocked A&P, Water Quality, Ecology, and Crime Busters for the shared practice engine. Split map / log / badges off the dashboard. Daily mission progress-only. Lasting XP line. Rewards overlay without auto-close. Unique live-question progress. Miss → weak / three later corrects → strong for Tricky Topics (40-attempt cap kept).
 
 ---
 

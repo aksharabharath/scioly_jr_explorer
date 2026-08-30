@@ -47,10 +47,6 @@ See `.env.example`. Required on local and Vercel:
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Publishable / anon key |
-| `VAPI_API_KEY` | Server-only. Lets the home page start a practice check-in phone call. Put it in `.env.local`, never in git. |
-| `VAPI_PHONE_NUMBER_ID` | Optional. Vapi number to call from. If unset, the app reuses one on the account or asks Vapi for a free number. |
-
-A picture page for the call lives at [http://localhost:3000/how-this-call-works.html](http://localhost:3000/how-this-call-works.html). Click the boxes. After login, the header also has **How the call works**.
 
 `NEXT_PUBLIC_SUPABASE_ANON_KEY` is an optional fallback if the publishable name is unset.
 
@@ -114,5 +110,8 @@ Other engine checks: `lib/gamification.check.ts`, `lib/mock/events.check.ts`, `l
 ## What is not live yet
 
 - Lessons / topic study pages
-- Image-based Entomology items
+- Image-based Entomology items (held out of the live pool)
+- Codebusters practice
 - Full 120–150 question competition banks
+- Password reset / resend confirmation
+- Hosted migrations are **not recorded as applied** in this repo — run the SQL files in the Supabase SQL Editor

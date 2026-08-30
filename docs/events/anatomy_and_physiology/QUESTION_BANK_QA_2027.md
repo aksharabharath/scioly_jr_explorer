@@ -1,6 +1,6 @@
 # Anatomy and Physiology 2027 — Question Bank QA (MVP)
 
-Content QA of `lib/mock/anatomy-physiology-questions.ts` (**ap-q1–ap-q45 only**). No bank expansion. No app, database, XP, or practice-logic changes. A&P remains a **locked** catalog event.
+Content QA of `lib/mock/anatomy-physiology-questions.ts` (**ap-q1–ap-q45 only**). No bank expansion during the QA pass. A&P is now an **unlocked** catalog event on the shared practice route.
 
 **This is an MVP verification pass, not a complete competition bank.** It does not attempt the 135-item blueprint, image slots, deferred diseases, or the remaining 23 muscles.
 
@@ -27,7 +27,7 @@ The implementation supports `verificationStatus: "draft" | "needs-review" | "ver
 
 There are **no `draft` statuses after this pass**.
 
-Practice live pool = `verified` **and** `imageRequired !== true`. A&P is still **locked**, so those live-eligible items **cannot** enter `/practice` until the event is unlocked. `EVENTS_WITH_QUESTION_BANKS` still lists only astronomy and entomology.
+Practice live pool = `verified` **and** `imageRequired !== true`. A&P is **unlocked** and listed in `EVENTS_WITH_QUESTION_BANKS`. All 45 items are live-eligible.
 
 ---
 
@@ -200,9 +200,9 @@ No factual transcription error was found in the evidence matrix this pass. The m
 
 ## Live-practice readiness
 
-**Content-safe for live practice (when the event is unlocked):** ap-q1–ap-q45.
+**Content-safe for live practice:** ap-q1–ap-q45.
 
-**Blocked from live practice today:** the whole set, because Anatomy & Physiology remains `unlocked: false`. `getPracticePageData("anatomy-physiology")` is still `null`. The event card label remains “Coming later.”
+**Live today:** the whole set, through the shared practice route. `getPracticePageData("anatomy-physiology")` returns the 45 live items. The event card label is “Practice.”
 
 **Questions blocked by unresolved evidence:** none of the current 45. The gaps above are topics **not in this bank**, not holds on these IDs.
 
@@ -216,4 +216,4 @@ No factual transcription error was found in the evidence matrix this pass. The m
 - **No q46+** were created
 - **No images** were added
 - **No new biology sources** were fetched for authoring
-- A&P **live practice remains locked**
+- A&P **live practice is unlocked** on the shared route

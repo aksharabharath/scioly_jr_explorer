@@ -322,6 +322,8 @@ Phase 4 **must** get a human decision or skip: HR1–HR3 (biomes), HR11 (disrupt
 
 ## 9. Next step
 
+**Status (app):** Ecology Phase 7 is done. Ecology is `unlocked: true` and registered for shared live practice (`eco-q1`–`eco-q40`). The following Phase 4 instruction is **historical** (completed).
+
 Phase 4 — author a **text-first** Ecology bank from T1-RULES closed names + V-F quotations listed in §3, cap near **40**, leave graphs/10%/formulas/species lists empty. Register curriculum/topics in app only in that authoring pass if the project pattern requires it. Keep `unlocked: false` until Phase 7.
 
 ---

@@ -1,6 +1,12 @@
 # Jr. Explorer — MVP readiness audit
 
-**Date:** 2026-08-26  
+**This file is a snapshot from 2026-08-26.** Catalog, banks, and dashboard have moved on. Treat **`README.md`**, **`PRODUCT_SPEC.md`**, and **`PROJECT_CONTEXT.md`** as current product truth.
+
+**Current MVP (code, 2026-08-29):** five playable text events (Water Quality, Ecology, Entomology 27 live, A&P 45, Crime Busters 40), shared 10-question engine, XP/streak, 15 derived badges, map/log/badges pages, Tricky Topics = miss → 3 later corrects. Codebusters and builds remain Coming later. Entomology images are still held out. Hosted migration apply is still **not** recorded here.
+
+---
+
+**Original date:** 2026-08-26  
 **Scope:** Product MVP readiness, not competition-complete content.  
 **Method:** Inspected `app/`, `lib/`, `components/`, `supabase/migrations/`, and docs against running TypeScript. No application behavior, question content, statuses, schema, XP rules, or deploy config were changed.
 

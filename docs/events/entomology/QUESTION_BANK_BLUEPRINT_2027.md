@@ -459,7 +459,7 @@ Every future item:
 
 ## 11. Adaptive-practice coverage
 
-The app selects by **`topicId` only** (`lib/learning/adaptive.ts`). Session size **10**. Recently asked IDs are avoided when another unused item exists. Weak mode prefers topics with revisit score > 0.
+The app selects by **`topicId` only** (`lib/learning/adaptive.ts`). Session size **10**. Recently asked IDs are avoided when another unused item exists. Weak mode prefers topics that are still weak (unrecovered miss; three later corrects on that topic clear it).
 
 **Do not change the algorithm in this pass.**
 

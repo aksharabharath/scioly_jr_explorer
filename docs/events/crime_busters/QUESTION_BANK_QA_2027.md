@@ -23,7 +23,7 @@ General forensics/chemistry knowledge was **not** treated as enough evidence to 
 
 There are **no `draft` statuses after this pass**.
 
-Practice live pool = `verified` **and** `imageRequired !== true`. Crime Busters is still **locked** and **not** in `EVENTS_WITH_QUESTION_BANKS`, so those items cannot enter `/practice` until later phases.
+Practice live pool = `verified` **and** `imageRequired !== true`. Crime Busters is **unlocked** and in `EVENTS_WITH_QUESTION_BANKS`; those items enter `/practice` through the shared route.
 
 ---
 

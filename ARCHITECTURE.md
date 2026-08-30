@@ -20,7 +20,8 @@ Curriculum does **not** go through Supabase:
 
 ```
 lib/mock/curriculum.ts
-  eventId → astronomy-questions.ts | entomology-questions.ts
+  eventId → water-quality | ecology | entomology | anatomy-physiology | crime-busters
+            (astronomy registered for checks only)
   ↓
 lib/learning/adaptive.ts         (pick next question; generic)
   ↓
@@ -53,8 +54,9 @@ later sessions: getMyRecentPracticeAttempts → adaptive again
 | `/auth/callback` | Route handler | Auth code exchange |
 | `/onboarding/events` | Server page | `requireUser()` only; redirects to `/` if already selected |
 | `/profile/events` | Server page | `requireUser()`; edit selections |
-| `/events/[eventId]` | Server page | Events layout: user + event selection |
-| `/events/[eventId]/practice` | Server page | Loads bank + history, renders `PracticeQuiz` |
+| `/map`, `/log`, `/badges` | Server pages | User + event selection |
+| `/events/[eventId]` | Server page | Events layout: user + event selection; unselected IDs redirect home |
+| `/events/[eventId]/practice` | Server page | Loads bank + last 40 attempts, renders `PracticeQuiz` |
 
 ### Server vs Client Components
 
@@ -63,6 +65,10 @@ Almost everything is a **Server Component** (data fetching, Auth, progress, XP d
 `"use client"` only where the browser must hold interaction:
 
 - `components/PracticeQuiz.tsx`
+- `components/ExpeditionRewardsOverlay.tsx`
+- `components/DailyMissionCard.tsx`
+- `components/RecentAchievements.tsx`
+- `components/useLocalCalendarDate.ts`
 - `app/login/login-form.tsx`
 - `app/signup/signup-form.tsx`
 - `components/EventSelectionForm.tsx`
@@ -138,15 +144,19 @@ Event page: still real Explorer Level + mock Event Level/mastery. Events layout 
 | `astronomy.ts` | Astronomy topics/overview; leftover 4-id helper |
 | `astronomy-questions.ts` | **48** Astronomy questions |
 | `entomology.ts` | Entomology topics/overview |
-| `entomology-questions.ts` | **30** Entomology questions, mapped into `Question` |
+| `entomology-questions.ts` | **60** Entomology questions; **27** live |
+| `anatomy-physiology-questions.ts` | **45** A&P questions, all live |
+| `water-quality-questions.ts` | **40** Water Quality questions, all live |
+| `ecology-questions.ts` | **40** Ecology questions, all live |
+| `crime-busters-questions.ts` | **40** Crime Busters questions, all live |
 | `explorer.ts` | Mock recs / next steps. `MOCK_EXPLORER` leftover; **not** the XP source |
 
 **Why mock:** ship the student loop without a CMS. Getters return the same types the UI already uses so a later database can replace internals.
 
 **Practice set vs leftover ids**
 
-- Live practice: `getPracticePageData` → `getQuestionsForEvent` → that event’s full bank, then 8 selected by `selectNextQuestion`.
-- `eventHasPractice(eventId)` is true when a bank is registered. Build events cannot open `/practice`.
+- Live practice: `getPracticePageData` → `getQuestionsForEvent` → that event’s live pool (`verified` and not `imageRequired`), then 10 selected by `selectNextQuestion`.
+- `eventHasPractice(eventId)` is true when live questions exist. Build events and locked catalog events cannot open `/practice`.
 - `MOCK_ASTRONOMY_PRACTICE_IDS`: four ids, **legacy**. **No `app/` route uses it.**
 
 **Stale comments (do not treat as product truth):** `lib/types.ts` still says types are filled by mock data; `lib/progress.ts` still says stats are “separate from mock Explorer XP.” Explorer XP is real in the running pages. Those application comments were left as-is.
@@ -159,7 +169,7 @@ It does **not** own XP rules or correctness against the bank for persistence.
 
 On start: `sessionId = crypto.randomUUID()`. Each Check answer: `attemptId` UUID (reused on save retry). `practiceDate = localCalendarDate()`.
 
-Why wait for `saved` before Next: the 8th save must finish so the session bonus can be awarded before results read `sessionXpRef`.
+Why wait for `saved` before Next: the 10th save must finish so the session bonus can be awarded before results read `sessionXpRef`.
 
 ## Adaptive-learning architecture
 
@@ -176,7 +186,7 @@ Pure functions in `lib/learning/adaptive.ts`. No I/O.
 5. Prefer difficulty near `targetDifficulty`
 6. Stable `id` sort as tie-break (deterministic, not random)
 
-**Why topic-first:** one “mastery %” would hide which idea is shaky. **Why recency weights:** a new miss should outrank an old one. **Why spacing:** do not hammer the same topic on consecutive questions.
+**Why topic-first:** one “mastery %” would hide which idea is shaky. **Why miss → 3 corrects:** Tricky Topics should match a rule a child can understand. **Why spacing:** do not hammer the same topic on consecutive questions.
 
 Practice page loads **40** most recent attempts for selection; progress pages load **all** attempts. Different jobs.
 
@@ -231,18 +241,23 @@ Dashboard / event Explorer Level
 
 | Component | Responsibility |
 |---|---|
-| `SiteHeader` | Brand, name, **My Events**, login/logout |
+| `SiteHeader` | Brand, name, Map / Log / Badges / My Events, login/logout |
 | `EventSelectionForm` | Multi-select catalog; save via Server Action |
 | `EventCard` | Equal-weight current-event cards; **Practice →** if open, **🔒 Coming later** if locked |
-| `OverallProgressCard` | Real historical totals (questions tried / accuracy / events tried) |
+| `OverallProgressCard` | Real historical totals (questions tried / X of N correct / events tried) |
 | `ExplorerProgress` | Real XP / level / bar / streak from `calculateXpProgress` |
+| `DailyMissionCard` | 0/1 expedition today; no extra XP |
+| `RecentAchievements` | Derived recent badges / streak / daily mission |
+| `ExplorerMap` | Selected playable events; unique live questions |
+| `ExpeditionLog` | Recent completed sets; reconstructed XP |
 | `BadgeShelf` | Earned badges computed from saved attempts |
 | `XpAwardFeedback` | Server-reported attempt/session XP after a saved answer |
 | `ContinueExploring` / `NextSteps` | Unused mock dashboard widgets |
 | `EventHero` | Unused event chrome (mock event stats) |
-| `EventProgressCard` | Real event activity |
+| `EventProgressCard` | Real event activity (unused on live pages) |
+| `EventPracticeProgress` | Event unique / expeditions vs live bank |
 | `TopicList` / `MasteryBadge` | Mock topic mastery |
-| `PracticeQuiz` | Session UI + results celebration |
+| `PracticeQuiz` | Session UI + results + extras overlay |
 
 ## Important transformations
 
