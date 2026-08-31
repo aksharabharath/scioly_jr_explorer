@@ -75,7 +75,7 @@ The mock catalog has **nine** 2027 Science Olympiad-style events. Students **sel
 
 **Build / engineering (locked):** Engineering CAD, Hovercraft, Rubber Band Catapult. These are not quiz-practice events and are not selectable.
 
-All five open events use the **same** practice route and selector. Live practice = `verificationStatus === "verified"` (omitted counts as verified) **and** `imageRequired !== true`.
+All five open events use the **same** practice route and selector. Live practice = `verificationStatus === "verified"` (omitted counts as verified). Image-required items are live only when `imageSrc` and `imageAlt` are set.
 
 Astronomy is not in this catalog. `/events/astronomy` **404s**. The Astronomy bank remains registered for checks.
 
@@ -130,16 +130,16 @@ Results keep: questions answered, **X of N correct**, follow-up copy, Retry, Bac
 
 Registered MVP banks (not official Science Olympiad items):
 
-| Event | Registered | Live (text, verified, no image required) |
+| Event | Registered | Live |
 |---|---|---|
-| Entomology | 60 (`ento-q1`–`ento-q60`) | **27** |
-| Anatomy & Physiology | 45 (`ap-q1`–`ap-q45`) | 45 |
-| Water Quality | 40 (`wq-q1`–`wq-q40`) | 40 |
-| Ecology | 40 (`eco-q1`–`eco-q40`) | 40 |
-| Crime Busters | 40 (`cb-q1`–`cb-q40`) | 40 |
+| Entomology | 60 (`ento-q1`–`ento-q60`) | **36** (19 text + 17 Commons photos) |
+| Anatomy & Physiology | 45 (`ap-q1`–`ap-q45`) | 45 (text) |
+| Water Quality | 40 (`wq-q1`–`wq-q40`) | 40 (text) |
+| Ecology | 40 (`eco-q1`–`eco-q40`) | 40 (text) |
+| Crime Busters | 44 (`cb-q1`–`cb-q44`) | **44** (40 text + 4 Loop / Whorl / Arch photos) |
 | Astronomy (checks only) | 48 | 48 (not a student catalog route) |
 
-Multiple choice (`a`–`d`), difficulties 1 / 2 / 3, hint + explanation on every live item. `needs-review` and `imageRequired` items stay in the bank for history lookup and are **not** shown in live practice. The quiz does **not** tell a child that a specimen image is missing.
+Multiple choice (`a`–`d`), difficulties 1 / 2 / 3, hint + explanation on every live item. `needs-review` items stay in the bank for history lookup and are **not** shown in live practice. Image-required items are live when they are `verified` and have non-empty `imageSrc` and `imageAlt`. Entomology image items use Wikimedia Commons photographs with yellow circles or A/B marks that do not print the taxon or the correct choice. Crime Busters IM4 items use FBI handbook drawings and Commons fingerprint photos.
 
 IDs are stable because saved attempts store `question_id`.
 
@@ -270,7 +270,6 @@ Not scheduled in a roadmap doc. Source comments say, later:
 - Replace mock events / topics / questions with a real data layer **without** changing UI shapes
 - Derive event progress percent from attempts instead of hand-written numbers
 - Reimplement `getDashboardData()` when recommendations are real
-- Live images on image-required items (Entomology first)
 - Password reset / resend confirmation email
 
 Until then, treat catalog metadata as mock TypeScript.
@@ -284,7 +283,6 @@ Until then, treat catalog metadata as mock TypeScript.
 - Password reset / resend email
 - Practice bank for **Codebusters**
 - Quiz practice for Engineering CAD, Hovercraft, Rubber Band Catapult
-- Entomology specimen images in live practice
 - Full 120–150 question competition banks
 - Real Event Level, topic mastery, or event `progressPercent`
 - Clickable “Continue exploring” / computed next steps

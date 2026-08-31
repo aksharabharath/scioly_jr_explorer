@@ -369,7 +369,10 @@ The bank should flow through the existing architecture:
 Confirm:
 
 - all questions remain registered
-- only verified, non-image-required questions are live-eligible
+- verified questions are live-eligible (`verificationStatus === "verified"`; omitted counts as verified)
+- image-required questions additionally require non-empty `imageSrc` and `imageAlt`
+- `needs-review` and `draft` items are not live
+- do not weaken the verification gate to grow the live pool
 - historical question lookup still works
 - the event has the expected topic/overview metadata
 - no special selector was created

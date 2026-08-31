@@ -81,7 +81,7 @@ Secondary restatements (`RULES_2027.md`, `TAXON_LIST_2027.md`, curriculum, bluep
 | Images | **Insect images will be exhibited** so students can see **pertinent features** | Photo count, live vs photo, labeled diagrams, any diagnostic character |
 | Specimens | Representatives of insects found in the Contiguous United States | That Entognatha / Ixodidae are “insects” (see §1.7) |
 
-Contest **will** show images. The official file contains **no** specimen images and **no** visual diagnostics. Bank photos remain `IMAGE_SOURCE_NEEDED`.
+Contest **will** show images. The official file contains **no** specimen images and **no** visual diagnostics. The **practice bank** currently has **17** local Commons JPEGs (`public/entomology/`; `IMAGE_QA_2027.md`). Those files do **not** supply official diagnostic characters and do **not** close `FACTUAL_SOURCE_NEEDED` biology.
 
 ### 1.5 Correlated content areas (scope, not fact tables)
 
@@ -211,7 +211,7 @@ Orders/subclass with **no families** listed: Collembola, Diplura, Zygentoma, Eph
 | E-002 | Official list | Same file, ESO Entomology LIST; 53 named taxa | — | `OFFICIAL_LIST` |
 | E-003 | ID by order / subclass / family / common name | Explicit **will** / ranks named | No, if the item only uses printed strings | `OFFICIAL_RULES` + `OFFICIAL_LIST` |
 | E-004 | Closed taxon list | **limited to** 2027 ESO Entomology List | No | `OFFICIAL_RULES` |
-| E-005 | Images exhibited | **will** exhibit insect images; pertinent features | Diagnostics and bank assets | `OFFICIAL_RULES` (format); `IMAGE_SOURCE_NEEDED` (assets) |
+| E-005 | Images exhibited | **will** exhibit insect images; pertinent features | Diagnostics; 17 practice JPEGs are assets, not official features | `OFFICIAL_RULES` (format); practice assets in `IMAGE_QA_2027.md` |
 | E-006 | Dichotomous keys | In scope; **simple**; **may** (competition) vs **will** (description) | Couplet biology if not list strings | `OFFICIAL_RULES` + `AMBIGUOUS_HUMAN_REVIEW` |
 | E-007 | Correlated questions | **will**, **for each specimen**; anatomy, ecology, economic, **or** systematics | Any specific fact | `OFFICIAL_RULES` (scope only) |
 | E-008 | Internal / external anatomy | Named correlated topics | Tagmata, spiracles, cerci, exoskeleton function, etc. | `FACTUAL_SOURCE_NEEDED` |
@@ -224,7 +224,7 @@ Orders/subclass with **no families** listed: Collembola, Diplura, Zygentoma, Eph
 | E-015 | Star meaning | Stars **present**; **undefined** | — | `AMBIGUOUS_HUMAN_REVIEW` |
 | E-016 | “Insects” vs Entognatha / Ixodidae | Description vs list headings | How to teach ticks / springtails | `AMBIGUOUS_HUMAN_REVIEW` |
 | E-017 | Cheat sheet / scoring facts above | Explicit | Size and point values still absent | `OFFICIAL_RULES` |
-| E-018 | Visual diagnostics (snout, furcula, tails, orientation, antennae) | Not in file | Yes | `IMAGE_SOURCE_NEEDED` and/or `FACTUAL_SOURCE_NEEDED` |
+| E-018 | Visual diagnostics (snout, furcula, tails, orientation, antennae) | Not in file | Yes | `FACTUAL_SOURCE_NEEDED` even when a photo **shows** a trait; see `IMAGE_QA_2027.md` |
 | E-019 | Official sample packet | Not in this file | — | not official rules |
 | E-020 | Name-only keys | Keys in scope; couplets may quote **only** official strings | None if strictly list-literal | `OFFICIAL_LIST` + `OFFICIAL_RULES` |
 
@@ -235,7 +235,7 @@ Orders/subclass with **no families** listed: Collembola, Diplura, Zygentoma, Eph
 | Area | Official support | Usable for verified items **now** | Blocked |
 |---|---|---|---|
 | taxonomy | `OFFICIAL_LIST` names, ranks, parents, printed strings | List literacy that matches **official** strings (`TAXON_LIST_2027.md` aligned) | Star meaning; bank items that still quote old TAXON_LIST-ish strings |
-| visual-id | Contest **will** show images | **None** without assets | All specimen ID |
+| visual-id | Contest **will** show images | Practice: 17 live JPEGs; list names only for the **printed** answer | Extra morphology still `FACTUAL_SOURCE_NEEDED` |
 | comparison | List can support **name** contrasts | Name-only look-alikes using official strings | Orientation, antenna splits, photos |
 | dichotomous-keys | In scope (`may`/`will` conflict) | Follow/write keys that use **only** official names/headings | Biological couplets |
 | external-anatomy | Scope only | **None** | All structure facts |
@@ -265,7 +265,7 @@ Orders/subclass with **no families** listed: Collembola, Diplura, Zygentoma, Eph
 
 ## 6. Existing question audit (q1–q60)
 
-**No bank edits. No `verificationStatus` changes.** Capitalization/punctuation mismatches are documented here rather than forced status flips.
+**Image QA 2026-08-30 did not change `verificationStatus`.** Status column = current bank. A live JPEG is **not** official evidence for extra biology.
 
 **Safely supported by official rules/list** = answer is fully determined by printed names, ranks, headings, or a key that only uses those strings.
 
@@ -273,28 +273,28 @@ Orders/subclass with **no families** listed: Collembola, Diplura, Zygentoma, Eph
 |---|---|---|---|---|
 | q1 | verified | Blattodea = cockroaches/termites | — | **Supported** (`OFFICIAL_LIST`) |
 | q2 | verified | Collembola = springtails, snow fleas; Entognatha | — | **Supported** |
-| q3 | verified | Ixodidae under Non-Insect Arthropods; hardback ticks | Description “insects” vs heading | **Supported** as list grouping; `AMBIGUOUS_HUMAN_REVIEW` only if teaching “not an insect” from the description sentence |
+| q3 | verified | Ixodidae under Non-Insect Arthropods; hardback ticks | Photo of eight-legged specimen; description “insects” vs heading | **Supported** as list grouping; photo is supporting (`IMAGE_QA_2027.md`) |
 | q4 | verified | Ephemeroptera = mayflies | Star unused | **Supported** |
-| q5 | verified | Apidae (bees) → Hymenoptera | — | **Supported** |
-| q6 | needs-review | Formicidae = ants (name only) | Ant image + petiole/antenna | `IMAGE_SOURCE_NEEDED` |
-| q7 | needs-review | Papilionidae = swallowtails | Image + hindwing tails | `IMAGE_SOURCE_NEEDED` |
-| q8 | needs-review | Notonectidae = backswimmers | Image + orientation | `IMAGE_SOURCE_NEEDED` + `FACTUAL_SOURCE_NEEDED` |
-| q9 | needs-review | Curculionidae = weevils | Image + snout | `IMAGE_SOURCE_NEEDED` |
-| q10 | needs-review | Collembola names/rank | Image + furcula | `IMAGE_SOURCE_NEEDED` |
+| q5 | verified | Apidae (bees) listed | Specimen photo | **Supported** as list name; photo for matching (`IMAGE_QA_2027.md`) |
+| q6 | verified | Formicidae = ants (name only) | Ant image + petiole/antenna | Asset present; extra morphology `FACTUAL_SOURCE_NEEDED` |
+| q7 | verified | Papilionidae = swallowtails | Image + hindwing tails | Asset present; tails not on list |
+| q8 | verified | Notonectidae = backswimmers | Image + orientation | Asset present; orientation `FACTUAL_SOURCE_NEEDED` |
+| q9 | verified | Curculionidae = weevils | Image + snout | Asset present; snout `FACTUAL_SOURCE_NEEDED` |
+| q10 | verified | Collembola names/rank | Image + furcula | A/B composite shows whole animal + forked organ; furcula still not a list fact |
 | q11 | needs-review | Both families listed | Dorsal vs ventral swimming | `FACTUAL_SOURCE_NEEDED` |
-| q12 | needs-review | Family names listed | Antenna/palp split + image; choice text “water scavenger **beetles**” ≠ official **water scavenger** | `IMAGE_SOURCE_NEEDED` + `AMBIGUOUS_HUMAN_REVIEW` |
-| q13 | needs-review | Tipulidae / Culicidae listed | Image + piercing/blood-feeding | `IMAGE_SOURCE_NEEDED` + `FACTUAL_SOURCE_NEEDED` |
+| q12 | verified | Family names listed | Antenna/palp split + image | Asset present (B replaced); split still `FACTUAL_SOURCE_NEEDED` |
+| q13 | verified | Tipulidae / Culicidae listed | Image + piercing/blood-feeding | Asset present; blood-feeding `FACTUAL_SOURCE_NEEDED` (not visible in photo) |
 | q14 | needs-review | Anatomy **in scope** | Three tagmata | `FACTUAL_SOURCE_NEEDED` |
 | q15 | needs-review | Anatomy in scope | Exoskeleton function | `FACTUAL_SOURCE_NEEDED` |
 | q16 | needs-review | Anatomy in scope | Leg attachment | `FACTUAL_SOURCE_NEEDED` |
-| q17 | needs-review | Anatomy in scope | Cerci + diagram | `IMAGE_SOURCE_NEEDED` + `FACTUAL_SOURCE_NEEDED` |
+| q17 | verified | Anatomy in scope | Cerci + photo | Asset present; cerci location `FACTUAL_SOURCE_NEEDED` |
 | q18 | needs-review | Keys in scope | Orientation couplet | `FACTUAL_SOURCE_NEEDED` |
 | q19 | verified | Orthoptera family official names only | — | **Supported** (list-literacy key) |
 | q20 | verified | Taxa listed; Dytiscidae “predaceous diving beetles”; Hydrophilidae official **water scavenger** | Explanation says “water scavenger **beetles**”; winning split is **lives in water vs land** (habitat inference) | `AMBIGUOUS_HUMAN_REVIEW` |
 | q21 | needs-review | Trichoptera = caddisflies | Larval freshwater habitat | `FACTUAL_SOURCE_NEEDED` |
 | q22 | needs-review | Ephemeroptera = mayflies | Naiad habitat | `FACTUAL_SOURCE_NEEDED` |
 | q23 | needs-review | Lepidoptera listed | Complete metamorphosis / pupa; life cycles **not named** | `FACTUAL_SOURCE_NEEDED` |
-| q24 | needs-review | Dytiscidae listed; adaptations **may include** | Natatorial + image | `IMAGE_SOURCE_NEEDED` + `FACTUAL_SOURCE_NEEDED` |
+| q24 | verified | Dytiscidae listed; adaptations **may include** | Natatorial + image | Asset present; natatorial `FACTUAL_SOURCE_NEEDED` |
 | q25 | needs-review | Gryllidae listed; behavior **may include** | Stridulation | `FACTUAL_SOURCE_NEEDED` |
 | q26 | needs-review | Culicidae listed; public health / disease **examples** | Pathogen transmission | `FACTUAL_SOURCE_NEEDED` |
 | q27 | needs-review | Apidae = bees; economic **such as** food | Honey / pollination | `FACTUAL_SOURCE_NEEDED` |
@@ -303,18 +303,18 @@ Orders/subclass with **no families** listed: Collembola, Diplura, Zygentoma, Eph
 | q30 | needs-review | Climate **may include** | Warm-water / oxygen | `FACTUAL_SOURCE_NEEDED` |
 | q31 | verified | Scutelleridae = metallic shield bugs | — | **Supported** |
 | q32 | verified | Pentatomidae = **Stink bugs** | Stem uses “stink bugs” | `AMBIGUOUS_HUMAN_REVIEW` (capital S) |
-| q33 | verified | Cicadidae → Hemiptera | Star unused | **Supported** |
+| q33 | verified | Cicadidae listed | Specimen photo | **Supported** as list name; `IMAGE_QA_2027.md` |
 | q34 | verified | Megaloptera = dobsonflies | — | **Supported** |
-| q35 | verified | Buprestidae → Coleoptera | Order common name **beetles** now official | **Supported** |
+| q35 | verified | Coccinellidae official string | Specimen photo | **Supported** as list name. (Older matrix row about Buprestidae→Coleoptera applies to **q50**, not this photo item.) |
 | q36 | verified | Zopheridae = **diabolical ironclad Beetles** | Choices use “beetles” | `AMBIGUOUS_HUMAN_REVIEW` (capital B) |
 | q37 | verified | Tephritidae → Diptera; fruit flies, husk fly | — | **Supported** |
-| q38 | verified | Mantodea = mantids | — | **Supported** |
+| q38 | verified | Mantodea = mantids | Specimen photo | **Supported** as list name |
 | q39 | verified | Siphonaptera = fleas; order, no families | — | **Supported** |
-| q40 | verified | Bombyliidae bee flies / Diptera vs Apidae bees / Hymenoptera | — | **Supported** |
-| q41 | verified | Vespidae = paper wasps, hornets, yellowjackets | — | **Supported** |
+| q40 | verified | Bombyliidae bee flies / Diptera vs Apidae bees / Hymenoptera | A/B photos | **Supported** as list names |
+| q41 | verified | Vespidae = paper wasps, hornets, yellowjackets | Specimen photo (1920×1280 side view) | **Supported** as list name |
 | q42 | verified | Saturniidae Giant Silkworm moths → Lepidoptera | — | **Supported** |
 | q43 | verified | Collembola subclass vs Diplura order | — | **Supported** |
-| q44 | verified | Membracidae → Hemiptera | — | **Supported** |
+| q44 | verified | Membracidae listed | Specimen photo | **Supported** as list name |
 | q45 | verified | Non-Insect Arthropods / Insecta / bees / ants | — | **Supported** (list-literacy key) |
 | q46 | verified | Hemiptera vs Coleoptera; cicadas / metallic shield bugs | — | **Supported** |
 | q47 | verified | thrips / dobsonflies / caddisflies | — | **Supported** |
@@ -339,10 +339,10 @@ Orders/subclass with **no families** listed: Collembola, Diplura, Zygentoma, Eph
 | **Supported by official list/rules** (string/rank/name-only key) | **23** | q1–q5, q19, q31, q33–q35, q37–q49 |
 | **Ambiguous / human review** (status left `verified`) | **4** | q20, q32, q36, q50 |
 | **External factual source** | **24** | q11, q14–q16, q18, q21–q23, q25–q30, q51–q60 |
-| **Image and/or visual diagnostic** | **9** | q6–q10, q12, q13, q17, q24 |
-| **Statuses changed in code** | **0** | — |
+| **Image items (live JPEGs)** | **17** | q3, q5–q10, q12, q13, q17, q24, q33, q35, q38, q40, q41, q44 — extra biology still `FACTUAL_SOURCE_NEEDED` |
+| **Statuses changed in this image-QA pass** | **0** | — |
 
-q12 is counted under image (primary blocker) and also has a Hydrophilidae string issue.
+Extra biology on several live image items remains `FACTUAL_SOURCE_NEEDED`.
 
 ---
 
@@ -369,8 +369,8 @@ All anatomy facts, habitats, metamorphosis, behavior mechanisms, economic/health
 | `CURRICULUM_2027.md` | **Factual statements updated** (authority, stars, order names, family strings, keys in scope, life cycles not named) |
 | `QUESTION_BANK_BLUEPRINT_2027.md` | Planning notes updated so they no longer say TAXON_LIST is unaligned |
 | `SOURCE_INGESTION_2027.md` | Updated to record alignment |
-| `QUESTION_BANK_QA_2027.md` | **Unchanged** — still describes pre-alignment QA of q1–q60 |
-| `lib/mock/entomology-questions.ts` | **Unchanged** — several items still use pre-alignment wording (q12, q20, q32, q36, q50) |
+| `QUESTION_BANK_QA_2027.md` | **Updated 2026-08-30** for live image counts; see also `IMAGE_QA_2027.md` |
+| `lib/mock/entomology-questions.ts` | Image items are `verified` with JPEGs; 24 text items still `needs-review`. This evidence pass did not flip statuses. |
 | Samples | Not official rules | unchanged |
 
 **53 taxa:** scientific-name count **matches**. Secondary list copy now **matches official strings and stars**. Remaining ambiguity: star meaning; keys **may** vs **will**; “insects” vs Entognatha/Ixodidae; bank exact-string items not yet re-QA’d.
@@ -381,7 +381,7 @@ All anatomy facts, habitats, metamorphosis, behavior mechanisms, economic/health
 
 The **135** figure is a **product planning ceiling**, not an official question count.
 
-From official evidence alone, verified items can grow in **taxonomy + name-only keys + name-only comparison** only. Correlated biology and visual-id stay empty until `FACTUAL_SOURCE_NEEDED` / `IMAGE_SOURCE_NEEDED` sources exist. **Do not invent** to reach 135.
+From official evidence alone, verified **list-literacy** can grow in taxonomy + name-only keys + name-only comparison. Correlated biology stays `FACTUAL_SOURCE_NEEDED`. Practice specimen photos exist (`IMAGE_QA_2027.md`) but do **not** invent extra biology. **Do not invent** to reach 135.
 
 ---
 
@@ -391,11 +391,11 @@ From official evidence alone, verified items can grow in **taxonomy + name-only 
 |---|---|
 | Official taxon count | **53** |
 | Official sources in hand | `RULES_2027_OFFICIAL.md` (`OFFICIAL_RULES` + `OFFICIAL_LIST`) |
-| q1–q60 statuses changed | **0** |
-| Supported list/key items | **23** |
+| q1–q60 statuses changed this image-QA pass | **0** |
+| Supported list/key items | still name/rank based; several also have photos |
 | Human-review among previously verified | **4** (q20, q32, q36, q50) |
-| Factual-source items | **24** |
-| Image items | **9** |
+| Factual-source items (text `needs-review`) | **24** |
+| Image items | **17** live JPEGs; q10/q12/q41 replaced 2026-08-30 |
 | Official life-cycle domain | **No** |
 | Star meaning | **Undefined** |
 
@@ -403,6 +403,6 @@ From official evidence alone, verified items can grow in **taxonomy + name-only 
 
 1. **Re-QA q1–q60** against aligned official strings (q12, q20, q32, q36, q50 first). Still do not invent biology. Do not skip this step.
 2. Then author **additional list-literacy and name-only keys only**.
-3. In parallel, acquire factual sources and licensed images before filling correlated or visual slots.
+3. Keep image QA current; acquire factual sources before filling remaining correlated slots.
 
 Do **not** skip the string/QA step. Do **not** treat 135 as a mandate to invent ecology.

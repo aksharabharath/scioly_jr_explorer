@@ -9,10 +9,10 @@
 | `TAXON_LIST_2027.md` | Aligned copy of the official list (53 taxa, official strings, 14 undefined stars) |
 | `SAMPLE_ANALYSIS_2027.md` | Style, topic mix, and sample keys only — **not** automatic biology |
 | `CONTENT_SPEC.md` | Product practice areas (`topicId`s) — not official ranks |
-| `lib/mock/entomology-questions.ts` | Existing 30-item first-pass bank — **not** equivalent to a rule |
+| `lib/mock/entomology-questions.ts` | Existing 60-item registered bank — **not** equivalent to a rule |
 | `lib/mock/entomology.ts` | Event-page topic labels aligned to those `topicId`s |
 
-The authoritative rules/list are in `RULES_2027_OFFICIAL.md`. `TAXON_LIST_2027.md` is aligned to that list. Sample-test PDFs and specimen images are still not in the repo. Anything that would require those originals is marked `needs-official-verification`.
+The authoritative rules/list are in `RULES_2027_OFFICIAL.md`. `TAXON_LIST_2027.md` is aligned to that list. Official sample-test PDFs are still not in the repo. Licensed Commons practice JPEGs for **17** live items are in `public/entomology/` (`IMAGE_QA_2027.md`). Anything that would require the missing official sample originals is marked `needs-official-verification`.
 
 Do not generate questions from this file until a later bank-authoring pass.
 
@@ -200,13 +200,13 @@ Nested: `taxonomy-list-hierarchy`, `taxonomy-common-names`.
 |---|---|
 | Name | Visual identification |
 | Parent | `identification` |
-| Description | Identify listed taxa from specimen images (official scope). Jr. Explorer currently has no image assets. |
+| Description | Identify listed taxa from specimen images (official scope). Jr. Explorer currently has **17** live Commons practice JPEGs (`IMAGE_QA_2027.md`). |
 | Expected knowledge | Diagnostic traits used in a **specific** photo must be true of that specimen; do not guess missing sample photos. |
 | Expected skill | Use visible traits to choose a listed family/order/subclass. |
 | Relevant taxa | Any listed ID target; current bank: Formicidae, Papilionidae, Notonectidae, Curculionidae, Collembola |
 | Source evidence | `RULES_2027.md` image-based specimens; Sample Test 1 majority ID; bank `ento-q6`–`q10` |
 | Source strength | `direct-rules` (images in scope); `sample-analysis` (heavy image ID); `existing-bank` (five generated items) |
-| Verification status | **All five current visual-id items are image-required and not live.** Diagnostics in `imageBrief` are author notes, not verified photos. |
+| Verification status | Photographed visual-id items in the current bank are **live** when `verified` with `imageSrc` + `imageAlt`. Extra morphology in `imageBrief` is still not an official-list fact. |
 
 #### `comparison`
 
@@ -494,14 +494,14 @@ Higher-level combinations (not extra IDs): following a key that encodes a look-a
 
 Ranks and common names are **only** from `TAXON_LIST_2027.md` (aligned to `RULES_2027_OFFICIAL.md`). No morphological characters are invented here. Starred taxa are marked in that file; **star meaning is undefined**.
 
-**Appearance in the 30-item bank**
+**Appearance in the 30-item bank** (historical first-pass inventory; the registered bank is now **60** items — use `QUESTION_BANK_QA_2027.md` for current live/verified)
 
 - **Tagged:** in `taxonomyTags` (author metadata).
 - **Mentioned:** appears in prompt, choices, hint, or explanation but is not necessarily tagged.
-- **Live tagged:** at least one **live** question (`imageRequired !== true`) includes the taxon in `taxonomyTags`.
-- **Additional questions needed:** `yes` if there is no live item whose **primary job** is identifying or placing that taxon; `correlated-only` if live coverage is anatomy/habitat/etc.; `image-only` if the only ID item is held out.
+- **Live tagged:** at least one **live** question (`isLivePracticeQuestion`) includes the taxon in `taxonomyTags`.
+- **image-only:** historical label when the only ID item was held out pending a photo. **Current live filter:** image-required items with `imageSrc` + `imageAlt` **are** live.
 
-Live practice cannot show image-required items, so tagged-on-image-only ≠ usable ID practice.
+Live practice **does** show photographed items that meet that filter. Older rows in the tables below that say “image ID not live” or list image questions as `draft` / not live are **inventory from an earlier bank**; current statuses are in `QUESTION_BANK_QA_2027.md` and `lib/mock/entomology-questions.ts`.
 
 ### 4.1 Classes, subclass, non-insect heading
 
@@ -592,9 +592,11 @@ Do not treat “mentioned as a distractor” as coverage.
 
 ## 5. Mapping of the existing 30 questions
 
+**Historical inventory of the first-pass bank.** Rows below (including “not live” image items and `draft` statuses) are **not** the current 60-item live pool. Current live/verified counts: `QUESTION_BANK_QA_2027.md`.
+
 This is analysis only. Questions are not rewritten.
 
-**Live** = included in `getQuestionsForEvent("entomology")` (`imageRequired !== true`). Full bank remains in `getAllQuestions()`.
+**Live** = included in `getQuestionsForEvent("entomology")` via `isLivePracticeQuestion`: `verified`, and if `imageRequired` then `imageSrc` + `imageAlt`. Full bank remains in `getAllQuestions()`.
 
 `verificationStatus` defaults to `draft` when omitted in source.
 
@@ -784,7 +786,7 @@ Do **not** implement in application code in this pass. Design only.
 | `sourceType` | yes | Keep `rules-derived \| sample-derived \| generated`; do not set `sample-derived` for copies |
 | `sourceNote` | yes | Pointer to list section, rules domain, or “inspired by sample Qn, new stem” |
 | `verificationStatus` | yes | Expand later beyond `draft \| needs-review` (e.g. `verified`) if needed |
-| `imageRequired` | yes | If true, item is **not live** until an asset exists |
+| `imageRequired` | yes | If true, item is **not live** until `imageSrc` and `imageAlt` are set (and the item is `verified`) |
 | `imageBrief` | if `imageRequired` | Diagnostic description; not a substitute for a file |
 | `imageAssetId` / URL | later | When types are extended |
 | `confusableTaxa` | later | Listed look-alikes only |

@@ -38,7 +38,7 @@ import {
 } from "@/lib/expeditions";
 import type { PracticeFollowUp, PracticeSummary, Question } from "@/lib/types";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type PracticeQuizProps = {
   eventId: string;
@@ -172,6 +172,7 @@ export function PracticeQuiz({
   const [state, setState] = useState<QuizState>(() =>
     beginSet(questions, priorAttempts, initialAttemptCount, mode),
   );
+  const feedbackRef = useRef<HTMLDivElement>(null);
   const savingRef = useRef(false);
   const sessionIdRef = useRef(crypto.randomUUID());
   const attemptIdRef = useRef<string | null>(null);
@@ -181,6 +182,18 @@ export function PracticeQuiz({
   const badgeAttemptsRef = useRef(priorBadgeAttempts);
   const baselineXpRef = useRef(initialXp);
   const baselineStreakRef = useRef(initialStreakDays);
+
+  const showFeedback = state.status === "active" && state.submitted;
+
+  useEffect(() => {
+    if (!showFeedback) {
+      return;
+    }
+    feedbackRef.current?.scrollIntoView({
+      block: "nearest",
+      behavior: "smooth",
+    });
+  }, [showFeedback]);
 
   function startNewSession() {
     if (totalXpRef.current != null) {
@@ -442,7 +455,7 @@ export function PracticeQuiz({
   }
 
   return (
-    <section className="rounded-3xl border border-stone-200/80 bg-surface p-5 shadow-[0_8px_30px_rgba(28,45,41,0.05)] sm:p-7">
+    <section className="rounded-3xl border border-stone-200/80 bg-surface p-4 shadow-[0_8px_30px_rgba(28,45,41,0.05)] sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
         <p className="font-medium text-stone-600">
           Question {state.records.length + 1} of {plannedTotal}
@@ -457,11 +470,27 @@ export function PracticeQuiz({
         </div>
       </div>
 
-      <h2 className="mt-4 font-display text-2xl font-semibold tracking-tight text-ink">
+      <h2 className="mt-3 font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
         {question.prompt}
       </h2>
+      {question.imageSrc ? (
+        <figure className="mt-3 overflow-hidden rounded-2xl border border-stone-200/80 bg-parchment">
+          {/* Local public JPEGs (and any other static imageSrc); next/image is not required. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={question.imageSrc}
+            alt={question.imageAlt ?? ""}
+            className="mx-auto max-h-56 w-full object-contain p-2 sm:max-h-64 lg:max-h-72"
+          />
+          {question.imageCredit ? (
+            <figcaption className="px-3 pb-2 text-center text-xs leading-snug text-stone-500">
+              {question.imageCredit}
+            </figcaption>
+          ) : null}
+        </figure>
+      ) : null}
 
-      <div className="mt-6 space-y-2" role="group" aria-label="Answer choices">
+      <div className="mt-4 space-y-2" role="group" aria-label="Answer choices">
         {question.choices.map((choice) => {
           const selected = state.selectedChoiceId === choice.id;
           const correctChoice = choice.id === question.correctChoiceId;
@@ -482,7 +511,7 @@ export function PracticeQuiz({
               type="button"
               disabled={state.submitted}
               onClick={() => selectChoice(choice.id)}
-              className={`flex w-full items-start gap-3 rounded-2xl border px-4 py-3 text-left text-base transition disabled:cursor-default ${choiceClass}`}
+              className={`flex w-full items-start gap-3 rounded-2xl border px-4 py-2.5 text-left text-base transition disabled:cursor-default ${choiceClass}`}
             >
               <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-sm font-semibold text-stone-600">
                 {choice.id.toUpperCase()}
@@ -494,7 +523,7 @@ export function PracticeQuiz({
       </div>
 
       {!state.submitted ? (
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="button"
             onClick={() => setState({ ...state, revealedHint: true })}
@@ -514,25 +543,39 @@ export function PracticeQuiz({
       ) : null}
 
       {state.revealedHint && !state.submitted ? (
-        <p className="mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-950">
+        <p className="mt-3 rounded-2xl bg-amber-50 px-4 py-2.5 text-sm leading-relaxed text-amber-950">
           <span className="font-semibold">Hint: </span>
           {question.hint}
         </p>
       ) : null}
 
       {state.submitted ? (
-        <div className="mt-6 space-y-4" aria-live="polite">
-          <p
-            className={`rounded-2xl px-4 py-3 text-sm font-semibold ${
-              isCorrect
-                ? "bg-emerald-50 text-emerald-900"
-                : "bg-sky-50 text-sky-950"
-            }`}
-          >
-            {isCorrect
-              ? "That's right — nice exploring."
-              : "Good try! Mistakes don't take anything away. Here's the idea:"}
-          </p>
+        <div
+          ref={feedbackRef}
+          className="mt-4 space-y-3"
+          aria-live="polite"
+        >
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <p
+              className={`rounded-2xl px-4 py-2.5 text-sm font-semibold sm:flex-1 ${
+                isCorrect
+                  ? "bg-emerald-50 text-emerald-900"
+                  : "bg-sky-50 text-sky-950"
+              }`}
+            >
+              {isCorrect
+                ? "That's right — nice exploring."
+                : "Good try! Mistakes don't take anything away. Here's the idea:"}
+            </p>
+            <button
+              type="button"
+              onClick={continueToNext}
+              disabled={!state.saved}
+              className="shrink-0 rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment transition enabled:hover:bg-teal disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isLast ? "See results" : "Next question"}
+            </button>
+          </div>
           {state.saved && state.xpAward ? (
             <XpAwardFeedback
               attemptXp={state.xpAward.attemptXp}
@@ -551,15 +594,15 @@ export function PracticeQuiz({
             </p>
           ) : null}
           {!state.saved ? (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {state.saveError ? (
-                <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-950">
+                <p className="rounded-2xl bg-amber-50 px-4 py-2.5 text-sm text-amber-950">
                   {state.saveError}
                 </p>
               ) : state.saving ? (
                 <p className="text-sm text-stone-500">Saving your answer…</p>
               ) : (
-                <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-950">
+                <p className="rounded-2xl bg-amber-50 px-4 py-2.5 text-sm text-amber-950">
                   Your answer was checked, but it could not be saved. Try
                   saving again to continue.
                 </p>
@@ -575,16 +618,6 @@ export function PracticeQuiz({
               ) : null}
             </div>
           ) : null}
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={continueToNext}
-              disabled={!state.saved}
-              className="rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment transition enabled:hover:bg-teal disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isLast ? "See results" : "Next question"}
-            </button>
-          </div>
         </div>
       ) : null}
     </section>

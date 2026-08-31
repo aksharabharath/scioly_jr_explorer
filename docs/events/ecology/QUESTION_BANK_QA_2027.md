@@ -27,7 +27,7 @@ The implementation supports `verificationStatus: "draft" | "needs-review" | "ver
 
 There are **no `draft` statuses after this pass**.
 
-Practice live pool = `verified` **and** `imageRequired !== true`. Ecology is **unlocked** and in `EVENTS_WITH_QUESTION_BANKS`, so those items enter the shared `/events/ecology/practice` route.
+Practice live pool = `verified` (omitted counts as verified). Image-required items also need `imageSrc` + `imageAlt`. This Ecology bank has **no** image-required items. Ecology is **unlocked** and in `EVENTS_WITH_QUESTION_BANKS`, so those 40 items enter `/events/ecology/practice`.
 
 ---
 

@@ -1,6 +1,6 @@
 # Crime Busters 2027 — Question Bank QA (MVP)
 
-Content QA of `lib/mock/crime-busters-questions.ts` (**cb-q1–cb-q40 only**). No bank expansion. Crime Busters is **unlocked** for shared live practice (`EVENTS_WITH_QUESTION_BANKS`, selectable onboarding/profile).
+Content QA of `lib/mock/crime-busters-questions.ts` (**cb-q1–cb-q40** text MVP). The later IM4 image slice (`cb-q41`–`cb-q44`) is recorded in `IMAGE_QA_2027.md`. Crime Busters is **unlocked** for shared live practice (`EVENTS_WITH_QUESTION_BANKS`, selectable onboarding/profile).
 
 **Authority:**
 
@@ -23,7 +23,7 @@ General forensics/chemistry knowledge was **not** treated as enough evidence to 
 
 There are **no `draft` statuses after this pass**.
 
-Practice live pool = `verified` **and** `imageRequired !== true`. Crime Busters is **unlocked** and in `EVENTS_WITH_QUESTION_BANKS`; those items enter `/practice` through the shared route.
+Practice live pool = `verified` (omitted counts as verified). Image-required items are live when `imageSrc` and `imageAlt` are set (`isLivePracticeQuestion`). This text-MVP pass covered **cb-q1–cb-q40** (no images). Current bank: **44** registered / **44** live (those 40 text items plus IM4 `cb-q41`–`cb-q44`). Crime Busters is **unlocked** and in `EVENTS_WITH_QUESTION_BANKS`.
 
 ---
 
@@ -36,7 +36,7 @@ Practice live pool = `verified` **and** `imageRequired !== true`. Crime Busters 
 | HUMAN REVIEW | **0** | — |
 | REMOVE | **0** | — |
 
-Source bank remains **exactly cb-q1–cb-q40**. No q41+ items. All `imageRequired: false`.
+This text-MVP pass covered **cb-q1–cb-q40**. Image items `cb-q41`–`cb-q44` were added later; see `IMAGE_QA_2027.md`.
 
 A conservative reading of the matrix supported verifying the whole MVP set after hint and stem trims. That is **not** a claim that the hands-on contest (prints, micrographs, unknown powders, pH, crime stories) is covered.
 
@@ -112,18 +112,18 @@ Hint and/or stem trims on: **cb-q6, q7, q8, q9, q11, q12, q13, q16, q20, q22, q2
 
 ## Remaining gaps (not in this bank)
 
-- Fingerprint/hair/fiber/soil **image or sample ID** (IM1–IM7)
+- Fingerprint compare, minutiae markup, hair/fiber/soil **image or sample ID** (IM1–IM3, IM5–IM7). IM4 family exemplars are in `IMAGE_QA_2027.md`.
 - Species hair keys; fiber class mapping (`HR-FIB`)
 - Full iodine/HCl/water unknown tables; pH numbers
 - Yeast/gelatin/flour formulas; crime stories; chromatography; Overall Analysis
 
-**Image blockers:** none in-bank (`imageRequired` stays false). Official ID skills remain out of MVP.
+**Image blockers:** IM4 family exemplars are live (`cb-q41`–`cb-q44`). Official compare / minutiae / hair / fiber / soil / lab images remain out.
 
 ---
 
 ## MVP readiness
 
-The verified text-first set is **registered** in `lib/mock/curriculum.ts` and **unlocked** for the shared `/events/crime-busters/practice` route. Do not expand the bank (Phase 8).
+The verified text-first set (`cb-q1`–`cb-q40`) plus the later IM4 slice (`cb-q41`–`cb-q44`) is **registered** in `lib/mock/curriculum.ts` and **unlocked** for `/events/crime-busters/practice`. Do not add `cb-q45+` in this freeze.
 
 ---
 
@@ -131,7 +131,7 @@ The verified text-first set is **registered** in `lib/mock/curriculum.ts` and **
 
 Recorded after this pass — **all passed**:
 
-- `npx tsx lib/mock/crime-busters-questions.check.ts` — 40 verified
+- `npx tsx lib/mock/crime-busters-questions.check.ts` — 40 verified on this text-MVP pass (later IM4 checks expect **44**)
 - `npx tsx lib/mock/curriculum.check.ts`
 - `npx tsx lib/mock/events.check.ts`
 - `npx tsx lib/student-events.check.ts`

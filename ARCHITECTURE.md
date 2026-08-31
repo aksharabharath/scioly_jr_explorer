@@ -144,18 +144,18 @@ Event page: still real Explorer Level + mock Event Level/mastery. Events layout 
 | `astronomy.ts` | Astronomy topics/overview; leftover 4-id helper |
 | `astronomy-questions.ts` | **48** Astronomy questions |
 | `entomology.ts` | Entomology topics/overview |
-| `entomology-questions.ts` | **60** Entomology questions; **27** live |
+| `entomology-questions.ts` | **60** Entomology questions; **36** live (17 Commons photos) |
 | `anatomy-physiology-questions.ts` | **45** A&P questions, all live |
 | `water-quality-questions.ts` | **40** Water Quality questions, all live |
 | `ecology-questions.ts` | **40** Ecology questions, all live |
-| `crime-busters-questions.ts` | **40** Crime Busters questions, all live |
+| `crime-busters-questions.ts` | **44** Crime Busters questions, all live (40 text + 4 fingerprint-family photos) |
 | `explorer.ts` | Mock recs / next steps. `MOCK_EXPLORER` leftover; **not** the XP source |
 
 **Why mock:** ship the student loop without a CMS. Getters return the same types the UI already uses so a later database can replace internals.
 
 **Practice set vs leftover ids**
 
-- Live practice: `getPracticePageData` → `getQuestionsForEvent` → that event’s live pool (`verified` and not `imageRequired`), then 10 selected by `selectNextQuestion`.
+- Live practice: `getPracticePageData` → `getQuestionsForEvent` → that event’s live pool (`verified`; image-required items need `imageSrc` + `imageAlt`), then 10 selected by `selectNextQuestion`.
 - `eventHasPractice(eventId)` is true when live questions exist. Build events and locked catalog events cannot open `/practice`.
 - `MOCK_ASTRONOMY_PRACTICE_IDS`: four ids, **legacy**. **No `app/` route uses it.**
 

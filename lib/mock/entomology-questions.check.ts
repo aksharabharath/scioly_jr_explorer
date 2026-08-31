@@ -3,14 +3,79 @@
  * Validates schema and invariants. Does not require all items to be verified.
  * Run: npx tsx lib/mock/entomology-questions.check.ts
  */
+import { existsSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import {
   ENTOMOLOGY_EVENT_ID,
   ENTOMOLOGY_TAXON_IDS,
   ENTOMOLOGY_TOPIC_IDS,
   MOCK_ENTOMOLOGY_QUESTIONS,
+  entomologyQuestionToPracticeQuestion,
   type EntomologyCognitiveDemand,
   type EntomologyQuestion,
 } from "@/lib/mock/entomology-questions";
+import { entomologyImageCredit } from "@/lib/mock/entomology-image-credits";
+
+const IMAGE_ALT_SPOILERS = [
+  "formicidae",
+  "swallowtail",
+  "papilionidae",
+  "backswimmer",
+  "notonectidae",
+  "weevil",
+  "curculionidae",
+  "springtail",
+  "collembola",
+  "dytiscidae",
+  "hydrophilidae",
+  "crane fly",
+  "tipulidae",
+  "culicidae",
+  "mosquito",
+  "cerci",
+  "natatorial",
+  "earwig",
+  "dermaptera",
+  "ixodidae",
+  "tick",
+  "cicada",
+  "cicadidae",
+  "ladybug",
+  "ladybird",
+  "lady-bird",
+  "coccinellidae",
+  "mantid",
+  "mantis",
+  "mantodea",
+  "yellowjacket",
+  "vespidae",
+  "treehopper",
+  "membracidae",
+  "bombyliidae",
+  "bee fly",
+  "honeybee",
+  "honey bee",
+];
+
+const IMAGE_COMPANION_PHOTOS: Record<string, string[]> = {
+  "ento-q6.jpg": ["ento-q6-photo.jpg"],
+  "ento-q7.jpg": ["ento-q7-photo.jpg"],
+  "ento-q8.jpg": ["ento-q8-photo.jpg"],
+  "ento-q9.jpg": ["ento-q9-photo.jpg"],
+  "ento-q10.jpg": ["ento-q10a-photo.jpg", "ento-q10b-photo.jpg"],
+  "ento-q12.jpg": ["ento-q12a-photo.jpg", "ento-q12b-photo.jpg"],
+  "ento-q13.jpg": ["ento-q13a-photo.jpg", "ento-q13b-photo.jpg"],
+  "ento-q17.jpg": ["ento-q17-photo.jpg"],
+  "ento-q24.jpg": ["ento-q24-photo.jpg"],
+  "ento-q3.jpg": ["ento-q3-photo.jpg"],
+  "ento-q5.jpg": ["ento-q5-photo.jpg"],
+  "ento-q33.jpg": ["ento-q33-photo.jpg"],
+  "ento-q35.jpg": ["ento-q35-photo.jpg"],
+  "ento-q38.jpg": ["ento-q38-photo.jpg"],
+  "ento-q40.jpg": ["ento-q40a-photo.jpg", "ento-q5-photo.jpg"],
+  "ento-q41.jpg": ["ento-q41-photo.jpg"],
+  "ento-q44.jpg": ["ento-q44-photo.jpg"],
+};
 
 const failures: string[] = [];
 
@@ -133,9 +198,63 @@ for (const question of questions) {
       question.imageBrief.trim().length > 0,
     );
     check(
-      `${question.id} prompt marks the missing image`,
+      `${question.id} prompt marks that an image belongs with the item`,
       question.prompt.includes("[IMAGE REQUIRED:"),
     );
+    check(
+      `${question.id} has a public image path`,
+      question.imageSrc.startsWith("/entomology/") &&
+        (question.imageSrc.endsWith(".jpg") || question.imageSrc.endsWith(".jpeg")),
+    );
+    check(
+      `${question.id} has image alt text`,
+      question.imageAlt.trim().length > 0,
+    );
+    check(
+      `${question.id} image file exists`,
+      existsSync(join(process.cwd(), "public", question.imageSrc.slice(1))),
+    );
+    const altLower = question.imageAlt.toLowerCase();
+    const spoiler = IMAGE_ALT_SPOILERS.find((word) => altLower.includes(word));
+    check(
+      `${question.id} image alt does not name the taxon or the answer`,
+      spoiler === undefined,
+    );
+    const practice = entomologyQuestionToPracticeQuestion(question);
+    const credit = entomologyImageCredit(question.imageSrc);
+    const fileName = question.imageSrc.slice("/entomology/".length);
+    const attributionNotRequired = new Set([
+      "ento-q7.jpg",
+      "ento-q9.jpg",
+      "ento-q17.jpg",
+    ]);
+    if (attributionNotRequired.has(fileName)) {
+      check(
+        `${question.id} public-domain or CC0 photo has no required student credit`,
+        credit === undefined && practice.imageCredit === undefined,
+      );
+    } else {
+      check(
+        `${question.id} CC BY / CC BY-SA photo has a student credit`,
+        typeof credit === "string" &&
+          credit.trim().length > 0 &&
+          practice.imageCredit === credit,
+      );
+      const creditLower = (credit ?? "").toLowerCase();
+      const creditSpoiler = IMAGE_ALT_SPOILERS.find((word) =>
+        creditLower.includes(word),
+      );
+      check(
+        `${question.id} image credit does not name the taxon or the answer`,
+        creditSpoiler === undefined,
+      );
+    }
+    for (const photo of IMAGE_COMPANION_PHOTOS[fileName] ?? []) {
+      check(
+        `${question.id} companion photo ${photo} exists`,
+        existsSync(join(process.cwd(), "public/entomology", photo)),
+      );
+    }
   }
 
   byTopic[question.topicId] = (byTopic[question.topicId] ?? 0) + 1;
@@ -157,8 +276,24 @@ check(
 );
 
 check(
-  "image-required count stays 9 (Phase 1 added none)",
-  imageRequiredCount === 9,
+  "image-required count is 17",
+  imageRequiredCount === 17,
+);
+
+const entomologyPublicDir = join(process.cwd(), "public/entomology");
+const quizJpegNames = readdirSync(entomologyPublicDir).filter(
+  (name) => name.endsWith(".jpg") && !name.includes("photo"),
+);
+const referencedQuizJpegNames = questions
+  .filter((question) => question.imageRequired)
+  .map((question) => question.imageSrc.slice("/entomology/".length));
+check(
+  "every quiz JPEG in public/entomology is referenced by the bank",
+  quizJpegNames.every((name) => referencedQuizJpegNames.includes(name)),
+);
+check(
+  "every imageSrc quiz JPEG is present as a non-photo file",
+  referencedQuizJpegNames.every((name) => quizJpegNames.includes(name)),
 );
 
 check(
@@ -171,14 +306,23 @@ const phase1 = questions.filter((question) => {
   return number >= 31 && number <= 60;
 });
 
+const phase1ImageIds = new Set([
+  "ento-q33",
+  "ento-q35",
+  "ento-q38",
+  "ento-q40",
+  "ento-q41",
+  "ento-q44",
+]);
 check("Phase 1 added 30 questions", phase1.length === 30);
 check(
-  "Phase 1 questions are not image-required",
-  phase1.every((question) => question.imageRequired !== true),
-);
-check(
-  "Phase 1 questions have no IMAGE REQUIRED prompt prefix",
-  phase1.every((question) => !question.prompt.includes("[IMAGE REQUIRED:")),
+  "Phase 1 image-required items are the photographed set",
+  phase1.filter((question) => question.imageRequired === true).every((question) =>
+    phase1ImageIds.has(question.id),
+  ) &&
+    [...phase1ImageIds].every((id) =>
+      phase1.some((question) => question.id === id && question.imageRequired === true),
+    ),
 );
 check(
   "Phase 1 questions have sourceType",
@@ -193,10 +337,11 @@ check(
   phase1.every((question) => question.sourceNote.trim().length > 0),
 );
 
-const phase1Topics = new Set(phase1.map((question) => question.topicId));
 check(
-  "Phase 1 does not add visual-id items",
-  !phase1Topics.has("visual-id"),
+  "Phase 1 visual-id items are photographed",
+  phase1
+    .filter((question) => question.topicId === "visual-id")
+    .every((question) => question.imageRequired === true),
 );
 
 function assertImageBrief(question: EntomologyQuestion): void {

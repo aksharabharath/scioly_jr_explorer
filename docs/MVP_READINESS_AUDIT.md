@@ -1,8 +1,16 @@
 # Jr. Explorer — MVP readiness audit
 
-**This file is a snapshot from 2026-08-26.** Catalog, banks, and dashboard have moved on. Treat **`README.md`**, **`PRODUCT_SPEC.md`**, and **`PROJECT_CONTEXT.md`** as current product truth.
+**Historical snapshot from 2026-08-26.** This file records a product-readiness inspection on that date. Bank counts, unlock flags, playable events, and “what is the MVP” in the body **describe that snapshot**. They are **not** today’s working tree.
 
-**Current MVP (code, 2026-08-29):** five playable text events (Water Quality, Ecology, Entomology 27 live, A&P 45, Crime Busters 40), shared 10-question engine, XP/streak, 15 derived badges, map/log/badges pages, Tricky Topics = miss → 3 later corrects. Codebusters and builds remain Coming later. Entomology images are still held out. Hosted migration apply is still **not** recorded here.
+**Do not use this file for current bank totals or live-filter rules.** Current product truth is `README.md`, `PRODUCT_SPEC.md`, and `PROJECT_CONTEXT.md`. As of the later image-practice pass those docs should report:
+
+- Entomology: 60 registered / 36 live (19 text + 17 Commons photos) / 24 `needs-review` held out
+- Crime Busters: 44 registered / 44 live (40 text + 4 Loop / Whorl / Arch photos)
+- Anatomy & Physiology: 45 registered / 45 live, **unlocked**
+- Water Quality: 40 registered / 40 live, **unlocked**
+- Ecology: 40 registered / 40 live, **unlocked**
+
+A previous overlay labeled “Current MVP (code, 2026-08-29)” mixed newer Entomology counts into this file while leaving the 2026-08-26 body intact. That overlay is removed so this audit is not mistaken for a live status report.
 
 ---
 
@@ -40,7 +48,7 @@ The **student product loop is implemented and shippable for Entomology**, provid
 - Lessons / “learn” pages / choose-a-topic study flow
 - Water Quality and Ecology question banks
 - A&P live practice (locked on purpose)
-- Image-based Entomology items (9 `imageRequired`, all `needs-review`)
+- Expanding Entomology past the current 36 live items / replacing weak photos (see `docs/events/entomology/IMAGE_QA_2027.md`)
 - Full 120–150 item competition banks
 
 **Verdict:** Treat this as an **Entomology practice MVP**. Do not wait for A&P unlock or bank expansion. The remaining blockers are **operational** (env + migrations) and a few **P1 UX** issues (students can pick events that have no quiz).
@@ -93,7 +101,7 @@ Both banks map into the same generic `Question` type and `QUESTIONS_BY_EVENT` in
 | Registered | 60 (`ento-q1`–`ento-q60`) | 45 (`ap-q1`–`ap-q45`) |
 | Extra author fields | taxonomy tags, `imageBrief`, `sourceType` | `cognitiveDemand`, `evidenceIds`, `sourceType` |
 | Mapper strips extras | `entomologyQuestionToPracticeQuestion` | `anatomyPhysiologyQuestionToPracticeQuestion` |
-| Live filter | `verified` **and** `imageRequired !== true` | same (`isLivePracticeQuestion`) |
+| Live filter | `verified`; image-required also need `imageSrc` + `imageAlt` | `isLivePracticeQuestion` |
 | Catalog `unlocked` | `true` | `false` |
 | `/practice` | Open if event selected | **Blocked** (`getPracticePageData` returns null) |
 
@@ -146,13 +154,13 @@ Author-only fields (cognitive demand, sources, evidence IDs, taxon tags) stay on
 |---|---|
 | IDs `ento-q1`–`ento-q60` registered | Yes — `QUESTIONS_BY_EVENT.entomology` |
 | Live practice | `getQuestionsForEvent` → `isLivePracticeQuestion` |
-| Verified + non-image | **27** live (q1–q5, q19, q20, q31–q50) |
-| Held out | **33** `needs-review`, including **9** `imageRequired` |
-| Image items in live pool | No |
+| Verified | **36** (19 text + 17 image) |
+| Held out | **24** `needs-review` (text only) |
+| Image items in live pool | **17** (local Commons JPEGs; visual QA in `IMAGE_QA_2027.md`) |
 | Historical lookup | `getQuestionById` / `getAllQuestions` include held-out IDs; event-page `toLearningAttempts` uses the **full** entomology slice |
-| Selector dropping live items | No extra Entomology filter beyond verified + non-image |
+| Selector dropping live items | No extra Entomology filter beyond `isLivePracticeQuestion` |
 
-Live Entomology is **narrow by topic**, not by a bug: almost all live items are `taxonomy` and `dichotomous-keys`. Visual ID, anatomy, ecology, and similar topics remain held out. That is content QA, not an engine failure.
+Live Entomology includes taxonomy, keys, and **17 photographed** items. Anatomy/ecology-style **text** items remain `needs-review`. That is content QA, not an engine failure.
 
 ### A&P (`lib/mock/anatomy-physiology-questions.ts`)
 
@@ -358,11 +366,10 @@ Do not spend MVP time on:
 
 ---
 
-## Appendix — live Entomology vs held-out
+## Appendix — live Entomology vs held-out (as of this 2026-08-26 snapshot)
 
-Live (verified, text): **ento-q1–q5, q19, q20, q31–q50** (27).  
-Held out: **q6–q18, q21–q30, q51–q60** (33), including image-required visual items.
+**Do not copy these counts into current product docs.** This snapshot recorded Entomology live as **27** verified non-image items from 60 registered, with image-required items held out, and A&P **ap-q1–ap-q45** verified but **locked**.
 
-A&P: **ap-q1–ap-q45** all verified, all text, **locked**.
+Current live pools (36 Entomology including 17 images; Crime Busters 44; five unlocked events) are in `README.md`.
 
-No q61+ or ap-q46+ exist. This audit did not add any.
+No q61+ or ap-q46+ existed at the time of this audit. This audit did not add any.

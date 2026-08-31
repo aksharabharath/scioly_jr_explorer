@@ -126,7 +126,7 @@ Examples of **allowed** operations (not stems):
 
 **Blocked for MVP live items.** Do not create placeholders, fake URLs, or synthetic tables.
 
-When assets exist later, IM1–IM5 can leave the hold-out set. Until then, live practice should use **text** list/definition items only (same generic `verified` + not `imageRequired` rule as other events — do not add a Water Quality allowlist in app code in the authoring pass).
+When assets exist later, IM1–IM5 can leave the hold-out set (they still need `imageSrc` + `imageAlt` under the shared live filter). Until then, live practice should use **text** list/definition items only. Do not add a Water Quality allowlist in app code in the authoring pass.
 
 ---
 

@@ -20,23 +20,27 @@ The implementation supports `verificationStatus: "draft" | "needs-review" | "ver
 | **HUMAN REVIEW** | `needs-review` | Unresolved official-text ambiguity blocks verification |
 | **REMOVE** | — | None this pass |
 
-Practice live pool = `verified` **and** `imageRequired !== true`.
+Practice live pool = `verified` (omitted counts as verified). Image-required items additionally need non-empty `imageSrc` + `imageAlt`. That is implemented in `isLivePracticeQuestion`. There are **no** teaching SVGs; live images are Wikimedia Commons JPEGs in `public/entomology/`. Per-image visual/license QA: `IMAGE_QA_2027.md`.
 
 ---
 
-## Overall results
+## Overall results (code, 2026-08-30)
+
+Authoritative counts come from `lib/mock/entomology-questions.ts`, not from an older QA table.
 
 | QA status | Count | IDs |
 |---|---:|---|
-| VERIFIED | **27** | q1–q5, q19, q20, q31–q50 |
+| VERIFIED (incl. 17 photographed) | **36** | q1–q10, q12, q13, q17, q19, q20, q24, q31–q50 |
 | SOURCE NEEDED | **24** | q11, q14–q16, q18, q21–q23, q25–q30, q51–q60 |
-| IMAGE SOURCE NEEDED | **9** | q6–q10, q12, q13, q17, q24 |
-| HUMAN REVIEW | **0** | — |
+| IMAGE SOURCE NEEDED | **0** | Assets exist for all 17 `imageRequired` items. q10/q12/q41 were replaced 2026-08-30 (`IMAGE_QA_2027.md`) |
+| HUMAN REVIEW | **0** new | Extra biology on some live image items remains `FACTUAL_SOURCE_NEEDED` in the evidence matrix |
 | REMOVE | **0** | — |
 
-Source bank remains **exactly q1–q60**. Nine image-required items stay held out of live practice.
+Source bank remains **exactly q1–q60**. **Live practice pool = 36** (19 text + 17 image). The 24 text SOURCE NEEDED items stay `needs-review` (not promoted).
 
-This document records the **final MVP cleanup** of that bank. **`verificationStatus` changes this pass: none.** The verified core (q1–q5, q19, q20, q31–q50) stayed verified. Image-required and source-dependent items stayed `needs-review`. No q61+ items were added.
+**Image QA pass (2026-08-30):** Commons license re-check, visual fitness, and live JPEGs. Photographed items that had been `needs-review` only for missing images were promoted to `verified`. Several visual-id stems/choices were rewritten to match the photos (`IMAGE_QA_2027.md`). No q61+ items. Do not treat a photo as proof of unsourced biology.
+
+Historical note: an earlier QA pass reported 27 verified text items, 9 IMAGE SOURCE NEEDED, and live = 27. That is **obsolete**.
 
 ---
 
@@ -46,28 +50,28 @@ This document records the **final MVP cleanup** of that bank. **`verificationSta
 | -- | ----- | --------- | ----------- | --------------------------- | ---------------- | ------ | -------------- | ----------------------- |
 | q1 | taxonomy | VERIFIED | verified | Blattodea = cockroaches/termites | no | no | Explanation: Orthoptera/Coleoptera official order names | — |
 | q2 | taxonomy | VERIFIED | verified | Collembola = springtails, snow fleas | no | no | sourceNote | — |
-| q3 | taxonomy | VERIFIED | verified | Ixodidae / Non-Insect Arthropods / hardback ticks | no | no | Hint no longer names the Non-Insect heading | List grouping is official; description “insects” vs ticks is a packet ambiguity, not this stem |
+| q3 | visual-id | VERIFIED | verified | Ixodidae / Non-Insect Arthropods / hardback ticks | Commons photo | **yes** | — | Photo shows eight legs / fused body; choice D also names ticks. See `IMAGE_QA_2027.md` |
 | q4 | taxonomy | VERIFIED | verified | Ephemeroptera = mayflies | no | no | none this cleanup | Star unused |
-| q5 | taxonomy | VERIFIED | verified | Apidae (bees) → Hymenoptera | no | no | Hint no longer lists other Hymenoptera families | — |
-| q6 | visual-id | IMAGE SOURCE NEEDED | needs-review | Formicidae = ants (name only) | diagnostics | **yes** | Hint no longer names ants | No photo; petiole/antenna not on list |
-| q7 | visual-id | IMAGE SOURCE NEEDED | needs-review | Papilionidae = swallowtails | hindwing tails | **yes** | Hint no longer names swallowtails | No photo; tails not on list |
-| q8 | visual-id | IMAGE SOURCE NEEDED | needs-review | Notonectidae = backswimmers | orientation | **yes** | Hint no longer maps common name to orientation | Photo + orientation fact |
-| q9 | visual-id | IMAGE SOURCE NEEDED | needs-review | Curculionidae = weevils | snout | **yes** | Hint no longer names weevils | Photo + snout diagnostic |
-| q10 | visual-id | IMAGE SOURCE NEEDED | needs-review | Collembola names/rank | furcula | **yes** | none | Photo + furcula |
+| q5 | visual-id | VERIFIED | verified | Apidae (bees) listed | Commons photo | **yes** | — | Specimen photo; list names still the official support |
+| q6 | visual-id | VERIFIED | verified | Formicidae = ants (name only) | petiole not on list | **yes** | JPEG live | Photo present; extra morphology still not official. `IMAGE_QA_2027.md` PASS |
+| q7 | visual-id | VERIFIED | verified | Papilionidae = swallowtails | tails not on list | **yes** | JPEG live | Tails visible. `IMAGE_QA_2027.md` PASS |
+| q8 | visual-id | VERIFIED | verified | Notonectidae = backswimmers | orientation | **yes** | JPEG live | Photo shows pose; orientation still `FACTUAL_SOURCE_NEEDED` |
+| q9 | visual-id | VERIFIED | verified | Curculionidae = weevils | snout | **yes** | JPEG live | Snout visible; snout still not a list fact |
+| q10 | visual-id | VERIFIED | verified | Collembola names/rank | furcula | **yes** | JPEG live | A/B composite: whole animal + forked organ. Furcula still not a list fact |
 | q11 | comparison | SOURCE NEEDED | needs-review | Both families listed | swimming orientation | no | none | Orientation is not a list fact |
-| q12 | comparison | IMAGE SOURCE NEEDED | needs-review | Family names listed | antenna/palp split | **yes** | Hydrophilidae = water scavenger; hint/explanation | Photo + unsourced antenna split |
-| q13 | comparison | IMAGE SOURCE NEEDED | needs-review | Tipulidae/Culicidae listed | piercing/blood-feeding | **yes** | none | Photo + mouthpart/blood fact |
+| q12 | comparison | VERIFIED | verified | Family names listed | antenna/palp split | **yes** | JPEG live | B replaced (no tennis ball). Antenna split still not a list fact |
+| q13 | comparison | VERIFIED | verified | Tipulidae/Culicidae listed | piercing/blood-feeding | **yes** | JPEG live | Pairing photo OK; blood-feeding not visible in the image |
 | q14 | external-anatomy | SOURCE NEEDED | needs-review | Anatomy **in scope** only | tagmata | no | none | No official structure checklist |
 | q15 | external-anatomy | SOURCE NEEDED | needs-review | Anatomy in scope | exoskeleton function | no | none | Not a rules fact |
 | q16 | external-anatomy | SOURCE NEEDED | needs-review | Anatomy in scope | leg attachment | no | Hint no longer names thorax | Not a rules fact |
-| q17 | external-anatomy | IMAGE SOURCE NEEDED | needs-review | Anatomy in scope | cerci location | **yes** | Hint no longer names abdomen rear | Diagram + unsourced location |
+| q17 | external-anatomy | VERIFIED | verified | Anatomy in scope | cerci location | **yes** | JPEG live | Circle on rear pair; location still `FACTUAL_SOURCE_NEEDED` |
 | q18 | dichotomous-keys | SOURCE NEEDED | needs-review | Keys in scope | orientation couplet | no | sourceNote (may/will, not “required”) | Couplet biology |
 | q19 | dichotomous-keys | VERIFIED | verified | Orthoptera family official names | no | no | sourceNote cites RULES_2027_OFFICIAL.md | Name-only key |
 | q20 | dichotomous-keys | VERIFIED | verified | Official name groups (diving/water vs grasshoppers/crickets) | no | no | Choice A no longer asserts habitat; Hydrophilidae = water scavenger | — |
 | q21 | ecology-habitat | SOURCE NEEDED | needs-review | Trichoptera = caddisflies | larval freshwater habitat | no | none | Habitat not on list |
 | q22 | ecology-habitat | SOURCE NEEDED | needs-review | Ephemeroptera = mayflies | naiad habitat | no | none | Habitat not on list |
 | q23 | life-cycles | SOURCE NEEDED | needs-review | Taxa listed; life cycles **not named** | metamorphosis/pupa | no | none | Not official domain |
-| q24 | behavior-adaptations | IMAGE SOURCE NEEDED | needs-review | Dytiscidae listed; adaptations **may include** | natatorial | **yes** | none | Image + glossary not official |
+| q24 | behavior-adaptations | VERIFIED | verified | Dytiscidae listed; adaptations **may include** | natatorial | **yes** | JPEG live | Flattened hind leg visible; “natatorial” still not official |
 | q25 | behavior-adaptations | SOURCE NEEDED | needs-review | Gryllidae listed; behavior **may include** | stridulation | no | none | Mechanism not on list |
 | q26 | human-impact | SOURCE NEEDED | needs-review | Culicidae; public health **may include** | pathogens | no | none | Disease example not a list fact |
 | q27 | human-impact | SOURCE NEEDED | needs-review | Apidae = bees; economic **such as** food | honey/pollination | no | Hint no longer names Apidae = bees | Economic example not a list fact |
@@ -76,18 +80,18 @@ This document records the **final MVP cleanup** of that bank. **`verificationSta
 | q30 | climate | SOURCE NEEDED | needs-review | Climate **may include** | oxygen/warming | no | none | Mechanism not on list |
 | q31 | taxonomy | VERIFIED | verified | Scutelleridae = metallic shield bugs | no | no | Distractor `Stink bugs` (official capitals) | — |
 | q32 | taxonomy | VERIFIED | verified | Pentatomidae = Stink bugs | no | no | Prompt quotes “Stink bugs”; sourceNote cites official rules | — |
-| q33 | taxonomy | VERIFIED | verified | Cicadidae → Hemiptera | no | no | Hint no longer says “true-bug order” | — |
+| q33 | visual-id | VERIFIED | verified | Cicadidae → Hemiptera | Commons photo | **yes** | JPEG live | Specimen photo; list names still official support |
 | q34 | taxonomy | VERIFIED | verified | Megaloptera = dobsonflies | no | no | none | — |
-| q35 | taxonomy | VERIFIED | verified | Buprestidae → Coleoptera | no | no | Hint points at list parent, not “beetles” | — |
+| q35 | visual-id | VERIFIED | verified | Coccinellidae official string | Commons photo | **yes** | JPEG live | Lady-bird beetle photo. Family-to-order for Buprestidae remains q50 |
 | q36 | taxonomy | VERIFIED | verified | Zopheridae = diabolical ironclad Beetles | no | no | Choice/explanation capital B | — |
 | q37 | taxonomy | VERIFIED | verified | Tephritidae → Diptera | no | no | Hint points at list parent, not “fly family” | — |
-| q38 | taxonomy | VERIFIED | verified | Mantodea = mantids | no | no | none | — |
+| q38 | visual-id | VERIFIED | verified | Mantodea = mantids | Commons photo | **yes** | JPEG live | Specimen photo |
 | q39 | taxonomy | VERIFIED | verified | Siphonaptera fleas; order, no families | no | no | none | — |
-| q40 | taxonomy | VERIFIED | verified | Bombyliidae vs Apidae names/orders | no | no | none | — |
-| q41 | taxonomy | VERIFIED | verified | Vespidae full official string | no | no | none | — |
+| q40 | comparison | VERIFIED | verified | Bombyliidae vs Apidae names/orders | Commons photos | **yes** | JPEG live | A/B composite; list names still official support |
+| q41 | visual-id | VERIFIED | verified | Vespidae full official string | Commons photo | **yes** | JPEG live | Larger side-view photo (1920×1280) |
 | q42 | taxonomy | VERIFIED | verified | Saturniidae → Lepidoptera | no | no | Hint no longer groups swallowtails/nymphalids; explanation uses official order strings | — |
 | q43 | taxonomy | VERIFIED | verified | Collembola subclass vs Diplura order | no | no | none | — |
-| q44 | taxonomy | VERIFIED | verified | Membracidae → Hemiptera | no | no | Hint no longer names Hemiptera | — |
+| q44 | visual-id | VERIFIED | verified | Membracidae → Hemiptera | Commons photo | **yes** | JPEG live | Specimen photo |
 | q45 | dichotomous-keys | VERIFIED | verified | Non-Insect / Insecta / bees / ants | no | no | none | Name/heading key |
 | q46 | dichotomous-keys | VERIFIED | verified | Hemiptera names cicadas / metallic shield bugs | no | no | Explanation Stink bugs | — |
 | q47 | dichotomous-keys | VERIFIED | verified | thrips / dobsonflies / caddisflies | no | no | none | — |
@@ -111,12 +115,12 @@ This document records the **final MVP cleanup** of that bank. **`verificationSta
 
 | ID | Outcome |
 |---|---|
-| q12 | IMAGE SOURCE NEEDED. Official Hydrophilidae string **water scavenger** now used. Antenna/palp split still unsourced. |
+| q12 | VERIFIED in code (live JPEG). Official Hydrophilidae string **water scavenger**. Antenna/palp split still unsourced. Panel B replaced 2026-08-30 (`IMAGE_QA_2027.md`). |
 | q20 | VERIFIED after rewrite. First split is official-name grouping (diving/water vs grasshoppers/crickets), not “lives in water vs land.” |
 | q32 | VERIFIED. Official **Stink bugs**. Prompt now quotes that string. |
 | q36 | VERIFIED. Official **diabolical ironclad Beetles**. |
 | q50 | VERIFIED. Key uses official Zopheridae string. |
-| q8 | IMAGE SOURCE NEEDED. Hydrophilidae choice string corrected. |
+| q8 | Live JPEG. Hydrophilidae choice string corrected. Orientation still not a list fact. |
 | q11 / q18 | SOURCE NEEDED. Orientation still unsourced. |
 | q23 / q55 | SOURCE NEEDED. Life cycles not in official rules. |
 | q26 / q60 | SOURCE NEEDED. Public health is **may include**; pathogen fact is not listed. |
@@ -144,11 +148,11 @@ Unchanged from the prior QA: tagmata (q14/q51/q52), exoskeleton (q15/q53), metam
 
 ## Remaining evidence gaps
 
-1. Licensed specimen images and visual diagnostics.
-2. Factual sources for anatomy, habitat, metamorphosis, behavior, galls, pathogens, honey/pollination, climate mechanisms.
+1. Student-facing attribution is in the quiz. Remaining work is factual sources for anatomy/habitat/life-cycle items, not more image infrastructure.
+2. Factual sources for anatomy, habitat, metamorphosis, behavior, galls, pathogens, honey/pollination, climate mechanisms — **including** extra claims on some live image items (orientation, snout, furcula, cerci, natatorial, blood-feeding).
 3. Official key **style** (not required to keep name-only keys).
 4. Star meaning (unused in this bank).
-5. Description “insects” vs Entognatha / Ixodidae (q3 asks list grouping only).
+5. Description “insects” vs Entognatha / Ixodidae (q3 asks list grouping; photo is supporting).
 
 ---
 
@@ -159,16 +163,16 @@ This bank is intentionally incomplete. The MVP is **not** a 120–150-question c
 | Measure | Count |
 |---|---:|
 | Total registered questions | **60** (q1–q60 only) |
-| Verified | **27** (q1–q5, q19, q20, q31–q50) |
-| Needs-review | **33** |
-| Image-required | **9** (q6–q10, q12, q13, q17, q24) |
-| Current live-practice pool | **27** (`verified` and not image-required) |
+| Verified | **36** |
+| Needs-review | **24** (all text; none of the 17 image items) |
+| Image-required | **17** (all have local JPEG + alt; all live) |
+| Current live-practice pool | **36** (`verified`; image items also have `imageSrc` + `imageAlt`) |
 
-Live practice uses the generic verification filter. There is no Entomology-specific ID allowlist.
+Live practice uses the generic verification filter plus the image src/alt gate. There is no Entomology-specific ID allowlist.
 
 **Deferred for later expansion (not required for this MVP):**
 
-- Licensed specimen/diagram images for the nine image-required items
+- In-app attribution is live for CC BY / CC BY-SA Entomology photos
 - Sourced anatomy, habitat, life-cycle, behavior, gall, pathogen, honey/pollination, and climate facts (q11, q14–q16, q18, q21–q23, q25–q30, q51–q60)
 - Bank growth toward a full 120–150-question competition set (q61+ and remaining taxa coverage)
 - Official key style beyond name-only couplets; star meaning on the 2027 list
@@ -180,4 +184,5 @@ Live practice uses the generic verification filter. There is no Entomology-speci
 - `RULES_2027_OFFICIAL.md`
 - `TAXON_LIST_2027.md`
 - `EVIDENCE_MATRIX_2027.md`
+- `IMAGE_QA_2027.md`
 - `lib/mock/entomology-questions.ts`

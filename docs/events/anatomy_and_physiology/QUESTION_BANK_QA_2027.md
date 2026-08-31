@@ -27,7 +27,7 @@ The implementation supports `verificationStatus: "draft" | "needs-review" | "ver
 
 There are **no `draft` statuses after this pass**.
 
-Practice live pool = `verified` **and** `imageRequired !== true`. A&P is **unlocked** and listed in `EVENTS_WITH_QUESTION_BANKS`. All 45 items are live-eligible.
+Practice live pool = `verified` (omitted counts as verified). Image-required items also need `imageSrc` + `imageAlt`. This A&P bank has **no** image-required items, so all 45 verified items are live-eligible. A&P is **unlocked** and listed in `EVENTS_WITH_QUESTION_BANKS`.
 
 ---
 

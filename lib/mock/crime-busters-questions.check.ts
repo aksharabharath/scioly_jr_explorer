@@ -1,7 +1,9 @@
 /**
- * Structural checks for the Crime Busters 2027 MVP bank (cb-q1–cb-q40).
+ * Structural checks for the Crime Busters 2027 bank (cb-q1–cb-q44).
  * Run: npx tsx lib/mock/crime-busters-questions.check.ts
  */
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import {
   CRIME_BUSTERS_EVENT_ID,
   CRIME_BUSTERS_TOPIC_IDS,
@@ -35,17 +37,18 @@ const allowedSources = new Set<CrimeBustersSourceType>([
   "rhs-soil",
   "pubchem",
   "libretexts",
+  "commons",
 ]);
 const questions = MOCK_CRIME_BUSTERS_QUESTIONS;
 
-check("MVP bank has 40 questions", questions.length === 40);
+check("bank has 44 questions", questions.length === 44);
 
 const ids = questions.map((question) => question.id);
 check("question IDs are unique", new Set(ids).size === ids.length);
 check(
-  "IDs are cb-q1 through cb-q40 with no gaps",
+  "IDs are cb-q1 through cb-q44 with no gaps",
   ids.join(",") ===
-    Array.from({ length: 40 }, (_, index) => `cb-q${index + 1}`).join(","),
+    Array.from({ length: 44 }, (_, index) => `cb-q${index + 1}`).join(","),
 );
 
 const prompts = questions.map((question) => question.prompt.trim());
@@ -77,7 +80,36 @@ for (const question of questions) {
   );
   check(`${question.id} has a non-empty hint`, question.hint.trim().length > 0);
   check(`${question.id} has exactly 4 choices`, question.choices.length === 4);
-  check(`${question.id} is text-only`, question.imageRequired === false);
+  if (question.imageRequired) {
+    check(
+      `${question.id} has imageBrief`,
+      question.imageBrief.trim().length > 0,
+    );
+    check(
+      `${question.id} has a public crime-busters JPEG path`,
+      question.imageSrc.startsWith("/crime-busters/") &&
+        question.imageSrc.endsWith(".jpg"),
+    );
+    check(
+      `${question.id} image file exists`,
+      existsSync(join(process.cwd(), "public", question.imageSrc.slice(1))),
+    );
+    check(
+      `${question.id} has image alt text`,
+      question.imageAlt.trim().length > 0,
+    );
+    const leak = /loop|whorl|arch|tented|ulnar|radial|central pocket/i;
+    check(
+      `${question.id} image alt does not name the pattern family`,
+      !leak.test(question.imageAlt),
+    );
+    check(
+      `${question.id} image credit does not name the pattern family`,
+      !leak.test(question.imageCredit ?? ""),
+    );
+  } else {
+    check(`${question.id} is text-only`, question.imageRequired === false);
+  }
   check(
     `${question.id} has verificationStatus verified or needs-review`,
     question.verificationStatus === "verified" ||
@@ -136,7 +168,9 @@ for (const question of questions) {
   for (const evidenceId of question.evidenceIds) {
     check(
       `${question.id} evidence id ${evidenceId} looks like a matrix row`,
-      /^(E-CB-\d+|V-[PHFSWLG]\d+|V-W\d+|RS\d+)$/.test(evidenceId),
+      /^(E-CB-\d+|V-[PHFSWLG]\d+|V-W\d+|RS\d+|IM\d+(?:-[A-Z0-9]+)?)$/.test(
+        evidenceId,
+      ),
     );
   }
 
@@ -172,16 +206,18 @@ check(
   "no items remain draft",
   questions.every((question) => question.verificationStatus !== "draft"),
 );
-check(
-  "all items remain imageRequired false",
-  questions.every((question) => question.imageRequired === false),
-);
+const imageItems = questions.filter((question) => question.imageRequired);
+check("text MVP remains q1–q40", questions.slice(0, 40).every((question) => question.imageRequired === false));
+check("IM4 image slice is q41–q44", imageItems.length === 4 && imageItems.every((question) => {
+  const number = Number(question.id.replace("cb-q", ""));
+  return number >= 41 && number <= 44;
+}));
 check("safety topic is at most 3 items", (byTopic.safety ?? 0) <= 3);
 check(
-  "no q41+ items",
+  "no q45+ items",
   questions.every((question) => {
     const number = Number(question.id.replace("cb-q", ""));
-    return number >= 1 && number <= 40;
+    return number >= 1 && number <= 44;
   }),
 );
 
@@ -209,5 +245,6 @@ console.log(
     `verification={${Object.entries(byVerification)
       .map(([key, value]) => `${key}:${value}`)
       .join(",")}}`,
+    `imageRequired=${imageItems.length}`,
   ].join(" "),
 );

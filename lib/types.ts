@@ -121,8 +121,17 @@ export type Question = {
   explanation: string;
   hint: string;
   difficulty: DifficultyLevel;
-  /** True when a specimen image belongs with the item but is not supplied yet. */
+  /**
+   * True when the item is written as an image question. Live practice still
+   * requires a real `imageSrc` (see `isLivePracticeQuestion`).
+   */
   imageRequired?: boolean;
+  /** Public path for Entomology (and later events) practice images. */
+  imageSrc?: string;
+  /** Required when `imageSrc` is set. Read by the quiz; keep child-friendly. */
+  imageAlt?: string;
+  /** Student-visible credit for CC BY / CC BY-SA practice photos. */
+  imageCredit?: string;
   /** Author-only. Used to decide live practice eligibility; not shown to students. */
   verificationStatus?: QuestionVerificationStatus;
 };

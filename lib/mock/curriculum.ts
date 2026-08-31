@@ -78,15 +78,29 @@ const OVERVIEW_BY_EVENT: Record<string, string> = {
   ecology: MOCK_ECOLOGY_OVERVIEW,
 };
 
+export function questionHasPracticeImage(question: Question): boolean {
+  return (
+    typeof question.imageSrc === "string" &&
+    question.imageSrc.trim().length > 0 &&
+    typeof question.imageAlt === "string" &&
+    question.imageAlt.trim().length > 0
+  );
+}
+
 /**
  * Live practice eligibility. Banks that omit `verificationStatus` are treated
  * as verified so events that have not been through content QA stay playable.
+ * Image items are live only when a sourced `imageSrc` + `imageAlt` are present.
  */
 export function isLivePracticeQuestion(question: Question): boolean {
   const verificationStatus = question.verificationStatus ?? "verified";
-  return (
-    verificationStatus === "verified" && question.imageRequired !== true
-  );
+  if (verificationStatus !== "verified") {
+    return false;
+  }
+  if (question.imageRequired === true) {
+    return questionHasPracticeImage(question);
+  }
+  return true;
 }
 
 export function livePracticeQuestions(questions: Question[]): Question[] {

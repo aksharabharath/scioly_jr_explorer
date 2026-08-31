@@ -27,7 +27,7 @@ Do not invent minutiae catalogs, species-level hair keys, powder outcome tables,
 | `IMAGE-SOURCE-NEEDED` | Needs a print, micrograph, soil photo/sample, or lab stimulus not in this repo. |
 | `HUMAN-REVIEW` | Genuine wording, grouping, mixture, or product-format ambiguity. |
 
-`IMAGE-SOURCE-VERIFIED` is unused (**0** assets).
+`IMAGE-SOURCE-VERIFIED` is used for the IM4 family exemplars in §7.1 (**4** assets).
 
 Direct evidence vs inference is labeled in the Notes column.
 
@@ -77,9 +77,10 @@ Primary status per row (one status each). Dual labels in notes are not double-co
 | `RULES-SCOPE` | **16** | RS1–RS16 |
 | `SOURCE-VERIFIED` | **97** | 52 T1-RULES name/logistics rows (V-P, V-H, V-F, V-S, V-W, V-L, V-G) + 45 inspected external claims (E-CB-001–021, E-CB-023–046) |
 | `SOURCE-NEEDED` | **24** | SN1–SN24 |
-| `IMAGE-SOURCE-NEEDED` | **8** | IM1–IM8 |
+| `IMAGE-SOURCE-NEEDED` | **7** | IM1–IM3, IM5–IM8 |
+| `IMAGE-SOURCE-VERIFIED` | **4** | IM4-L1, IM4-L2, IM4-W1, IM4-A1 |
 | `HUMAN-REVIEW` | **12** | HR1–HR10, HR-FIB, HR-SUGAR |
-| **Total** | **157** | |
+| **Total** | **160** | |
 
 **External science claims (the 45 E-CB rows):** fingerprint definitions, two minutia types, skin/fingerprint formation, human vs animal hair **in general**, RHS soil properties, starch–iodine, carbonate/acid CO₂, selected formulas/uses, FTC manufactured-fiber definitions, cotton/cellulose.
 
@@ -320,20 +321,38 @@ USDA 12-class texture triangle was **not** inspected successfully. Do not treat 
 
 ---
 
-## 7. `IMAGE-SOURCE-NEEDED` (8)
+## 7. Image evidence
+
+`IMAGE-SOURCE-VERIFIED` is used only when a licensed file is on disk and the visible diagnostic was inspected.
+
+### 7.1 `IMAGE-SOURCE-VERIFIED` — IM4 family exemplars (4)
+
+Pattern-**family** ID only (Loop / Whorl / Arch). Do **not** key Central Pocket (`HR8`). Do **not** key ulnar vs radial from these files.
+
+| ID | File | Source | License | Diagnostic | Quiz |
+|---|---|---|---|---|---|
+| IM4-L1 | `public/crime-busters/cb-q41.jpg` | FBI *The Science of Fingerprints* fig. 61, [Gutenberg 19022](https://www.gutenberg.org/files/19022/19022-h/19022-h.htm) | Public domain (U.S. government work) | Ridges enter, recurve, leave on the same side; one delta opposite the opening | cb-q41 |
+| IM4-L2 | `public/crime-busters/cb-q42.jpg` | FBI handbook fig. 62, same Gutenberg edition | Public domain | Same-side entry/exit with a hairpin core | cb-q42 |
+| IM4-W1 | `public/crime-busters/cb-q43.jpg` | [Plain whorl in a right thumbprint.JPG](https://commons.wikimedia.org/wiki/File:Plain_whorl_in_a_right_thumbprint.JPG) (Metrónomo) | CC BY-SA 4.0 | Complete circuit in the core; deltas at lower left and lower right | cb-q43 |
+| IM4-A1 | `public/crime-busters/cb-q44.jpg` | [Tented arch in a left index fingerprint.jpg](https://commons.wikimedia.org/wiki/File:Tented_arch_in_a_left_index_fingerprint.jpg) (Metrónomo) | CC BY-SA 4.0 | Enter one side, central rise, exit the other; no complete circuit. Key **Arch** family only | cb-q44 |
+
+Inspected 2026-08-30. Companion `*-photo.jpg` files are the unmodified downloads. Quiz JPEGs for IM4-W1 and IM4-A1 are resized adaptations; CC BY-SA still requires attribution (`imageCredit` on those items).
+
+Rejected this pass: FBI sheet crops from fig. 107–110 and fig. 194–198 (crop did not isolate a single diagnostic print). Central-pocket Commons files (HR8). Unlabeled “Fingerprint right little finger” photos.
+
+### 7.2 `IMAGE-SOURCE-NEEDED` (7)
 
 | ID | Stimulus | Curriculum |
 |---|---|---|
 | IM1 | Crime-scene vs suspect fingerprint images | S1 |
 | IM2 | Minutiae callouts on a print | S2 |
 | IM3 | Skin-structure diagram (if required) | S3 |
-| IM4 | Pattern/subtype identification images | S4 / K10 |
 | IM5 | Hair micrographs (five sources) | S5 |
 | IM6 | Fiber micrographs (classes + six names) | S6 |
 | IM7 | Soil samples or equivalent photos | S7 |
 | IM8 | Powder/liquid unknown lab photos | S8–S9 (optional; wet-lab is official) |
 
-Do not author image-required items. Do not invent placeholder assets.
+Subtype-only pattern images (ulnar vs radial; tented vs plain as the keyed answer) remain out of this slice. Do not invent placeholder assets.
 
 ---
 

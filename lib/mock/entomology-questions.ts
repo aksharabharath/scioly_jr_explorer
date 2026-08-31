@@ -15,6 +15,7 @@ import type {
   Question,
   QuestionVerificationStatus,
 } from "@/lib/types";
+import { entomologyImageCredit } from "@/lib/mock/entomology-image-credits";
 
 export const ENTOMOLOGY_EVENT_ID = "entomology";
 
@@ -125,6 +126,8 @@ export type EntomologyQuestion =
   | (EntomologyBase & {
       imageRequired: true;
       imageBrief: string;
+      imageSrc: string;
+      imageAlt: string;
     })
   | (EntomologyBase & {
       imageRequired: false;
@@ -149,7 +152,7 @@ function ento(
     sourceNote: string;
     verificationStatus?: EntomologyVerificationStatus;
   } & (
-    | { imageRequired: true; imageBrief: string }
+    | { imageRequired: true; imageBrief: string; imageSrc: string; imageAlt: string }
     | { imageRequired?: false }
   ),
 ): EntomologyQuestion {
@@ -176,7 +179,13 @@ function ento(
   };
 
   if (input.imageRequired === true) {
-    return { ...base, imageRequired: true, imageBrief: input.imageBrief };
+    return {
+      ...base,
+      imageRequired: true,
+      imageBrief: input.imageBrief,
+      imageSrc: input.imageSrc,
+      imageAlt: input.imageAlt,
+    };
   }
   return { ...base, imageRequired: false };
 }
@@ -230,10 +239,10 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
   }),
   ento({
     id: "ento-q3",
-    topicId: "taxonomy",
+    topicId: "visual-id",
     difficulty: 1,
     prompt:
-      "Family Ixodidae appears on the 2027 ESO Entomology List. How is it grouped?",
+      "[IMAGE REQUIRED: eight-legged arthropod with a fused body.] Using the 2027 list, how is this specimen grouped?",
     choiceTexts: [
       "As an insect order in Class Insecta",
       "As a beetle family in Coleoptera",
@@ -241,15 +250,21 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "As a non-insect arthropod family (hardback ticks)",
     ],
     correctChoiceId: "d",
-    hint: "Find the list heading that is separate from Class Entognatha and Class Insecta.",
+    hint: "Count the walking legs and find the list heading that is separate from Class Insecta.",
     explanation:
-      "Ixodidae is listed under Non-Insect Arthropods with the common name hardback ticks. It is not an insect order or a beetle or true-bug family.",
+      "Ixodidae is listed under Non-Insect Arthropods with the common name hardback ticks. It is not an insect order or a beetle or true-bug family. Eight walking legs and a fused body are visible in the photo; those characters are not printed on the 2027 list.",
     taxonomyTags: ["Ixodidae"],
-    cognitiveDemand: "recall",
+    cognitiveDemand: "recognition",
     sourceType: "rules-derived",
     sourceNote:
-      "RULES_2027_OFFICIAL.md / TAXON_LIST_2027.md Non-Insect Arthropods, Family Ixodidae — hardback ticks.",
+      "RULES_2027_OFFICIAL.md / TAXON_LIST_2027.md Non-Insect Arthropods, Family Ixodidae — hardback ticks. Wikimedia Commons photo (see public/entomology/README.md).",
     verificationStatus: "verified",
+    imageRequired: true,
+    imageSrc: "/entomology/ento-q3.jpg",
+    imageAlt:
+      "Photograph of a small arthropod on dry grass with eight walking legs and a flattened, fused body.",
+    imageBrief:
+      "Hard tick in dorsal view: eight legs, fused body, no three insect tagmata. Not a beetle, true bug, or insect order.",
   }),
   ento({
     id: "ento-q4",
@@ -275,26 +290,32 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
   }),
   ento({
     id: "ento-q5",
-    topicId: "taxonomy",
+    topicId: "visual-id",
     difficulty: 2,
     prompt:
-      "A specimen is correctly identified as family Apidae (bees). Which order must it belong to on the 2027 list?",
+      "[IMAGE REQUIRED: hairy flower-visiting insect with two pairs of wings.] Using the 2027 list, which family is this insect?",
     choiceTexts: [
-      "Hymenoptera",
-      "Diptera",
-      "Lepidoptera",
-      "Coleoptera",
+      "Bombyliidae — bee flies",
+      "Formicidae — ants",
+      "Apidae — bees",
+      "Vespidae — paper wasps, hornets, yellowjackets",
     ],
-    correctChoiceId: "a",
-    hint: "Bee flies are a different listed family; do not mix them with Apidae.",
+    correctChoiceId: "c",
+    hint: "Among listed Hymenoptera families, match the specimen to its official common name. Do not pick bee flies.",
     explanation:
-      "Apidae is a family under Order Hymenoptera. Bee flies (Bombyliidae) are Diptera and are a different listed family.",
+      "Apidae is printed as bees under Hymenoptera. Bee flies (Bombyliidae) are a listed Diptera family. Ants are Formicidae; paper wasps, hornets, and yellowjackets are Vespidae.",
     taxonomyTags: ["Apidae", "Hymenoptera"],
-    cognitiveDemand: "application",
+    cognitiveDemand: "recognition",
     sourceType: "rules-derived",
     sourceNote:
-      "RULES_2027_OFFICIAL.md / TAXON_LIST_2027.md Order Hymenoptera (bees/ants/wasps.) → Family Apidae — bees.",
+      "RULES_2027_OFFICIAL.md / TAXON_LIST_2027.md Family Apidae — bees. Wikimedia Commons photo (see public/entomology/README.md).",
     verificationStatus: "verified",
+    imageRequired: true,
+    imageSrc: "/entomology/ento-q5.jpg",
+    imageAlt:
+      "Photograph of a hairy insect with banded abdomen visiting purple flowers.",
+    imageBrief:
+      "Honey bee on flowers: hairy thorax, two pairs of wings, no long rigid bee-fly proboscis. Not an ant or a paper wasp.",
   }),
   ento({
     id: "ento-q6",
@@ -316,9 +337,12 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     cognitiveDemand: "recognition",
     sourceType: "generated",
     sourceNote:
-      "Generated ID item using official Formicidae common name. Image not supplied. Visual diagnostics (petiole, elbowed antennae) are not in TAXON_LIST_2027.md.",
-    verificationStatus: "needs-review",
+      "Official Formicidae common name. Wikimedia Commons specimen photo (see public/entomology/README.md). No taxon name on the image.",
+    verificationStatus: "verified",
     imageRequired: true,
+    imageSrc: "/entomology/ento-q6.jpg",
+    imageAlt:
+      "Side-view photograph of a pinned insect with a narrow waist between the middle and rear body sections.",
     imageBrief:
       "Clear side view of a worker ant: distinct head, thorax, petiole (narrow waist), and gaster; elbowed antennae; no wasp-like folded wings required. Not a bee (no pollen baskets / hairy bee shape) and not a paper wasp.",
   }),
@@ -342,9 +366,12 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     cognitiveDemand: "recognition",
     sourceType: "generated",
     sourceNote:
-      "Generated visual ID. Style similar to sample Papilionidae items but not a copy. Hindwing-tail diagnostic is not on the 2027 list.",
-    verificationStatus: "needs-review",
+      "Official Papilionidae common name. Wikimedia Commons photo (see public/entomology/README.md); yellow circle marks hindwing projections only.",
+    verificationStatus: "verified",
     imageRequired: true,
+    imageSrc: "/entomology/ento-q7.jpg",
+    imageAlt:
+      "Photograph of a butterfly with its wings open. A yellow circle marks thin projections on the hindwings.",
     imageBrief:
       "Dorsal view of a swallowtail butterfly with obvious hindwing tails, clubbed antennae, and scaled wings. Do not use a saturniid moth (feathery antennae, no swallowtail tails) or a nymphalid without tails.",
   }),
@@ -368,9 +395,12 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     cognitiveDemand: "recognition",
     sourceType: "generated",
     sourceNote:
-      "Generated from listed common names. Not a copy of Sample Test 1. Swimming-orientation diagnostic: needs-review if photo is ambiguous.",
-    verificationStatus: "needs-review",
+      "Official Notonectidae common name. Wikimedia Commons photo (see public/entomology/README.md). No taxon name on the image.",
+    verificationStatus: "verified",
     imageRequired: true,
+    imageSrc: "/entomology/ento-q8.jpg",
+    imageAlt:
+      "Photograph of an aquatic insect swimming just under the water surface with its belly toward the surface and long hind legs.",
     imageBrief:
       "Live or photo of a backswimmer at the surface, clearly oriented belly-up (keel/dorsum downward), long oar-like hind legs. Must not be a water boatman swimming right-side up or a beetle with elytra.",
   }),
@@ -393,9 +423,13 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     taxonomyTags: ["Curculionidae", "Coleoptera"],
     cognitiveDemand: "recognition",
     sourceType: "generated",
-    sourceNote: "Generated visual ID from official Curculionidae common name. Snout diagnostic is not on the 2027 list.",
-    verificationStatus: "needs-review",
+    sourceNote:
+      "Official Curculionidae common name. Wikimedia Commons photo (see public/entomology/README.md). No taxon name on the image.",
+    verificationStatus: "verified",
     imageRequired: true,
+    imageSrc: "/entomology/ento-q9.jpg",
+    imageAlt:
+      "Photograph of a beetle with a long snout on the front of the head.",
     imageBrief:
       "Dorsal or three-quarter view of an adult weevil with a clear rostrum (snout) and clubbed/elbowed antennae arising from the snout. Not a round ladybug, not a scarab, not a smooth darkling beetle without a snout.",
   }),
@@ -419,9 +453,12 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     cognitiveDemand: "distinction",
     sourceType: "generated",
     sourceNote:
-      "Generated mixed-class ID. Furcula diagnostic is not on the 2027 list; photo must show it if used.",
-    verificationStatus: "needs-review",
+      "Official Collembola listing. Wikimedia Commons photo (see public/entomology/README.md). No taxon name on the image.",
+    verificationStatus: "verified",
     imageRequired: true,
+    imageSrc: "/entomology/ento-q10.jpg",
+    imageAlt:
+      "Two photographs labeled A and B: a tiny wingless six-legged arthropod, and a close-up of a forked structure from under the abdomen.",
     imageBrief:
       "Close-up of a springtail showing six legs, no wings, and a visible furcula (forked jumping structure) folded under the abdomen. Not a silverfish (flat, tapered, terminal filaments) and not a dipluran (two long cerci).",
   }),
@@ -453,7 +490,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "comparison",
     difficulty: 3,
     prompt:
-      "[IMAGE REQUIRED: two aquatic beetles — one with threadlike antennae and flattened hind legs, one with short clubbed antennae often hidden and palps that look like extra antennae.] Which pairing matches the 2027 list?",
+      "[IMAGE REQUIRED: two aquatic beetles labeled A and B.] Two aquatic beetles are shown as A and B. Which pairing matches the 2027 list?",
     choiceTexts: [
       "Threadlike antennae = Hydrophilidae; clubbed hidden antennae = Dytiscidae",
       "Both are Lampyridae because they glow underwater",
@@ -468,9 +505,12 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     cognitiveDemand: "distinction",
     sourceType: "generated",
     sourceNote:
-      "Standard aquatic-beetle split. Some hydrophilids are predatory; wording uses typical antenna characters. Flagged for review.",
-    verificationStatus: "needs-review",
+      "Official Dytiscidae and Hydrophilidae common names. Wikimedia Commons photos (see public/entomology/README.md); A/B labels only.",
+    verificationStatus: "verified",
     imageRequired: true,
+    imageSrc: "/entomology/ento-q12.jpg",
+    imageAlt:
+      "Two photographs of aquatic beetles labeled A and B.",
     imageBrief:
       "Side-by-side adults: (1) dytiscid with visible filiform antennae and oar-like hind legs; (2) hydrophilid with short clubbed antennae and prominent palps, often a convex underside. Labels optional; diagnostics must be visible.",
   }),
@@ -479,7 +519,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "comparison",
     difficulty: 3,
     prompt:
-      "[IMAGE REQUIRED: a long-legged fly that looks like a giant mosquito, next to a true mosquito.] Which listed families are being compared, and which one has piercing mouthparts used to take blood in many species?",
+      "[IMAGE REQUIRED: two flies labeled A and B.] Two flies are shown as A and B. Which listed families are being compared, and which one has piercing mouthparts used to take blood in many species?",
     choiceTexts: [
       "Tipulidae (crane flies) have the piercing mouthparts; Culicidae do not bite.",
       "Both are Bombyliidae (bee flies).",
@@ -494,9 +534,12 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     cognitiveDemand: "distinction",
     sourceType: "generated",
     sourceNote:
-      "Generated comparison. Blood-feeding applies to many but not all mosquitoes; adult crane flies are not blood-feeders. Review photo pair.",
-    verificationStatus: "needs-review",
+      "Official Tipulidae and Culicidae common names. Wikimedia Commons photos (see public/entomology/README.md); A/B labels only, no mouthpart circles.",
+    verificationStatus: "verified",
     imageRequired: true,
+    imageSrc: "/entomology/ento-q13.jpg",
+    imageAlt:
+      "Two photographs of flies labeled A and B. No extra labels on the mouthparts.",
     imageBrief:
       "Two adult flies to scale: a crane fly (very long legs, no long piercing proboscis, often V-shaped wing marking) and a mosquito (proboscis, scaled wing veins, shorter legs relative to crane flies). Not bee flies or blow flies.",
   }),
@@ -581,16 +624,19 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Inside the compound eyes",
     ],
     correctChoiceId: "c",
-    hint: "Use the labeled diagram. Do not pick antennae or eyes.",
+    hint: "Look at the circled pair of structures. Do not pick antennae or eyes.",
     explanation:
       "Cerci arise at the posterior end of the abdomen. They are not parts of the antennae, tarsi, or eyes.",
     taxonomyTags: ["Insecta"],
     cognitiveDemand: "recognition",
     sourceType: "generated",
     sourceNote:
-      "Cerci location is sample-adjacent (Sample Test 1 had a cerci item). Not an official structure checklist. Diagram required.",
-    verificationStatus: "needs-review",
+      "Cerci location is sample-adjacent. Wikimedia Commons photo (see public/entomology/README.md); yellow circle marks the rear pair only, without naming them.",
+    verificationStatus: "verified",
     imageRequired: true,
+    imageSrc: "/entomology/ento-q17.jpg",
+    imageAlt:
+      "Photograph of an insect. A yellow circle marks a pair of structures at the rear of the body.",
     imageBrief:
       "Simple side or dorsal diagram of an insect with the abdomen tip highlighted, showing a pair of cerci. Do not label antennae as cerci. Optional: a dipluran for contrast, clearly not required for the correct choice.",
   }),
@@ -751,9 +797,12 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     cognitiveDemand: "application",
     sourceType: "generated",
     sourceNote:
-      "Natatorial/fossorial/raptorial terms are sample-adjacent. Not on TAXON_LIST_2027.md.",
-    verificationStatus: "needs-review",
+      "Natatorial legs on listed Dytiscidae. Wikimedia Commons photo (see public/entomology/README.md); yellow circle marks a flattened hind leg only.",
+    verificationStatus: "verified",
     imageRequired: true,
+    imageSrc: "/entomology/ento-q24.jpg",
+    imageAlt:
+      "Photograph of an aquatic beetle in water. A yellow circle marks a flattened hind leg.",
     imageBrief:
       "Close-up of a predaceous diving beetle showing widened, oar-like hind legs with swimming hairs. Not a mole-cricket digging leg (not on the list) and not a mantid raptorial foreleg.",
   }),
@@ -942,25 +991,32 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
   }),
   ento({
     id: "ento-q33",
-    topicId: "taxonomy",
+    topicId: "visual-id",
     difficulty: 2,
     prompt:
-      "A specimen is correctly identified as family Cicadidae (cicadas). Which order must it belong to on the 2027 list?",
+      "[IMAGE REQUIRED: large insect with clear wings folded roof-like over the back.] Using the 2027 list, which family is this insect?",
     choiceTexts: [
-      "Hemiptera",
-      "Coleoptera",
-      "Diptera",
-      "Thysanoptera",
+      "Membracidae — treehoppers",
+      "Cicadidae — cicadas",
+      "Scutelleridae — metallic shield bugs",
+      "Coccinellidae — lady-bird beetles(ladybugs)",
     ],
-    correctChoiceId: "a",
-    hint: "Find the parent order printed above Cicadidae on the 2027 list.",
+    correctChoiceId: "b",
+    hint: "Match the specimen to a listed Hemiptera family common name. Do not pick a beetle family.",
     explanation:
-      "Cicadidae is a family of Order Hemiptera. Coleoptera holds beetle families; Diptera holds fly families; Thysanoptera is the order for thrips and has no families listed. Recording the parent order is part of list identification.",
+      "Cicadidae is printed as cicadas under Hemiptera. Treehoppers are Membracidae; metallic shield bugs are Scutelleridae; lady-bird beetles(ladybugs) are Coccinellidae in Coleoptera.",
     taxonomyTags: ["Cicadidae", "Hemiptera"],
-    cognitiveDemand: "application",
+    cognitiveDemand: "recognition",
     sourceType: "rules-derived",
-    sourceNote: "TAXON_LIST_2027.md Hemiptera → Cicadidae.",
+    sourceNote:
+      "TAXON_LIST_2027.md Family Cicadidae. Wikimedia Commons photo (see public/entomology/README.md).",
     verificationStatus: "verified",
+    imageRequired: true,
+    imageSrc: "/entomology/ento-q33.jpg",
+    imageAlt:
+      "Photograph of a stout insect with large compound eyes and long clear wings folded over its back.",
+    imageBrief:
+      "Adult cicada: wide head, membranous wings past the abdomen. Not a treehopper, shield bug, or lady-bird beetle.",
   }),
   ento({
     id: "ento-q34",
@@ -986,25 +1042,32 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
   }),
   ento({
     id: "ento-q35",
-    topicId: "taxonomy",
+    topicId: "visual-id",
     difficulty: 2,
     prompt:
-      "Family Buprestidae (metallic wood-boring/jewel beetles) belongs to which order on the 2027 list?",
+      "[IMAGE REQUIRED: round beetles with spotted wing covers.] Using the 2027 list, which family is this?",
     choiceTexts: [
-      "Hemiptera",
-      "Coleoptera",
-      "Diptera",
-      "Lepidoptera",
+      "Curculionidae — weevils",
+      "Scarabaeidae — dung beetles",
+      "Tenebrionidae — darkling beetles",
+      "Coccinellidae — lady-bird beetles(ladybugs)",
     ],
-    correctChoiceId: "b",
-    hint: "Find the parent order printed above Buprestidae on the 2027 list.",
+    correctChoiceId: "d",
+    hint: "Among listed beetle families, match the specimen to its official common name. Keep the official punctuation.",
     explanation:
-      "Buprestidae is a beetle family under Coleoptera (printed as beetles). Hemiptera is printed as true bugs; Diptera as true flies; Lepidoptera as moths and butterflies. The parent order comes from the list hierarchy.",
-    taxonomyTags: ["Buprestidae", "Coleoptera"],
-    cognitiveDemand: "application",
+      "Coccinellidae is printed as lady-bird beetles(ladybugs). Weevils are Curculionidae; dung beetles are Scarabaeidae; darkling beetles are Tenebrionidae. Spot pattern is not printed on the 2027 list.",
+    taxonomyTags: ["Coccinellidae", "Coleoptera"],
+    cognitiveDemand: "recognition",
     sourceType: "rules-derived",
-    sourceNote: "TAXON_LIST_2027.md Coleoptera → Buprestidae.",
+    sourceNote:
+      "TAXON_LIST_2027.md Family Coccinellidae — lady-bird beetles(ladybugs). Wikimedia Commons photo (see public/entomology/README.md). Buprestidae family-to-order remains in ento-q50.",
     verificationStatus: "verified",
+    imageRequired: true,
+    imageSrc: "/entomology/ento-q35.jpg",
+    imageAlt:
+      "Photograph of two round beetles with spotted wing covers on a green plant.",
+    imageBrief:
+      "Lady-bird beetles in dorsal view: round spotted elytra, no snout. Not weevils, dung beetles, or darkling beetles.",
   }),
   ento({
     id: "ento-q36",
@@ -1052,25 +1115,32 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
   }),
   ento({
     id: "ento-q38",
-    topicId: "taxonomy",
+    topicId: "visual-id",
     difficulty: 1,
     prompt:
-      "Order Mantodea appears on the 2027 list as which official common name?",
+      "[IMAGE REQUIRED: insect with a triangular head and folded grasping front legs.] Using the 2027 list, which order is this?",
     choiceTexts: [
-      "silverfish, firebrats",
-      "cockroaches/termites",
-      "crickets/tree crickets",
-      "mantids",
+      "Zygentoma — silverfish, firebrats",
+      "Blattodea — cockroaches/termites",
+      "Orthoptera — grasshoppers & crickets",
+      "Mantodea — mantids",
     ],
     correctChoiceId: "d",
-    hint: "Do not confuse this order with Blattodea or with cricket families.",
+    hint: "Match the specimen to the listed order’s official common name. Do not pick cockroaches or crickets.",
     explanation:
-      "Mantodea is printed as mantids. Silverfish and firebrats are Zygentoma; cockroaches/termites are Blattodea; crickets/tree crickets are Gryllidae in Orthoptera. The official string is what the list uses.",
+      "Mantodea is printed as mantids. Silverfish and firebrats are Zygentoma; cockroaches/termites are Blattodea; grasshoppers & crickets are Orthoptera. Folded grasping front legs are visible in the photo; that character is not printed on the 2027 list.",
     taxonomyTags: ["Mantodea"],
-    cognitiveDemand: "recall",
+    cognitiveDemand: "recognition",
     sourceType: "rules-derived",
-    sourceNote: "TAXON_LIST_2027.md Order Mantodea common names.",
+    sourceNote:
+      "TAXON_LIST_2027.md Order Mantodea — mantids. Wikimedia Commons photo (see public/entomology/README.md).",
     verificationStatus: "verified",
+    imageRequired: true,
+    imageSrc: "/entomology/ento-q38.jpg",
+    imageAlt:
+      "Photograph of a green insect with a triangular head and folded, spiny front legs.",
+    imageBrief:
+      "Mantid: triangular head, raptorial forelegs folded. Not a cockroach, cricket, or silverfish.",
   }),
   ento({
     id: "ento-q39",
@@ -1097,48 +1167,61 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
   }),
   ento({
     id: "ento-q40",
-    topicId: "taxonomy",
+    topicId: "comparison",
     difficulty: 3,
     prompt:
-      "Bee flies and bees are both on the 2027 list. Which pairing matches the official names and orders?",
+      "[IMAGE REQUIRED: two flower-visiting insects labeled A and B.] Two insects are shown as A and B. Which pairing matches the 2027 list?",
     choiceTexts: [
-      "Bee flies = Apidae in Hymenoptera; bees = Bombyliidae in Diptera",
-      "Bee flies = Bombyliidae in Diptera; bees = Apidae in Hymenoptera",
-      "Both official names belong to families in Hymenoptera",
-      "Both official names belong to families in Diptera",
+      "A and B are both Apidae in Hymenoptera",
+      "A = Bombyliidae in Diptera; B = Apidae in Hymenoptera",
+      "A = Apidae in Hymenoptera; B = Bombyliidae in Diptera",
+      "A and B are both Bombyliidae in Diptera",
     ],
     correctChoiceId: "b",
-    hint: "Match each official common name to its family and parent order. Similar everyday words can sit in different orders.",
+    hint: "Match each specimen to a listed family and its parent order. Similar everyday words can sit in different orders.",
     explanation:
-      "Bombyliidae is printed as bee flies under Diptera. Apidae is printed as bees under Hymenoptera. Swapping those families or putting both in one order mixes two list entries that only sound similar.",
+      "Bombyliidae is printed as bee flies under Diptera. Apidae is printed as bees under Hymenoptera. Specimen A has one pair of wings and a long rigid mouthpart; specimen B has two pairs of wings. Those photo characters are not printed on the 2027 list.",
     taxonomyTags: ["Bombyliidae", "Apidae", "Diptera", "Hymenoptera"],
     cognitiveDemand: "distinction",
     sourceType: "rules-derived",
     sourceNote:
-      "TAXON_LIST_2027.md Bombyliidae (bee flies) vs Apidae (bees) and their parent orders.",
+      "TAXON_LIST_2027.md Bombyliidae (bee flies) vs Apidae (bees). Wikimedia Commons photos (see public/entomology/README.md); A/B labels only.",
     verificationStatus: "verified",
+    imageRequired: true,
+    imageSrc: "/entomology/ento-q40.jpg",
+    imageAlt:
+      "Two photographs of flower-visiting insects labeled A and B. No extra labels on the mouthparts or wings.",
+    imageBrief:
+      "A: bee fly with one wing pair and long rigid proboscis. B: honey bee with two wing pairs. Do not print family names on the image.",
   }),
   ento({
     id: "ento-q41",
-    topicId: "taxonomy",
+    topicId: "visual-id",
     difficulty: 1,
     prompt:
-      "Family Vespidae is printed on the 2027 list as which official common names?",
+      "[IMAGE REQUIRED: yellow-and-black flying insect with a narrow waist.] Using the 2027 list, which family is this?",
     choiceTexts: [
-      "ants",
-      "bees",
-      "paper wasps, hornets, yellowjackets",
-      "gall wasps",
+      "Formicidae — ants",
+      "Apidae — bees",
+      "Vespidae — paper wasps, hornets, yellowjackets",
+      "Cynipidae — gall wasps",
     ],
     correctChoiceId: "c",
-    hint: "All four choices are Hymenoptera common names on this list; match this family exactly.",
+    hint: "All four choices are listed Hymenoptera families; match the specimen to the official common-name string.",
     explanation:
-      "Vespidae is printed as paper wasps, hornets, yellowjackets. Ants are Formicidae; bees are Apidae; gall wasps are Cynipidae. Recording the full official string keeps four hymenopteran families from collapsing into “wasp.”",
+      "Vespidae is printed as paper wasps, hornets, yellowjackets. Ants are Formicidae; bees are Apidae; gall wasps are Cynipidae. A narrow waist is visible in the photo; that character is not printed on the 2027 list.",
     taxonomyTags: ["Vespidae", "Hymenoptera"],
-    cognitiveDemand: "recall",
+    cognitiveDemand: "recognition",
     sourceType: "rules-derived",
-    sourceNote: "TAXON_LIST_2027.md Family Vespidae common names.",
+    sourceNote:
+      "TAXON_LIST_2027.md Family Vespidae. Wikimedia Commons photo (see public/entomology/README.md).",
     verificationStatus: "verified",
+    imageRequired: true,
+    imageSrc: "/entomology/ento-q41.jpg",
+    imageAlt:
+      "Photograph of a yellow-and-black perched insect with a narrow waist and banded abdomen.",
+    imageBrief:
+      "Yellowjacket in flight: yellow and black bands, narrow waist. Not an ant, bee, or gall wasp.",
   }),
   ento({
     id: "ento-q42",
@@ -1187,25 +1270,32 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
   }),
   ento({
     id: "ento-q44",
-    topicId: "taxonomy",
+    topicId: "visual-id",
     difficulty: 2,
     prompt:
-      "Family Membracidae (treehoppers) belongs to which listed order?",
+      "[IMAGE REQUIRED: small insect with a peaked shield over the back.] Using the 2027 list, which family is this?",
     choiceTexts: [
-      "Orthoptera",
-      "Hemiptera",
-      "Coleoptera",
-      "Thysanoptera",
+      "Acrididae — short-horned grasshoppers",
+      "Cicadidae — cicadas",
+      "Membracidae — treehoppers",
+      "Pentatomidae — Stink bugs",
     ],
-    correctChoiceId: "b",
-    hint: "Find the parent order printed above Membracidae on the 2027 list.",
+    correctChoiceId: "c",
+    hint: "Match the specimen to a listed Hemiptera family common name. Do not pick a grasshopper family.",
     explanation:
-      "Membracidae is a family of Hemiptera (true bugs). Orthoptera is printed as grasshoppers & crickets; Coleoptera as beetles; Thysanoptera as thrips with no families listed. Parent order comes from the hierarchy.",
+      "Membracidae is printed as treehoppers under Hemiptera. Cicadas are Cicadidae; Stink bugs are Pentatomidae; short-horned grasshoppers are Acrididae in Orthoptera. A peaked dorsal shield is visible in the photo; that character is not printed on the 2027 list.",
     taxonomyTags: ["Membracidae", "Hemiptera"],
-    cognitiveDemand: "application",
+    cognitiveDemand: "recognition",
     sourceType: "rules-derived",
-    sourceNote: "TAXON_LIST_2027.md Hemiptera → Membracidae.",
+    sourceNote:
+      "TAXON_LIST_2027.md Family Membracidae. Wikimedia Commons photo (see public/entomology/README.md).",
     verificationStatus: "verified",
+    imageRequired: true,
+    imageSrc: "/entomology/ento-q44.jpg",
+    imageAlt:
+      "Side photograph of a small green insect with a peaked shield-shaped back on a stem.",
+    imageBrief:
+      "Treehopper in side view: enlarged pronotum forming a peak. Not a cicada, stink bug, or short-horned grasshopper.",
   }),
   ento({
     id: "ento-q45",
@@ -1581,6 +1671,9 @@ const IMAGE_REQUIRED_PREFIX = /^\[IMAGE REQUIRED:[^\]]*\]\s*/;
 export function entomologyQuestionToPracticeQuestion(
   question: EntomologyQuestion,
 ): Question {
+  const imageCredit = question.imageRequired
+    ? entomologyImageCredit(question.imageSrc)
+    : undefined;
   return {
     id: question.id,
     eventId: question.eventId,
@@ -1593,5 +1686,12 @@ export function entomologyQuestionToPracticeQuestion(
     difficulty: question.difficulty,
     imageRequired: question.imageRequired,
     verificationStatus: question.verificationStatus,
+    ...(question.imageRequired
+      ? {
+          imageSrc: question.imageSrc,
+          imageAlt: question.imageAlt,
+          ...(imageCredit ? { imageCredit } : {}),
+        }
+      : {}),
   };
 }

@@ -16,6 +16,7 @@ import {
   getQuestionById,
   getQuestionsForEvent,
   isLivePracticeQuestion,
+  questionHasPracticeImage,
 } from "@/lib/mock/curriculum";
 import type { Question } from "@/lib/types";
 import {
@@ -94,15 +95,26 @@ async function run() {
     (question) => question.eventId === "crime-busters",
   );
   check(
-    "Crime Busters registered MVP bank has 40 questions",
-    fullCrime.length === 40 && MOCK_CRIME_BUSTERS_QUESTIONS.length === 40,
+    "Crime Busters registered bank has 44 questions",
+    fullCrime.length === 44 && MOCK_CRIME_BUSTERS_QUESTIONS.length === 44,
   );
   check(
-    "Crime Busters items are verified and text-only",
+    "Crime Busters items are verified",
     fullCrime.every(
+      (question) => question.verificationStatus === "verified",
+    ),
+  );
+  check(
+    "Crime Busters q1–q40 stay text-only",
+    fullCrime.slice(0, 40).every((question) => question.imageRequired === false),
+  );
+  check(
+    "Crime Busters q41–q44 are live image items",
+    fullCrime.slice(40).every(
       (question) =>
-        question.verificationStatus === "verified" &&
-        question.imageRequired === false,
+        question.imageRequired === true &&
+        questionHasPracticeImage(question) &&
+        isLivePracticeQuestion(question),
     ),
   );
   const fullEcology = allQuestions.filter(
@@ -146,11 +158,11 @@ async function run() {
   );
   const crimeLive = await getQuestionsForEvent("crime-busters");
   check(
-    "live Crime Busters filter is the full 40-question verified bank",
-    crimeLive.length === 40 &&
+    "live Crime Busters filter is the 44-question verified bank",
+    crimeLive.length === 44 &&
       crimeLive.every(isLivePracticeQuestion) &&
       crimeLive.map((question) => question.id).join(",") ===
-        Array.from({ length: 40 }, (_, index) => `cb-q${index + 1}`).join(","),
+        Array.from({ length: 44 }, (_, index) => `cb-q${index + 1}`).join(","),
   );
   const ecologyLive = await getQuestionsForEvent("ecology");
   check(
@@ -209,20 +221,23 @@ async function run() {
   const imageRequiredCount = fullEntomology.filter(
     (question) => question.imageRequired === true,
   ).length;
-  const expectedLive = MOCK_ENTOMOLOGY_QUESTIONS.filter(
-    (question) =>
-      question.verificationStatus === "verified" &&
-      question.imageRequired !== true,
-  );
+  const expectedLive = MOCK_ENTOMOLOGY_QUESTIONS.filter((question) => {
+    if (question.verificationStatus !== "verified") {
+      return false;
+    }
+    if (question.imageRequired === true) {
+      return Boolean(question.imageSrc && question.imageAlt);
+    }
+    return true;
+  });
   const needsReviewNonImage = fullEntomology.find(
     (question) =>
       question.verificationStatus === "needs-review" &&
       question.imageRequired !== true,
   );
-  const needsReviewImage = fullEntomology.find(
+  const liveImageItem = fullEntomology.find(
     (question) =>
-      question.verificationStatus === "needs-review" &&
-      question.imageRequired === true,
+      question.imageRequired === true && isLivePracticeQuestion(question),
   );
 
   check(
@@ -234,11 +249,21 @@ async function run() {
     }),
   );
   check(
-    "a verified image-required question is not live",
+    "a verified image-required question without an image is not live",
     !isLivePracticeQuestion({
       ...eligibilitySample,
       verificationStatus: "verified",
       imageRequired: true,
+    }),
+  );
+  check(
+    "a verified image-required question with src and alt is live",
+    isLivePracticeQuestion({
+      ...eligibilitySample,
+      verificationStatus: "verified",
+      imageRequired: true,
+      imageSrc: "/entomology/ento-q6.jpg",
+      imageAlt: "Labeled ant drawing",
     }),
   );
   check(
@@ -266,14 +291,14 @@ async function run() {
     }),
   );
   check(
-    "live Entomology practice has 27 verified non-image questions",
-    entomology.length === 27 &&
+    "live Entomology practice has 36 verified questions including 17 image items",
+    entomology.length === 36 &&
       entomology.length === expectedLive.length &&
       entomology.every(isLivePracticeQuestion) &&
+      entomology.filter((question) => question.imageRequired === true)
+        .length === 17 &&
       entomology.every(
-        (question) =>
-          question.verificationStatus === "verified" &&
-          question.imageRequired !== true,
+        (question) => question.verificationStatus === "verified",
       ),
   );
   check(
@@ -332,9 +357,9 @@ async function run() {
         needsReviewNonImage.id,
   );
   check(
-    "needs-review image-required questions remain look-up-able",
-    needsReviewImage !== undefined &&
-      (await getQuestionById(needsReviewImage.id))?.id === needsReviewImage.id,
+    "image-required Entomology items remain look-up-able",
+    liveImageItem !== undefined &&
+      (await getQuestionById(liveImageItem.id))?.id === liveImageItem.id,
   );
 
   check("Entomology has practice", eventHasPractice("entomology"));
@@ -395,7 +420,8 @@ async function run() {
   check(
     "historical lookup resolves all registered Crime Busters questions",
     (await getQuestionById("cb-q1"))?.eventId === "crime-busters" &&
-      (await getQuestionById("cb-q40"))?.id === "cb-q40",
+      (await getQuestionById("cb-q40"))?.id === "cb-q40" &&
+      (await getQuestionById("cb-q44"))?.id === "cb-q44",
   );
   check(
     "historical lookup resolves all registered Ecology questions",
@@ -416,7 +442,7 @@ async function run() {
     crimePractice !== null &&
       crimePractice.event.id === "crime-busters" &&
       crimePractice.event.unlocked === true &&
-      crimePractice.questions.length === 40 &&
+      crimePractice.questions.length === 44 &&
       crimePractice.questions.every(isLivePracticeQuestion),
   );
   const ecologyPage = await getEventPageData("ecology");
@@ -652,24 +678,20 @@ async function run() {
       }),
   );
   check(
-    "practice selection cannot return an image-required question",
-    entomology.every((question) => question.imageRequired !== true) &&
+    "practice selection stays in the live Entomology pool",
+    first !== null &&
+      isLivePracticeQuestion(first) &&
       session.every((id) => {
         const question = entomology.find((item) => item.id === id);
-        return question !== undefined && question.imageRequired !== true;
+        return question !== undefined && isLivePracticeQuestion(question);
       }),
   );
 
-  if (needsReviewNonImage && needsReviewImage) {
+  if (needsReviewNonImage) {
     const weakFromNonLive = toLearningAttempts(
       [
         {
           questionId: needsReviewNonImage.id,
-          isCorrect: false,
-          hintUsed: false,
-        },
-        {
-          questionId: needsReviewImage.id,
           isCorrect: false,
           hintUsed: false,
         },
@@ -710,17 +732,6 @@ async function run() {
             id !== needsReviewNonImage.id
           );
         }),
-    );
-    check(
-      "weak-topic practice cannot return an image-required question",
-      weakIds.every((id) => {
-        const question = entomology.find((item) => item.id === id);
-        return (
-          question !== undefined &&
-          question.imageRequired !== true &&
-          id !== needsReviewImage.id
-        );
-      }),
     );
   }
 

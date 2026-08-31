@@ -73,22 +73,24 @@ export default async function PracticePage({
 
   return (
     <main className="flex flex-1 flex-col">
-      <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-        <p className="text-sm">
-          <Link
-            href={`/events/${data.event.id}`}
-            className="font-medium text-teal underline-offset-4 hover:underline"
-          >
-            ← {data.event.name}
-          </Link>
-        </p>
-        <p className="mt-6 text-sm font-semibold text-teal">
-          {mode === "weak" ? "Practice Tricky Topics" : "Practice"}
-        </p>
-        <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight text-ink">
+      <div className="mx-auto w-full max-w-3xl px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <p className="text-sm">
+            <Link
+              href={`/events/${data.event.id}`}
+              className="font-medium text-teal underline-offset-4 hover:underline"
+            >
+              ← {data.event.name}
+            </Link>
+          </p>
+          <p className="text-sm font-semibold text-teal">
+            {mode === "weak" ? "Practice Tricky Topics" : "Practice"}
+          </p>
+        </div>
+        <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-ink">
           {data.event.name}
         </h1>
-        <p className="mt-2 text-sm text-stone-600">
+        <p className="mt-1 text-sm text-stone-600">
           {mode === "weak"
             ? "These questions focus on topics you have found tricky."
             : "One question at a time. Check your thinking, then keep going."}
@@ -99,7 +101,7 @@ export default async function PracticePage({
             revisit. This session uses regular adaptive practice instead.
           </p>
         ) : null}
-        <div className="mt-6">
+        <div className="mt-4">
           <PracticeQuiz
             eventId={data.event.id}
             eventName={data.event.name}

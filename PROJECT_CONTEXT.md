@@ -22,7 +22,7 @@ Working today (in source):
 - Event Selection v1: persist chosen event IDs; onboarding if none; My Events to change them; unselected event URLs redirect home
 - Protected dashboard, event, map, log, and badge routes
 - 2027 catalog of **nine** events. **Selectable:** Water Quality, Ecology, Entomology, Anatomy & Physiology, Crime Busters. **Locked (visible, not selectable):** Codebusters, Engineering CAD, Hovercraft, Rubber Band Catapult
-- Live text practice for all five selectable events (same engine). Entomology live pool is **27** of 60 registered (image-required / needs-review held out). Astronomy remains for checks only
+- Live practice for all five selectable events (same engine). Entomology live pool is **36** of 60 registered (17 Commons photos + 19 text). Crime Busters live pool is **44** of 44 (40 text + 4 Loop / Whorl / Arch photos). Astronomy remains for checks only
 - 10-question adaptive sessions
 - Hints, explanations, saved attempts (including `hint_used`)
 - Cross-session adaptive selection and **Practice Tricky Topics** (miss → weak; 3 later corrects on that topic → strong; last 40 attempts)
@@ -130,13 +130,13 @@ The database stores those **IDs only**. Names/descriptions stay in the mock cata
 
 ## Practice
 
-`PracticeQuiz` runs a **10-question** set (`PRACTICE_SET_SIZE = 10` in `lib/learning/adaptive.ts`). The practice page loads the **live practice pool** for that event via `getPracticePageData` → `getQuestionsForEvent` in `lib/mock/curriculum.ts`. Live practice excludes `imageRequired` items. Adaptive selection orders the event’s live pool; it does **not** use a fixed 10-item list.
+`PracticeQuiz` runs a **10-question** set (`PRACTICE_SET_SIZE = 10` in `lib/learning/adaptive.ts`). The practice page loads the **live practice pool** for that event via `getPracticePageData` → `getQuestionsForEvent` in `lib/mock/curriculum.ts`. Live practice excludes unverified items. Entomology image items enter the live pool only when they have `imageSrc` and `imageAlt`. Adaptive selection orders the event’s live pool; it does **not** use a fixed 10-item list.
 
-`eventHasPractice(eventId)` is true when that event has live (non-image-required) questions. Build events and locked catalog events never get a practice route (`getPracticePageData` returns null when `kind === "build"` or `unlocked === false`). Extra Astronomy remains unlocked in the registry so checks can still load it.
+`eventHasPractice(eventId)` is true when that event has at least one live-eligible question (`isLivePracticeQuestion`). Image-required items count when they are verified and have `imageSrc` + `imageAlt`. Build events and locked catalog events never get a practice route (`getPracticePageData` returns null when `kind === "build"` or `unlocked === false`). Extra Astronomy remains unlocked in the registry so checks can still load it.
 
 `MOCK_ASTRONOMY_PRACTICE_IDS` is a leftover 4-id array. **Nothing in `app/` calls it.**
 
-Entomology items with `imageRequired` stay in `lib/mock/entomology-questions.ts` for later. They are **not** shown in live practice and the quiz does **not** tell a child that a specimen image is missing.
+Entomology `imageRequired` items use Wikimedia Commons photographs in `public/entomology/`. Alt text and overlays do not name the taxon or the correct choice. CC BY / CC BY-SA photos show a short credit under the figure.
 
 On **Check answer** the quiz calls `savePracticeAttempt` with `attemptId`, `sessionId`, `hintUsed`, and the student’s local calendar date. Next / results wait until the save succeeds. Feedback and explanations are shown immediately.
 
@@ -242,7 +242,7 @@ Astronomy is not in that catalog. `/events/astronomy` **404s** for students. The
 - Password reset / resend confirmation
 - Practice bank for Codebusters
 - Quiz practice for build events (Engineering CAD, Hovercraft, Rubber Band Catapult)
-- Specimen images for Entomology image-required items (held out of live practice)
+- Entomology image items beyond the current 17 Commons photos; Crime Busters image work beyond the four IM4 family exemplars
 - Real Event Level or topic mastery
 - Leaderboards, notifications, social features
 - Streak freezes/repairs

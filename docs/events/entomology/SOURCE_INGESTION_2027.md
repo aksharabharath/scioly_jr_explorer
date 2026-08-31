@@ -54,14 +54,16 @@ Full concept records, the 53-row official list, and the q1–q60 table live in `
 
 ---
 
-## 3. q1–q60 (statuses unchanged)
+## 3. q1–q60
 
-- **23** safely supported by official list/rules (names, ranks, name-only keys): q1–q5, q19, q31, q33–q35, q37–q49.
-- **4** human review (left `verified`): q20, q32, q36, q50.
-- **24** factual source needed.
-- **9** image/source asset needed.
+**Image assets (2026-08-30):** 17 live `imageRequired` items have local JPEGs under `public/entomology/`. See `IMAGE_QA_2027.md`. This file does **not** change `verificationStatus`. Photos do **not** close `FACTUAL_SOURCE_NEEDED` rows (orientation, snout, furcula, cerci location, natatorial, blood-feeding, etc.).
 
-Do not mark VERIFIED because a topic is in scope.
+- **23** safely supported by official list/rules as name/rank/key items: q1–q5, q19, q31, q33–q35, q37–q49 (several of these now also have specimen photos; list support is still the printed names).
+- **4** human review (left `verified` in the bank): q20, q32, q36, q50.
+- **24** factual source needed (text `needs-review`; not promoted this pass).
+- **17** photographed live items. q10/q12/q41 replacements and student credits: `IMAGE_QA_2027.md`.
+
+Do not mark VERIFIED because a topic is in scope. Do not treat a photo as a factual source for extra biology.
 
 ---
 
@@ -75,6 +77,6 @@ Do not mark VERIFIED because a topic is in scope.
 
 1. Re-QA q1–q60 against aligned official strings (do not skip).
 2. Then author more **list-literacy / name-only keys** only.
-3. Factual sources + images before correlated/visual expansion.
+3. Keep image QA current. Do not expand q61+.
 
-Pipeline: `align TAXON_LIST` → `rerun q1–q60 QA` → `list-only expansion` → `factual/image sources` → `then` correlated/visual items.
+Pipeline: `align TAXON_LIST` → `rerun q1–q60 QA` → `list-only expansion` → `factual sources` + `image QA` (`IMAGE_QA_2027.md`) → `then` correlated/visual items.

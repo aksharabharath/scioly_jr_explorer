@@ -1,9 +1,9 @@
 /**
- * Crime Busters 2027 MVP question bank — cb-q1–cb-q40.
+ * Crime Busters 2027 question bank — cb-q1–cb-q44.
  *
- * Text-only. Phase 5 QA: items may be verified. Facts are limited to
- * T1-RULES and inspected quotes in
- * docs/events/crime_busters/EVIDENCE_MATRIX_2027.md.
+ * cb-q1–cb-q40 are the text-first MVP. cb-q41–cb-q44 are the IM4
+ * pattern-family image slice. Facts stay inside T1-RULES and inspected
+ * quotes in docs/events/crime_busters/EVIDENCE_MATRIX_2027.md.
  *
  * Registered in curriculum.ts. Unlocked for shared live practice.
  */
@@ -40,46 +40,70 @@ export type CrimeBustersSourceType =
   | "doj-hair"
   | "rhs-soil"
   | "pubchem"
-  | "libretexts";
+  | "libretexts"
+  | "commons";
 
-export type CrimeBustersQuestion = Question & {
+type CrimeBustersBase = Question & {
   topicId: CrimeBustersTopicId;
   cognitiveDemand: CrimeBustersCognitiveDemand;
   sourceType: CrimeBustersSourceType;
   sourceNote: string;
   evidenceIds: string[];
   verificationStatus: QuestionVerificationStatus;
-  imageRequired: false;
 };
+
+export type CrimeBustersQuestion =
+  | (CrimeBustersBase & {
+      imageRequired: true;
+      imageBrief: string;
+      imageSrc: string;
+      imageAlt: string;
+      imageCredit?: string;
+    })
+  | (CrimeBustersBase & {
+      imageRequired: false;
+      imageBrief?: never;
+    });
 
 const EVENT_ID = CRIME_BUSTERS_EVENT_ID;
 
-function cb(input: {
-  id: string;
-  topicId: CrimeBustersTopicId;
-  difficulty: DifficultyLevel;
-  prompt: string;
-  choiceTexts: [string, string, string, string];
-  correctChoiceId: "a" | "b" | "c" | "d";
-  hint: string;
-  explanation: string;
-  cognitiveDemand: CrimeBustersCognitiveDemand;
-  sourceType: CrimeBustersSourceType;
-  sourceNote: string;
-  evidenceIds: string[];
-  verificationStatus: QuestionVerificationStatus;
-}): CrimeBustersQuestion {
-  return {
+function cb(
+  input: {
+    id: string;
+    topicId: CrimeBustersTopicId;
+    difficulty: DifficultyLevel;
+    prompt: string;
+    choiceTexts: [string, string, string, string];
+    correctChoiceId: "a" | "b" | "c" | "d";
+    hint: string;
+    explanation: string;
+    cognitiveDemand: CrimeBustersCognitiveDemand;
+    sourceType: CrimeBustersSourceType;
+    sourceNote: string;
+    evidenceIds: string[];
+    verificationStatus: QuestionVerificationStatus;
+  } & (
+    | {
+        imageRequired: true;
+        imageBrief: string;
+        imageSrc: string;
+        imageAlt: string;
+        imageCredit?: string;
+      }
+    | { imageRequired?: false }
+  ),
+): CrimeBustersQuestion {
+  const base = {
     id: input.id,
     eventId: EVENT_ID,
     topicId: input.topicId,
     prompt: input.prompt,
     difficulty: input.difficulty,
     choices: [
-      { id: "a", text: input.choiceTexts[0] },
-      { id: "b", text: input.choiceTexts[1] },
-      { id: "c", text: input.choiceTexts[2] },
-      { id: "d", text: input.choiceTexts[3] },
+      { id: "a" as const, text: input.choiceTexts[0] },
+      { id: "b" as const, text: input.choiceTexts[1] },
+      { id: "c" as const, text: input.choiceTexts[2] },
+      { id: "d" as const, text: input.choiceTexts[3] },
     ],
     correctChoiceId: input.correctChoiceId,
     hint: input.hint,
@@ -89,8 +113,19 @@ function cb(input: {
     sourceNote: input.sourceNote,
     evidenceIds: input.evidenceIds,
     verificationStatus: input.verificationStatus,
-    imageRequired: false,
   };
+
+  if (input.imageRequired === true) {
+    return {
+      ...base,
+      imageRequired: true,
+      imageBrief: input.imageBrief,
+      imageSrc: input.imageSrc,
+      imageAlt: input.imageAlt,
+      ...(input.imageCredit ? { imageCredit: input.imageCredit } : {}),
+    };
+  }
+  return { ...base, imageRequired: false };
 }
 
 export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
@@ -974,6 +1009,102 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     evidenceIds: ["V-G6"],
     verificationStatus: "verified",
   }),
+  cb({
+    id: "cb-q41",
+    topicId: "fingerprints",
+    difficulty: 1,
+    prompt:
+      "Look at this handbook drawing of a fingerprint. Which 2027 fundamental pattern family is it?",
+    choiceTexts: ["Loop", "Whorl", "Arch", "Minutiae"],
+    correctChoiceId: "a",
+    hint: "Watch whether ridges come back out on the same side, make a complete circuit, or rise and leave on the other side.",
+    explanation:
+      "Ridges enter from one side, recurve, and leave on the same side. That is the official Loop family.",
+    cognitiveDemand: "recognition",
+    sourceType: "fbi-handbook",
+    sourceNote:
+      "IM4-L1: FBI Science of Fingerprints fig. 61 (Gutenberg 19022). Loop family E-CB-002; names V-P1.",
+    evidenceIds: ["IM4-L1", "V-P1", "E-CB-002"],
+    verificationStatus: "verified",
+    imageRequired: true,
+    imageSrc: "/crime-busters/cb-q41.jpg",
+    imageAlt: "Inked fingerprint with ridges that curve and return toward the side they entered.",
+    imageBrief:
+      "FBI fig. 61. Same-side entry and exit with a recurve; one delta opposite the opening.",
+    imageCredit: "Figure: FBI, The Science of Fingerprints. Public domain.",
+  }),
+  cb({
+    id: "cb-q42",
+    topicId: "fingerprints",
+    difficulty: 2,
+    prompt:
+      "Look at this second handbook drawing of a fingerprint. Which 2027 fundamental pattern family is it?",
+    choiceTexts: ["Arch", "Minutiae", "Loop", "Whorl"],
+    correctChoiceId: "c",
+    hint: "Watch whether ridges come back out on the same side, make a complete circuit, or rise and leave on the other side.",
+    explanation:
+      "Ridges enter from one side, recurve, and leave on the same side. That is the official Loop family.",
+    cognitiveDemand: "recognition",
+    sourceType: "fbi-handbook",
+    sourceNote:
+      "IM4-L2: FBI Science of Fingerprints fig. 62 (Gutenberg 19022). Loop family E-CB-002; names V-P1.",
+    evidenceIds: ["IM4-L2", "V-P1", "E-CB-002"],
+    verificationStatus: "verified",
+    imageRequired: true,
+    imageSrc: "/crime-busters/cb-q42.jpg",
+    imageAlt: "Inked fingerprint with a tight inner curve and ridges leaving toward the side they entered.",
+    imageBrief:
+      "FBI fig. 62. Same-side entry and exit with a hairpin core; one delta on the opposite side.",
+    imageCredit: "Figure: FBI, The Science of Fingerprints. Public domain.",
+  }),
+  cb({
+    id: "cb-q43",
+    topicId: "fingerprints",
+    difficulty: 1,
+    prompt:
+      "Look at this photographed fingerprint. Which 2027 fundamental pattern family is it?",
+    choiceTexts: ["Arch", "Whorl", "Loop", "Skin layer"],
+    correctChoiceId: "b",
+    hint: "Watch whether ridges come back out on the same side, make a complete circuit, or rise and leave on the other side.",
+    explanation:
+      "Ridges in the center make a complete circuit, and two deltas sit on either side. That is the official Whorl family.",
+    cognitiveDemand: "recognition",
+    sourceType: "commons",
+    sourceNote:
+      "IM4-W1: Wikimedia Commons Plain whorl in a right thumbprint.JPG (Metrónomo, CC BY-SA 4.0). Whorl family E-CB-007; names V-P2.",
+    evidenceIds: ["IM4-W1", "V-P2", "E-CB-007"],
+    verificationStatus: "verified",
+    imageRequired: true,
+    imageSrc: "/crime-busters/cb-q43.jpg",
+    imageAlt: "Close-up fingerprint whose center ridges form a complete circular circuit.",
+    imageBrief:
+      "Plain whorl photo. Concentric circuit in the core; deltas at lower left and lower right.",
+    imageCredit: "Photo: Metrónomo. CC BY-SA 4.0. Wikimedia Commons.",
+  }),
+  cb({
+    id: "cb-q44",
+    topicId: "fingerprints",
+    difficulty: 2,
+    prompt:
+      "Look at this close-up fingerprint. Which 2027 fundamental pattern family is it?",
+    choiceTexts: ["Loop", "Whorl", "Minutiae", "Arch"],
+    correctChoiceId: "d",
+    hint: "Watch whether ridges come back out on the same side, make a complete circuit, or rise and leave on the other side.",
+    explanation:
+      "Ridges enter on one side, rise in the center, and flow out the other side. That is the official Arch family.",
+    cognitiveDemand: "recognition",
+    sourceType: "commons",
+    sourceNote:
+      "IM4-A1: Wikimedia Commons Tented arch in a left index fingerprint.jpg (Metrónomo, CC BY-SA 4.0). Arch family E-CB-005; names V-P3. Stem keys the family, not tented vs plain.",
+    evidenceIds: ["IM4-A1", "V-P3", "E-CB-005"],
+    verificationStatus: "verified",
+    imageRequired: true,
+    imageSrc: "/crime-busters/cb-q44.jpg",
+    imageAlt: "Close-up fingerprint whose ridges rise in the center and continue toward the opposite side.",
+    imageBrief:
+      "Tented-arch photo used only as Arch-family ID. Enter one side, central rise, exit the other; no complete circuit.",
+    imageCredit: "Photo: Metrónomo. CC BY-SA 4.0. Wikimedia Commons.",
+  }),
 ];
 
 /** Map to the shared Question shape. Keeps verificationStatus for live-practice filtering. */
@@ -992,5 +1123,14 @@ export function crimeBustersQuestionToPracticeQuestion(
     difficulty: question.difficulty,
     imageRequired: question.imageRequired,
     verificationStatus: question.verificationStatus,
+    ...(question.imageRequired
+      ? {
+          imageSrc: question.imageSrc,
+          imageAlt: question.imageAlt,
+          ...(question.imageCredit
+            ? { imageCredit: question.imageCredit }
+            : {}),
+        }
+      : {}),
   };
 }

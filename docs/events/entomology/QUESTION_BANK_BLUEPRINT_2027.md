@@ -19,13 +19,13 @@ The current **60** items in `lib/mock/entomology-questions.ts` (`ento-q1`–`ent
 | `lib/mock/entomology-questions.ts` | Draft 60; author metadata |
 | `lib/types.ts` | Live `Question` shape (do not change in this pass) |
 
-Official **sample** PDFs and licensed specimen images are **not** in this repository. The 2027 rules/list **are** in `RULES_2027_OFFICIAL.md`.
+Official **sample** PDFs are **not** in this repository. Licensed Commons JPEGs for **17** live practice items are in `public/entomology/` (`IMAGE_QA_2027.md`). The 2027 rules/list **are** in `RULES_2027_OFFICIAL.md`.
 
 ### Authoritative-rules implications (planning only)
 
 - **135 is a product ceiling**, not an official question count. If `SOURCE NEEDED` slots cannot be filled from real factual/image sources, **leave them empty**.
 - Identification is **limited to** the 2027 list (**53** named taxa). Use **official** common-name strings (e.g. Hydrophilidae = `water scavenger`, not `water scavenger beetles`).
-- Contest **will** exhibit images; bank photos remain **`IMAGE SOURCE NEEDED`**.
+- Contest **will** exhibit images. Practice currently has **17** Commons JPEGs; extra morphology is still `FACTUAL_SOURCE_NEEDED` (`IMAGE_QA_2027.md`).
 - Dichotomous keys are **in scope**. Competition says students **may** be asked to use or formulate a **simple** key; the description says they **will** be asked to use or construct a key. Do **not** treat “12 key items” as an official quota. Keep keys as a major practice area.
 - Ecological/economic lists are **`may include` / `e.g.` / `such as`**, not closed fact catalogs.
 - **Life cycles are not named** in the official rules. The `life-cycles` target is **product/sample planning**, not official domain. Do not fill it from general biology.
@@ -48,7 +48,7 @@ Official **sample** PDFs and licensed specimen images are **not** in this reposi
 
 - 53 named taxa. A 10-question session from a tiny bank repeats too fast (`PRACTICE_SET_SIZE = 10`).
 - Official scope is identification **and** correlated questions, not Sample Test 1’s ID-heavy mix.
-- Image items stay **held out of live practice** until assets exist, so the **source** bank can be larger than **live**.
+- Image items stay **held out of live practice until assets exist**, so the **source** bank can be larger than **live**. **Now:** 17 Commons JPEGs exist and those items are live; remaining `needs-review` text items stay held out.
 
 **What official evidence can actually fill:** list literacy, family→order placement, heading contrasts, and **name-only** keys/comparisons. That is **far fewer than 135**. Anatomy, habitat, life-cycle, behavior, impact, climate **facts**, and visual-id stay empty until sourced. **Do not invent content to hit 135.**
 
@@ -58,7 +58,7 @@ If `SOURCE NEEDED` slots cannot be filled, **leave them empty**. A verified ~50�
 
 | Phase | Source items | Typical live pool | Notes |
 |---|---|---|---|
-| Now | 60 | 27 verified non-image | 9 image-required held out; 33 `needs-review` |
+| Now | 60 | 36 verified (19 text + 17 Commons photos) | Remaining `needs-review` text items still held out |
 | Text expansion (official list strings only) | grow taxonomy + name-only keys | live = verified non-image | Use `TAXON_LIST_2027.md` / `RULES_2027_OFFICIAL.md`; re-QA old bank strings first |
 | Correlated / visual | only with factual or image sources | — | Do not pad |
 
@@ -152,20 +152,20 @@ Difficulty should match `cognitiveDemand` (level 3 usually `distinction` or `mul
 
 `CONTENT_SPEC.md` suggested 30–40% image specimen ID. This blueprint uses **~35% image-required** across ID **and** diagrams (cerci, swimming legs), not photos on every anatomy fact.
 
-**Until assets exist:** image-required items stay **out of live practice**. Do not flip `imageRequired` to false just to grow the live pool.
+**Until `imageSrc` + `imageAlt` exist:** image-required items stay **out of live practice**. Do not flip `imageRequired` to false just to grow the live pool. Do not skip `verified`.
 
 ---
 
 ## 3. Area allocation (12 `topicId`s)
 
-Current source/live counts from the curriculum audit (30 / 21).
+Current source/live counts from the curriculum audit (30 / 21) are **historical**. Entomology live practice is **36** of 60 as of the 2026-08-30 image QA (`IMAGE_QA_2027.md`).
 
 Priority: **P0** must grow for a usable event prep bank; **P1** official **scope** but facts usually `SOURCE NEEDED`; **P2** keep light; **P3** thin evidence or **not named** in official rules (life cycles).
 
 | Area | Target | Min | Max | Priority | Source now | Live now | Major gaps | Source requirement | Images |
 |---|---|---|---|---|---|---|---|---|
 | `taxonomy` | **28** | 24 | 32 | **P0** | 19 | 19 | Many taxa still lack a dedicated official-string item; some existing items still use pre-alignment wording | Official strings from `RULES_2027_OFFICIAL.md` / `TAXON_LIST_2027.md` | Useful later; **not required** for list literacy |
-| `visual-id` | **24** | 18 | 30 | **P0** (blocked) | 5 | **0** | Entire area is image-held | Photos + provenance + diagnostics; **`IMAGE SOURCE NEEDED`** | **Required** for specimen ID; text-description items may be live **without** photos (see §8) |
+| `visual-id` | **24** | 18 | 30 | **P0** | 12 photographed in-bank | **12 live** (MVP) | Grow toward 24; replace q10 | Photos + provenance + diagnostics (`IMAGE_QA_2027.md`) | **Required** for specimen ID; do not flip `imageRequired` off to pad live |
 | `comparison` | **12** | 8 | 16 | **P0** | 3 | 1 | Name-only pairs can use official strings; diagnostic pairs blocked | Name-only now; visual diagnostics **`SOURCE NEEDED`** | Useful for aquatic pairs; do not live-convert without assets |
 | `dichotomous-keys` | **12** | 10 | 14 | **P0** | 8 | 8 | In official **scope** (`may`/`will` conflict); samples have **zero** keys | Original keys using **official** names only until splits are sourced | No |
 | `external-anatomy` | **14** | 10 | 18 | **P1** | 4 | 0 verified | Tagmata / exoskeleton items exist as `needs-review` | Domain is official **scope**; every structure fact = **`FACTUAL SOURCE NEEDED`** | Diagrams useful; not a rules checklist |
@@ -341,7 +341,7 @@ If locate-structure or adaptations cannot be verified, do not invent; shift left
 
 ## 7. Image strategy
 
-**Today:** 60 source, 27 `verified` (non-image), 9 image-required, **0 live visual-id**.
+**Today:** 60 source, 36 `verified` (19 text + 17 image-required), **12** live `visual-id`.
 
 ### 7.1 Targets
 
@@ -379,7 +379,7 @@ If locate-structure or adaptations cannot be verified, do not invent; shift left
 
 ### 7.6 Live holdout
 
-`getQuestionsForEvent` already drops `imageRequired === true`. **Keep that rule.** Do not mark image items live with empty assets. Do not invent URLs.
+`isLivePracticeQuestion` requires `verified` (omitted counts as verified). Image-required items additionally need non-empty `imageSrc` and `imageAlt`. **Keep that gate.** Do not mark image items live with empty assets. Do not invent URLs. Do not drop `verified` to grow the pool.
 
 ---
 
@@ -407,9 +407,11 @@ source evidence → draft → review → verified → live
 | draft | In the bank file or authoring sheet; `verificationStatus: draft` |
 | review | Human checks facts, ambiguity, duplicates, metadata, images |
 | verified | `verificationStatus` promoted (today only `draft` \| `needs-review` exist — **future schema**) |
-| live | `imageRequired !== true` **or** asset attached and approved; included in `getQuestionsForEvent` |
+| live | `verified`, and if `imageRequired` then `imageSrc` + `imageAlt`; included in `getQuestionsForEvent` |
 
-Existing `needs-review` items (ento-q8, q11, q12, q13, q18, q19, q26, q30) stay out of “verified” until reviewed, even if already live.
+Remaining `needs-review` items stay out of live practice. Current IDs are in `QUESTION_BANK_QA_2027.md` (24 text items). Photographed items that were promoted to `verified` (including former examples **ento-q8, q12, q13**) are live.
+
+Historical planning note: an earlier draft of this section listed `ento-q8, q11, q12, q13, q18, q19, q26, q30` as still `needs-review`. That list is **obsolete** as a current-state claim (`q8`, `q12`, `q13`, and `q19` are verified in the bank).
 
 ### 8.3 Traceability
 
@@ -548,11 +550,11 @@ Students never see author-only fields (same as today’s `verificationStatus`).
 | 10. Final verification | Human | No |
 | 11. Add to bank | Author | — |
 | 12. Automated checks | CI / `npx tsx lib/mock/entomology-questions.check.ts` | **Yes** — counts, unique IDs, 4 choices, tags on list, topic IDs |
-| 13. Release to live | Policy | Live = verified (or accepted draft policy) **and** not image-held |
+| 13. Release to live | Policy | Live = `verified` (omitted counts as verified); if `imageRequired`, also `imageSrc` + `imageAlt` |
 
 Do not skip 5–7 for `generated` items. Do not copy sample wording at stage 4.
 
-**Reuse of the current 60:** run stages 5–10 on each draft against `RULES_2027_OFFICIAL.md`; retire or rewrite fails; image nine stay held out. Do not add q61+ until q1–q60 string re-QA.
+**Reuse of the current 60:** run stages 5–10 on each draft against `RULES_2027_OFFICIAL.md`; retire or rewrite fails; the **17** photographed items are live (do not treat “image nine stay held out” as current). Remaining `needs-review` text items stay held out. Do not add q61+ until q1–q60 string re-QA.
 
 ---
 
@@ -591,7 +593,7 @@ Tick when the taxon is a **correct-answer target** or **primary tag** on a verif
 
 Tick primary-skill counts against §6 table. Especially:
 
-- [ ] `visual-id-listed-taxon` (held out until images)
+- [ ] `visual-id-listed-taxon` (planning target for the 135-item bank; **17** live Commons photos already exist — see `IMAGE_QA_2027.md`)
 - [ ] `visual-id-from-text-description` (live without photos)
 - [ ] `interactions-named-official-modes` remains **0** until `SOURCE NEEDED` cleared
 

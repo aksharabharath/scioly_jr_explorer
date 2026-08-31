@@ -12,14 +12,14 @@ The shippable loop is:
 
 | Event | Status |
 |---|---|
-| **Entomology** | Playable. 60 registered questions; **27** verified, text-only items enter live practice. Image-required and `needs-review` items stay in the bank for history lookup but are not selected. |
+| **Entomology** | Playable. 60 registered; **36** live (19 text + 17 Commons photos). 24 `needs-review` items stay in the bank for history lookup but are not selected. |
 | **Anatomy & Physiology** | Playable. 45 verified, text-only questions enter live practice through the same 10-question engine as Entomology. |
 | **Water Quality** | Playable. 40 verified, text-only questions. |
 | **Ecology** | Playable. 40 verified, text-only questions. |
-| **Crime Busters** | Playable. 40 verified, text-only questions. Image identification is not in this MVP. |
+| **Crime Busters** | Playable. **44** live (40 text + 4 image). Image identification of Loop, Whorl, and Arch fingerprint families is in this MVP (`cb-q41`–`cb-q44`). |
 | Other 2027 catalog events | Visible as **Coming later**. Not selectable. |
 
-Do not treat a full competition bank or image questions as MVP work.
+Do not treat a full competition bank as MVP work. Remaining Entomology `needs-review` items and Crime Busters image work beyond the four IM4 family exemplars are out of this slice.
 
 ## Tech stack
 
@@ -101,7 +101,8 @@ Other engine checks: `lib/gamification.check.ts`, `lib/mock/events.check.ts`, `l
 
 ## Architecture constraints
 
-- Entomology stays 60 registered / 27 live. Do not add `ento-q61+`.
+- Entomology stays 60 registered / **36** live (19 text + 17 Commons photos with non-spoiling overlays). Do not add `ento-q61+`.
+- Crime Busters stays 44 registered / 44 live (40 text + 4 fingerprint-family photos). Do not add `cb-q45+`.
 - A&P stays 45 registered, all verified, unlocked for live practice. Do not add `ap-q46+`.
 - Historical attempts resolve through the full question registry (`getQuestionById` / `getAllQuestions`), including held-out Entomology items.
 - XP is awarded only inside `record_practice_attempt_and_award`. The UI displays server-returned amounts. Duplicate Check answer uses the same attempt id and does not double-award.
@@ -110,7 +111,8 @@ Other engine checks: `lib/gamification.check.ts`, `lib/mock/events.check.ts`, `l
 ## What is not live yet
 
 - Lessons / topic study pages
-- Image-based Entomology items (held out of the live pool)
+- Entomology image items beyond the current 17 Commons photos
+- Crime Busters image work beyond Loop / Whorl / Arch family exemplars (`cb-q41`–`cb-q44`)
 - Codebusters practice
 - Full 120–150 question competition banks
 - Password reset / resend confirmation
