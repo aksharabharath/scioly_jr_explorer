@@ -107,7 +107,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "The synovial joint cavity",
     ],
     correctChoiceId: "b",
-    hint: "The sourced barrier is keratin and glycolipids in the outer epidermal stratum.",
+    hint: "The outer barrier is keratin and glycolipids in the outer epidermal stratum.",
     explanation:
       "Keratin and glycolipids in the stratum corneum form a barrier against water loss. The same outer skin also helps defend against microbes and chemicals.",
     cognitiveDemand: "recall",
@@ -326,7 +326,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Acetylcholine at the neuromuscular junction",
     ],
     correctChoiceId: "c",
-    hint: "The sourced dermal proteins are collagen and elastin.",
+    hint: "The dermal proteins are collagen and elastin.",
     explanation:
       "Wrinkling of the skin occurs due to decreased collagen and elastin production in the dermis. Aging skin also has a thinner epidermis because mitosis in the stratum basale decreases.",
     cognitiveDemand: "recognition",
@@ -406,7 +406,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     topicId: "integument-conditions",
     difficulty: 1,
     prompt:
-      "HPV is a common virus that can cause cancers later in life. What is a sourced way to protect against those HPV cancers?",
+      "HPV is a common virus that can cause cancers later in life. What is one way to protect against those HPV cancers?",
     choiceTexts: [
       "Avoiding all eccrine sweating",
       "Removing the epiphyseal plate",
@@ -646,7 +646,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     topicId: "joints",
     difficulty: 3,
     prompt:
-      "All synovial joints belong to which functional class, and which named synovial type has the greatest range of motion?",
+      "Which pair names the functional class of synovial joints and the synovial type with the greatest range of motion?",
     choiceTexts: [
       "Synarthrosis; hinge",
       "Amphiarthrosis; pivot",
@@ -668,7 +668,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     topicId: "joints",
     difficulty: 2,
     prompt:
-      "Which sourced description correctly distinguishes a tendon from a ligament?",
+      "How is a tendon different from a ligament?",
     choiceTexts: [
       "A tendon attaches a muscle to bone; ligaments are strong bands of fibrous connective tissue",
       "A tendon stores red marrow; a ligament synthesizes vitamin D in the epidermis",
@@ -843,7 +843,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     topicId: "muscle-physiology",
     difficulty: 2,
     prompt:
-      "In excitation-contraction coupling, what must happen before a skeletal muscle fiber can contract, and what ion release is coupled to that step?",
+      "In excitation-contraction coupling, what must happen before a skeletal muscle fiber can contract?",
     choiceTexts: [
       "The fiber must fire an action potential; calcium ions are then released from the sarcoplasmic reticulum",
       "The epidermis must make vitamin D; phosphate is then stored in sweat",
@@ -932,7 +932,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     topicId: "muscle-types",
     difficulty: 2,
     prompt:
-      "Which sourced description of cardiac muscle tissue is correct?",
+      "Which description of cardiac muscle tissue is correct?",
     choiceTexts: [
       "It is striated, organized into sarcomeres, and connected at the ends of fibers by intercalated discs",
       "It is nonstriated and found only in the epidermis",
@@ -975,7 +975,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     topicId: "listed-muscles",
     difficulty: 2,
     prompt:
-      "Rectus abdominis originates on the pubis. Where does it insert, and what is a primary action?",
+      "Which description matches rectus abdominis?",
     choiceTexts: [
       "On the calcaneal tendon; it plantarflexes the foot",
       "On the sternum and ribs 5 and 7; it flexes the vertebral column (as in sitting up)",
@@ -998,7 +998,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     topicId: "listed-muscles",
     difficulty: 3,
     prompt:
-      "The diaphragm originates on the sternum, ribs 6–12, and lumbar vertebrae. Where does it insert, and what is its role in breathing?",
+      "Which description matches the diaphragm?",
     choiceTexts: [
       "On the pubis; it flexes the vertebral column in a sit-up",
       "On the central tendon; it changes thoracic volume during inhalation and exhalation",
@@ -1021,7 +1021,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     topicId: "listed-muscles",
     difficulty: 2,
     prompt:
-      "Trapezius originates on the skull and vertebral column and inserts on the acromion and spine of the scapula and on the clavicle. What is a sourced action of trapezius?",
+      "What is one action of trapezius?",
     choiceTexts: [
       "It flexes the forearm at the elbow",
       "It elevates the shoulders, as in shrugging",
@@ -1031,7 +1031,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     correctChoiceId: "b",
     hint: "Picture raising the shoulders toward the ears.",
     explanation:
-      "Trapezius inserts on the acromion and spine of the scapula and on the clavicle. A sourced action is elevating the shoulders (shrugging). It can also pull the shoulder blades together and tilt the head backwards.",
+      "Trapezius inserts on the acromion and spine of the scapula and on the clavicle. One action is elevating the shoulders (shrugging). It can also pull the shoulder blades together and tilt the head backwards.",
     cognitiveDemand: "recognition",
     sourceType: "openstax",
     sourceNote:
@@ -1067,7 +1067,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     topicId: "listed-muscles",
     difficulty: 3,
     prompt:
-      "Serratus anterior inserts on the anterior surface of the vertebral border of the scapula. What sourced action does it have on the scapula?",
+      "What is one action of serratus anterior on the scapula?",
     choiceTexts: [
       "It extends the forearm",
       "It synthesizes vitamin D in the epidermis",
@@ -1075,7 +1075,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "It protracts the scapula",
     ],
     correctChoiceId: "d",
-    hint: "Protraction is the sourced action of this muscle on the scapula.",
+    hint: "Protraction is the action of this muscle on the scapula.",
     explanation:
       "Serratus anterior inserts on the anterior surface of the vertebral border of the scapula and protracts the scapula. (This item does not use a single rib-number origin, because sources give a range.)",
     cognitiveDemand: "recognition",

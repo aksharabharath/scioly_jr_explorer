@@ -10,7 +10,13 @@ import {
 import {
   expeditionLogEntries,
   hasCompletedExpeditionOnLocalDate,
+  questionsPracticedOnLocalDate,
 } from "@/lib/expeditions";
+import {
+  DEFAULT_DAILY_PRACTICE_GOAL,
+  isDailyMissionComplete,
+  type DailyPracticeGoal,
+} from "@/lib/student-preferences";
 import { STREAK_MILESTONES } from "@/lib/gamification";
 import type { Question } from "@/lib/types";
 
@@ -25,8 +31,11 @@ export function recentAchievements(input: {
   questions: Question[];
   streakDays: number;
   practiceDate: string;
+  dailyPracticeGoal?: DailyPracticeGoal;
 }): RecentAchievement[] {
   const { attempts, questions, streakDays, practiceDate } = input;
+  const dailyPracticeGoal =
+    input.dailyPracticeGoal ?? DEFAULT_DAILY_PRACTICE_GOAL;
   const items: RecentAchievement[] = [];
   const latest = expeditionLogEntries(attempts, questions, {}, 1)[0];
 
@@ -68,11 +77,16 @@ export function recentAchievements(input: {
     });
   }
 
-  if (hasCompletedExpeditionOnLocalDate(attempts, practiceDate)) {
+  if (
+    isDailyMissionComplete(
+      questionsPracticedOnLocalDate(attempts, practiceDate),
+      dailyPracticeGoal,
+    )
+  ) {
     items.push({
       id: "daily-mission",
-      title: "Daily mission complete",
-      detail: "You finished an expedition today.",
+      title: "Daily expedition complete",
+      detail: "You reached today's practice goal.",
     });
   }
 

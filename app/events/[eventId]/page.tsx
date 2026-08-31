@@ -1,9 +1,11 @@
 import { EventPracticeProgress } from "@/components/EventPracticeProgress";
+import { EventIcon } from "@/components/EventIcon";
 import { getCurrentUser } from "@/lib/auth/session";
 import {
   completedSessionCountForEvent,
   uniqueQuestionsPracticed,
 } from "@/lib/expeditions";
+import { fieldSiteSubtitle, fieldSiteTint } from "@/lib/field-sites";
 import {
   toLearningAttempts,
   topicsNeedingRevisit,
@@ -17,6 +19,7 @@ import {
 import { calculateEventProgress } from "@/lib/progress";
 import { requireSelectedEvent } from "@/lib/student-events";
 import type { Metadata } from "next";
+import { ExplorerTrail } from "@/components/ExplorerTrail";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -60,6 +63,7 @@ export default async function EventPage({ params }: EventRouteProps) {
   const eventQuestions = questions.filter(
     (question) => question.eventId === event.id,
   );
+  const liveBankSize = eventQuestions.filter(isLivePracticeQuestion).length;
   const eventProgress = {
     ...calculateEventProgress(
       event.id,
@@ -79,108 +83,119 @@ export default async function EventPage({ params }: EventRouteProps) {
           .filter((name): name is string => Boolean(name))
           .slice(0, 4)
       : [];
+  const site = fieldSiteSubtitle(event.id);
+  const tint = fieldSiteTint(event.id);
 
   return (
     <main className="flex flex-1 flex-col">
-      <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-        <p className="text-sm">
-          <Link
-            href="/"
-            className="font-medium text-teal underline-offset-4 hover:underline"
-          >
-            ← Dashboard
-          </Link>
-        </p>
+      <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-5 sm:px-6">
+        <ExplorerTrail
+          crumbs={[
+            { href: "/", label: "Base camp" },
+            { label: event.name },
+          ]}
+        />
 
-        <p className="mt-6 text-sm font-semibold text-teal">Your event</p>
-        <h1 className="mt-1 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-          {event.name}
-        </h1>
-        <p className="mt-3 max-w-xl text-base leading-relaxed text-stone-600">
-          {overview}
-        </p>
-
-        {!event.unlocked ? (
-          <div className="mt-8 rounded-3xl border border-stone-200/80 bg-surface p-5 sm:p-6">
-            <h2 className="font-display text-2xl font-semibold tracking-tight text-ink">
-              🔒 Coming later
-            </h2>
-            <p className="mt-2 text-sm text-stone-600">
-              This event is not open for practice yet.
-            </p>
-          </div>
-        ) : hasPractice ? (
-          <>
-            <EventPracticeProgress
-              eventName={event.name}
-              progress={eventProgress}
-              expeditionsCompleted={completedSessionCountForEvent(
-                event.id,
-                attempts,
-                questions,
-              )}
-              liveBankSize={
-                eventQuestions.filter(isLivePracticeQuestion).length
-              }
-            />
-
-            {weakTopicNames.length > 0 ? (
-              <section
-                aria-labelledby="weak-topics-heading"
-                className="mt-6 rounded-3xl border border-stone-200/80 bg-surface p-5 sm:p-6"
+        <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-start lg:gap-6">
+          <div className={`rounded-3xl journal-panel p-4 sm:p-5 ${tint.wash}`}>
+            <div className="flex items-start gap-3">
+              <span
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${tint.wrap} ${tint.icon}`}
               >
-                <h2
-                  id="weak-topics-heading"
-                  className="font-display text-2xl font-semibold tracking-tight text-ink"
-                >
-                  Worth revisiting
-                </h2>
-                <p className="mt-2 text-sm text-stone-600">
-                  A miss marks a topic as tricky. Three later correct answers
-                  in that topic mark it strong again.
-                </p>
-                <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-stone-600">
-                  {weakTopicNames.map((name) => (
-                    <li key={name}>{name}</li>
-                  ))}
-                </ul>
-              </section>
-            ) : null}
-
-            <div className="mt-6 rounded-3xl border border-stone-200/80 bg-surface p-5 sm:p-6">
-              <h2 className="font-display text-2xl font-semibold tracking-tight text-ink">
-                Ready to practice?
-              </h2>
-              <p className="mt-2 text-sm text-stone-600">
-                10 questions. Hints are there if you need them.
-              </p>
-              <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href={`/events/${event.id}/practice`}
-                  className="inline-flex justify-center rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment hover:bg-teal"
-                >
-                  Start Practice
-                </Link>
-                <Link
-                  href={`/events/${event.id}/practice?mode=weak`}
-                  className="inline-flex justify-center rounded-full border border-stone-200 px-5 py-2.5 text-sm font-semibold text-ink hover:bg-parchment"
-                >
-                  Practice Tricky Topics
-                </Link>
+                <EventIcon id={event.icon} className="h-6 w-6" />
+              </span>
+              <div>
+                <p className="text-sm font-semibold text-teal">Field site</p>
+                <h1 className="mt-0.5 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+                  {event.name}
+                </h1>
+                {site ? (
+                  <p className="mt-1 text-sm font-medium text-stone-600">{site}</p>
+                ) : null}
               </div>
             </div>
-          </>
-        ) : (
-          <div className="mt-8 rounded-3xl border border-stone-200/80 bg-surface p-5 sm:p-6">
-            <h2 className="font-display text-2xl font-semibold tracking-tight text-ink">
-              Ready to practice?
-            </h2>
-            <p className="mt-2 text-sm text-stone-600">
-              You can keep {event.name} on your list. Practice questions for
-              this event will be here soon.
+            <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:text-base">
+              {overview}
             </p>
           </div>
-        )}
+
+          <div className="flex flex-col gap-4">
+            {!event.unlocked ? (
+              <div className="journal-panel rounded-3xl p-4 sm:p-5">
+                <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
+                  Coming later
+                </h2>
+                <p className="mt-2 text-sm text-stone-600">
+                  This event is not open for practice yet.
+                </p>
+              </div>
+            ) : hasPractice ? (
+              <>
+                <EventPracticeProgress
+                  eventName={event.name}
+                  progress={eventProgress}
+                  expeditionsCompleted={completedSessionCountForEvent(
+                    event.id,
+                    attempts,
+                    questions,
+                  )}
+                  liveBankSize={liveBankSize}
+                />
+
+                <div className="journal-panel rounded-3xl p-4 sm:p-5">
+                  <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
+                    Ready for an expedition?
+                  </h2>
+                  <p className="mt-1 text-sm text-stone-600">
+                    10 questions. Hints are there if you need them.
+                  </p>
+                  <div className="mt-4 flex flex-col gap-2">
+                    <Link
+                      href={`/events/${event.id}/practice`}
+                      className="inline-flex min-h-11 justify-center rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment hover:bg-teal"
+                    >
+                      Start expedition
+                    </Link>
+                    <Link
+                      href={`/events/${event.id}/practice?mode=weak`}
+                      className="inline-flex min-h-11 justify-center rounded-full border border-stone-200 px-5 py-2.5 text-sm font-semibold text-ink hover:bg-parchment"
+                    >
+                      Revisit tricky topics
+                    </Link>
+                  </div>
+                  {weakTopicNames.length > 0 ? (
+                    <div className="mt-4 border-t border-stone-200/80 pt-3">
+                      <h3
+                        id="weak-topics-heading"
+                        className="text-sm font-semibold text-ink"
+                      >
+                        Worth revisiting
+                      </h3>
+                      <p className="mt-1 text-xs text-stone-600">
+                        A miss marks a topic as tricky. Three later correct
+                        answers in that topic mark it strong again.
+                      </p>
+                      <ul className="mt-2 list-disc space-y-0.5 pl-5 text-sm text-stone-600">
+                        {weakTopicNames.map((name) => (
+                          <li key={name}>{name}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
+                </div>
+              </>
+            ) : (
+              <div className="journal-panel rounded-3xl p-4 sm:p-5">
+                <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
+                  This site is on your list
+                </h2>
+                <p className="mt-2 text-sm text-stone-600">
+                  Expeditions for {event.name} will be here soon.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </main>
   );

@@ -1,5 +1,6 @@
 import { PracticeQuiz } from "@/components/PracticeQuiz";
 import {
+  eligibleWeakQuestions,
   hasWeakTopics,
   parsePracticeMode,
   toLearningAttempts,
@@ -13,7 +14,10 @@ import {
   getMyRecentPracticeAttempts,
 } from "@/lib/practice-attempts";
 import { requireSelectedEvent } from "@/lib/student-events";
+import { dailyPracticeGoalFromUser } from "@/lib/student-preferences";
+import { requireUser } from "@/lib/auth/session";
 import type { Metadata } from "next";
+import { ExplorerTrail } from "@/components/ExplorerTrail";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -32,13 +36,13 @@ export async function generateMetadata({
   }
   const data = await getPracticePageData(eventId);
   if (!data) {
-    return { title: "Practice · Jr. Explorer" };
+    return { title: "Expedition · Jr. Explorer" };
   }
   const mode = parsePracticeMode((await searchParams).mode);
   if (mode === "weak") {
     return { title: `Tricky Topics · ${data.event.name} · Jr. Explorer` };
   }
-  return { title: `Practice · ${data.event.name} · Jr. Explorer` };
+  return { title: `Expedition · ${data.event.name} · Jr. Explorer` };
 }
 
 export default async function PracticePage({
@@ -50,6 +54,7 @@ export default async function PracticePage({
     notFound();
   }
   await requireSelectedEvent(eventId);
+  const user = await requireUser();
   const mode = parsePracticeMode((await searchParams).mode);
   const data = await getPracticePageData(eventId);
 
@@ -69,52 +74,64 @@ export default async function PracticePage({
     (question) => question.eventId === data.event.id,
   );
   const priorAttempts = toLearningAttempts(storedAttempts, eventQuestions);
-  const weakFallback = mode === "weak" && !hasWeakTopics(priorAttempts);
+  const practiceQuestions =
+    mode === "weak"
+      ? eligibleWeakQuestions(data.questions, priorAttempts)
+      : data.questions;
+  const noTrickyTopics = mode === "weak" && !hasWeakTopics(priorAttempts);
+  const noTrickyQuestions = mode === "weak" && practiceQuestions.length === 0;
 
   return (
     <main className="flex flex-1 flex-col">
-      <div className="mx-auto w-full max-w-3xl px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-          <p className="text-sm">
-            <Link
-              href={`/events/${data.event.id}`}
-              className="font-medium text-teal underline-offset-4 hover:underline"
-            >
-              ← {data.event.name}
-            </Link>
-          </p>
-          <p className="text-sm font-semibold text-teal">
-            {mode === "weak" ? "Practice Tricky Topics" : "Practice"}
-          </p>
-        </div>
-        <h1 className="mt-2 font-display text-2xl font-semibold tracking-tight text-ink">
-          {data.event.name}
-        </h1>
-        <p className="mt-1 text-sm text-stone-600">
-          {mode === "weak"
-            ? "These questions focus on topics you have found tricky."
-            : "One question at a time. Check your thinking, then keep going."}
-        </p>
-        {weakFallback ? (
-          <p className="mt-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-950">
-            No weak points yet — keep practicing and we&apos;ll learn what to
-            revisit. This session uses regular adaptive practice instead.
-          </p>
-        ) : null}
-        <div className="mt-4">
-          <PracticeQuiz
-            eventId={data.event.id}
-            eventName={data.event.name}
-            questions={data.questions}
-            priorAttempts={priorAttempts}
-            priorBadgeAttempts={priorBadgeAttempts}
-            allQuestions={allQuestions}
-            initialAttemptCount={attemptCount}
-            initialXp={gamification.xp}
-            initialStreakDays={gamification.streakDays}
-            mode={mode}
-          />
-        </div>
+      <div className="mx-auto w-full max-w-screen-xl px-4 py-3 sm:px-6">
+        <ExplorerTrail
+          crumbs={[
+            { href: "/", label: "Base camp" },
+            { href: `/events/${data.event.id}`, label: data.event.name },
+            { label: mode === "weak" ? "Tricky topics" : "Expedition" },
+          ]}
+        />
+        {noTrickyTopics || noTrickyQuestions ? (
+          <section className="journal-panel mt-4 rounded-3xl p-5">
+            <h1 className="font-display text-2xl font-semibold tracking-tight text-ink">
+              No tricky topics yet
+            </h1>
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-stone-600">
+              Keep exploring. We&apos;ll bring back anything that needs another
+              look.
+            </p>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href={`/events/${data.event.id}/practice`}
+                className="rounded-full bg-teal-dark px-5 py-2.5 text-center text-sm font-semibold text-parchment hover:bg-teal"
+              >
+                Start an expedition
+              </Link>
+              <Link
+                href={`/events/${data.event.id}`}
+                className="rounded-full border border-stone-200 px-5 py-2.5 text-center text-sm font-semibold text-ink hover:bg-parchment"
+              >
+                Back to {data.event.name}
+              </Link>
+            </div>
+          </section>
+        ) : (
+          <div className="mt-3">
+            <PracticeQuiz
+              eventId={data.event.id}
+              eventName={data.event.name}
+              questions={practiceQuestions}
+              priorAttempts={priorAttempts}
+              priorBadgeAttempts={priorBadgeAttempts}
+              allQuestions={allQuestions}
+              initialAttemptCount={attemptCount}
+              initialXp={gamification.xp}
+              initialStreakDays={gamification.streakDays}
+              dailyPracticeGoal={dailyPracticeGoalFromUser(user)}
+              mode={mode}
+            />
+          </div>
+        )}
       </div>
     </main>
   );

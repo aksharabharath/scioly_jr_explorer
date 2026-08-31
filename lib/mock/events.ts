@@ -225,7 +225,7 @@ export function eventStatusLabel(event: ScienceEvent): EventStatusLabel {
 }
 
 export function eventDashboardCta(event: ScienceEvent): string {
-  return isPlayablePracticeEvent(event) ? "Practice →" : "Coming later";
+  return isPlayablePracticeEvent(event) ? "Visit this site →" : "Coming later";
 }
 
 export function isSelectableEvent(event: ScienceEvent): boolean {

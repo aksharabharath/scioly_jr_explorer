@@ -14,7 +14,7 @@ export function ProgressBar({
 
   return (
     <div
-      className="h-2.5 w-full overflow-hidden rounded-full bg-stone-200/90"
+      className="h-3 w-full overflow-hidden rounded-full bg-stone-200/90"
       role="progressbar"
       aria-label={label}
       aria-valuemin={0}
@@ -22,7 +22,7 @@ export function ProgressBar({
       aria-valuenow={Math.round(percent)}
     >
       <div
-        className={`h-full rounded-full transition-[width] duration-500 ${fillClassName}`}
+        className={`progress-fill h-full rounded-full ${fillClassName}`}
         style={{ width: `${percent}%` }}
       />
     </div>

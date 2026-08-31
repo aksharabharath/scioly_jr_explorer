@@ -88,7 +88,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "indicator-classes",
     difficulty: 1,
     prompt:
-      "On the 2027 Water Quality adult-macroinvertebrate table, what is the official title of Class 1?",
+      "On the 2027 adult-macroinvertebrate table, what is the title of Class 1?",
     choiceTexts: [
       "Class 1 - Moderately Tolerant",
       "Class 1 - Pollution Sensitive",
@@ -110,7 +110,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "indicator-classes",
     difficulty: 1,
     prompt:
-      "Which official title does the 2027 table print for Class 5?",
+      "On the 2027 table, what is the title of Class 5?",
     choiceTexts: [
       "Class 5 - Pollution Sensitive",
       "Class 5 - Moderately Sensitive",
@@ -132,7 +132,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "indicator-classes",
     difficulty: 1,
     prompt:
-      "What is the official 2027 title of Class 3 on the indicator table?",
+      "On the 2027 indicator table, what is the title of Class 3?",
     choiceTexts: [
       "Class 3 - Moderately Tolerant",
       "Class 3 - Pollution Sensitive",
@@ -154,7 +154,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "indicator-classes",
     difficulty: 2,
     prompt:
-      "A teammate copies a Class 2 heading. Which string matches the 2027 table?",
+      "On the 2027 table, what is the title of Class 2?",
     choiceTexts: [
       "Class 2 - Pollution Sensitive",
       "Class 2 - Pollution Tolerant",
@@ -176,7 +176,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "indicator-classes",
     difficulty: 1,
     prompt:
-      "On the 2027 list, Mayfly is printed under which official class?",
+      "On the 2027 list, which class includes Mayfly?",
     choiceTexts: [
       "Class 4 - Pollution Tolerant",
       "Class 1 - Pollution Sensitive",
@@ -198,7 +198,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "indicator-classes",
     difficulty: 2,
     prompt:
-      "Which of these 2027 listed names is not printed under Class 1 - Pollution Sensitive?",
+      "Which of these 2027 listed names is not in Class 1 - Pollution Sensitive?",
     choiceTexts: [
       "Mayfly",
       "Caddisfly",
@@ -242,7 +242,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "indicator-classes",
     difficulty: 2,
     prompt:
-      "On the 2027 table, Air Breathing Snail is printed under which class?",
+      "On the 2027 table, which class includes Air Breathing Snail?",
     choiceTexts: [
       "Class 5 - Air Breathing",
       "Class 1 - Pollution Sensitive",
@@ -264,7 +264,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "indicator-classes",
     difficulty: 3,
     prompt:
-      "Use this key built only from 2027 printed class titles and names.\n\n1a. Printed under Class 1 - Pollution Sensitive … go to 2\n1b. Not printed under Class 1 … not keyed here\n2a. Printed name is Stonefly … Stonefly\n2b. Printed name is Mayfly … Mayfly\n\nA listed name is printed as Stonefly. What does the key give?",
+      "Follow this key from the top. It uses only 2027 table class headings and names.\n\n1a. Listed under Class 1 - Pollution Sensitive → go to 2\n1b. Not listed under Class 1 → not keyed here\n2a. Listed name is Stonefly → Stonefly\n2b. Listed name is Mayfly → Mayfly\n\nThe specimen’s listed name is Stonefly. Which name do you reach?",
     choiceTexts: [
       "Mayfly",
       "Stonefly",
@@ -309,7 +309,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "macroinvertebrates",
     difficulty: 1,
     prompt:
-      "Predacious Diving Beetle appears on the 2027 adult-macroinvertebrate table under which class?",
+      "On the 2027 table, which class includes Predacious Diving Beetle?",
     choiceTexts: [
       "Class 1 - Pollution Sensitive",
       "Class 2 - Moderately Sensitive",
@@ -331,7 +331,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "macroinvertebrates",
     difficulty: 2,
     prompt:
-      "Which of these 2027 table names is printed under Class 2 - Moderately Sensitive?",
+      "Which of these 2027 table names is in Class 2 - Moderately Sensitive?",
     choiceTexts: [
       "Dobsonfly",
       "Aquatic Sowbug",
@@ -353,7 +353,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "macroinvertebrates",
     difficulty: 1,
     prompt:
-      "On the 2027 table, Tubifex is printed under which class?",
+      "On the 2027 table, which class includes Tubifex?",
     choiceTexts: [
       "Class 1 - Pollution Sensitive",
       "Class 3 - Moderately Tolerant",
@@ -375,7 +375,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "macroinvertebrates",
     difficulty: 2,
     prompt:
-      "Which listed adult-macroinvertebrate name is printed under Class 5 - Air Breathing?",
+      "Which listed adult-macroinvertebrate name is in Class 5 - Air Breathing?",
     choiceTexts: [
       "Backswimmer",
       "Caddisfly",
@@ -397,7 +397,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "macroinvertebrates",
     difficulty: 1,
     prompt:
-      "Riffle Beetle is printed on the 2027 table under which class?",
+      "On the 2027 table, which class includes Riffle Beetle?",
     choiceTexts: [
       "Class 5 - Air Breathing",
       "Class 1 - Pollution Sensitive",
@@ -419,7 +419,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "macroinvertebrates",
     difficulty: 2,
     prompt:
-      "Cranefly is a 2027 table name. Which official class is it listed under?",
+      "On the 2027 table, which class includes Cranefly?",
     choiceTexts: [
       "Class 5 - Air Breathing",
       "Class 4 - Pollution Tolerant",
@@ -441,7 +441,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "macroinvertebrates",
     difficulty: 2,
     prompt:
-      "The 2027 table prints Leeches (plural). Which class heading sits above that name?",
+      "On the 2027 table, which class includes Leeches (plural, as printed)?",
     choiceTexts: [
       "Class 3 - Moderately Tolerant",
       "Class 1 - Pollution Sensitive",
@@ -485,7 +485,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "macroinvertebrates",
     difficulty: 3,
     prompt:
-      "Which name is printed on the 2027 adult-macroinvertebrate table under Class 3 - Moderately Tolerant?",
+      "Which name is in Class 3 - Moderately Tolerant on the 2027 table?",
     choiceTexts: [
       "Water Penny",
       "Blackfly",
@@ -507,7 +507,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "macroinvertebrates",
     difficulty: 3,
     prompt:
-      "Use this key built only from the 2027 table.\n\n1a. Printed under Class 5 - Air Breathing … go to 2\n1b. Not printed under Class 5 … not keyed here\n2a. Printed name is Giant Water Bug … Giant Water Bug\n2b. Printed name is Water Boatman … Water Boatman\n\nA listed name is printed as Giant Water Bug. What does the key give?",
+      "Follow this key from the top. It uses only the 2027 table.\n\n1a. Listed under Class 5 - Air Breathing → go to 2\n1b. Not listed under Class 5 → not keyed here\n2a. Listed name is Giant Water Bug → Giant Water Bug\n2b. Listed name is Water Boatman → Water Boatman\n\nThe specimen’s listed name is Giant Water Bug. Which name do you reach?",
     choiceTexts: [
       "not keyed here",
       "Water Boatman",
@@ -793,7 +793,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "water-monitoring",
     difficulty: 1,
     prompt:
-      "According to the inspected USGS Water Science School page, what is dissolved oxygen (DO)?",
+      "What is dissolved oxygen (DO)?",
     choiceTexts: [
       "A measure of how much oxygen is dissolved in the water — the amount of oxygen available to living aquatic organisms",
       "The official 2027 title of Class 1 - Pollution Sensitive",
@@ -815,10 +815,10 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "water-monitoring",
     difficulty: 2,
     prompt:
-      "Two samples of the same water body differ only in temperature. Using the inspected USGS statements, which sample can hold more dissolved oxygen?",
+      "Two samples of the same water body differ only in temperature. Which sample can hold more dissolved oxygen?",
     choiceTexts: [
       "The warmer sample",
-      "Neither sample; USGS says temperature does not affect dissolved oxygen",
+      "Neither sample; temperature does not affect dissolved oxygen",
       "The colder sample",
       "Only a sample labeled Class 5 - Air Breathing",
     ],
@@ -837,7 +837,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "water-monitoring",
     difficulty: 1,
     prompt:
-      "According to the inspected USGS Temperature and Water page, why is water temperature important for rivers and lakes?",
+      "Why is water temperature important for rivers and lakes?",
     choiceTexts: [
       "It is the official 2027 title of Class 3",
       "It exerts a major influence on biological activity and growth and governs the kinds of organisms that can live in rivers and lakes",
@@ -859,7 +859,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "water-monitoring",
     difficulty: 2,
     prompt:
-      "The 2027 list names nitrates as a monitoring parameter. The inspected USGS Nitrogen and Water page says nitrogen in the form of nitrate is which of the following?",
+      "Nitrates are a monitoring parameter. Nitrogen in the form of nitrate is which of the following?",
     choiceTexts: [
       "A Class 4 - Pollution Tolerant common name",
       "An Aquatic Nuisance Plant",
@@ -881,7 +881,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "water-monitoring",
     difficulty: 3,
     prompt:
-      "Using only the inspected USGS nitrogen page, what can excess nitrogen cause in water?",
+      "What can excess nitrogen cause in water?",
     choiceTexts: [
       "Overstimulation of growth of aquatic plants and algae",
       "The name Mayfly to move from Class 1 to Class 5 on the 2027 table",
@@ -903,7 +903,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "water-monitoring",
     difficulty: 3,
     prompt:
-      "According to the inspected USGS Phosphorus and Water page, what can too much phosphorus in water do?",
+      "What can too much phosphorus in water do?",
     choiceTexts: [
       "Print Phosphorus as a Class 1 common name on the 2027 table",
       "Replace salinity on the 2027 eight-parameter list",
@@ -925,7 +925,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "water-monitoring",
     difficulty: 1,
     prompt:
-      "The 2027 rules name salinity as a monitoring parameter. The inspected USGS salinity page says water that is saline contains which of the following?",
+      "Salinity is a monitoring parameter. Water that is saline contains which of the following?",
     choiceTexts: [
       "Only Class 5 - Air Breathing organisms",
       "Significant amounts (concentrations) of dissolved salts, the most common being sodium chloride (NaCl)",
@@ -947,7 +947,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
     topicId: "water-monitoring",
     difficulty: 1,
     prompt:
-      "According to the inspected USGS BOD page, what does biochemical oxygen demand (BOD) represent?",
+      "What does biochemical oxygen demand (BOD) represent?",
     choiceTexts: [
       "The official 2027 title of Class 2 - Moderately Sensitive",
       "An Aquatic Nuisance Animals string",

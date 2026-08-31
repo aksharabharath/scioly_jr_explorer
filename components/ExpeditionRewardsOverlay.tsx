@@ -94,15 +94,17 @@ export function ExpeditionRewardsOverlay({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="badge-pop w-full max-w-md rounded-3xl border border-stone-200/80 bg-surface p-6 shadow-[0_16px_40px_rgba(28,45,41,0.18)]"
+        className="badge-pop w-full max-w-md rounded-3xl border border-gold-dark/25 bg-surface p-6 shadow-[0_16px_40px_rgba(28,45,41,0.18)]"
         onClick={(event) => event.stopPropagation()}
       >
-        <p className="text-sm font-semibold text-teal">Expedition complete</p>
+        <p className="text-sm font-semibold text-teal">Field expedition</p>
         <h2
           id={titleId}
           className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink"
         >
-          {showLevel ? "Explorer level up!" : `Nice work on ${eventName}`}
+          {showLevel
+            ? "You reached a new Explorer Level"
+            : `Expedition complete — ${eventName}`}
         </h2>
         {showLevel ? (
           <p className="level-burst mt-3 font-display text-4xl font-semibold text-ink">
@@ -121,13 +123,13 @@ export function ExpeditionRewardsOverlay({
         ) : null}
         {dailyMissionComplete ? (
           <p className="mt-3 text-sm font-medium text-ink">
-            Daily mission complete — you finished an expedition today.
+            Daily expedition complete — you reached today&apos;s practice goal.
           </p>
         ) : null}
         {badges.length > 0 ? (
           <>
             <p className="mt-4 text-sm font-semibold text-teal">
-              {badges.length > 1 ? "New badges" : "New badge"}
+              {badges.length > 1 ? "New discoveries" : "New discovery"}
             </p>
             <ul className="mt-3 space-y-3">
               {badges.map((badge) => (

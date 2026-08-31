@@ -134,7 +134,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 1,
     prompt:
-      "The 2027 Crime Busters rules name three fundamental fingerprint pattern families. Which set is printed?",
+      "Fingerprints are grouped into three main pattern families. Which set is that?",
     choiceTexts: [
       "Waves, spirals, and tents",
       "Loops, Whorls, and Arches",
@@ -156,7 +156,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 1,
     prompt:
-      "Under Loops, which subtype names does the 2027 Crime Busters rules list?",
+      "Under Loops, which subtype names are listed?",
     choiceTexts: [
       "Ulnar, Radial, and Central Pocket",
       "Plain, Accidental, and Double Loop",
@@ -178,7 +178,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 1,
     prompt:
-      "Under Whorls, which subtype names does the 2027 Crime Busters rules list?",
+      "Under Whorls, which subtype names are listed?",
     choiceTexts: [
       "Ulnar, Radial, and Central Pocket",
       "Plain and Tented",
@@ -200,7 +200,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 1,
     prompt:
-      "Under Arches, which subtype names does the 2027 Crime Busters rules list?",
+      "Under Arches, which subtype names are listed?",
     choiceTexts: [
       "Ulnar and Radial",
       "Accidental and Double Loop",
@@ -222,7 +222,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 1,
     prompt:
-      "NIST training groups fingerprint impressions into which three pattern types?",
+      "Fingerprint impressions are grouped into which three pattern types?",
     choiceTexts: [
       "Cores, deltas, and minutiae",
       "Arches, loops, and whorls",
@@ -230,7 +230,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Radial, ulnar, and tented",
     ],
     correctChoiceId: "b",
-    hint: "The inspected NIST page names three broad types, then subclasses inside each.",
+    hint: "The three broad types come first, then subclasses inside each.",
     explanation:
       "NIST states that patterns are divided into three types: arches, loops, and whorls. That matches the three 2027 family names.",
     cognitiveDemand: "recognition",
@@ -244,7 +244,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 2,
     prompt:
-      "In the FBI fingerprint handbook, loops that flow toward the little finger are called what?",
+      "Loops that flow toward the little finger are called what?",
     choiceTexts: [
       "Ulnar loops",
       "Radial loops",
@@ -288,7 +288,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 2,
     prompt:
-      "In NIST training, a loop is a ridge-flow pattern in which ridges enter one side, recurve, and then do what?",
+      "In a loop pattern, ridges enter one side, recurve, and then do what?",
     choiceTexts: [
       "Stop at the core without exiting",
       "Make a complete circuit with two deltas",
@@ -310,7 +310,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 2,
     prompt:
-      "How does NIST describe a plain arch?",
+      "How is a plain arch described?",
     choiceTexts: [
       "Ridges enter one side, recurve, and exit the same side",
       "Two separate loop formations with two cores and two deltas",
@@ -332,7 +332,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 3,
     prompt:
-      "NIST notes that a tented arch may look similar to a loop except that it lacks one of which three loop requirements?",
+      "A tented arch may look similar to a loop except that it lacks one of which three loop requirements?",
     choiceTexts: [
       "Ink, paper, and pressure",
       "Recurve, delta, or ridge count",
@@ -340,7 +340,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Ulnar flow, radial flow, or a pocket",
     ],
     correctChoiceId: "b",
-    hint: "The inspected NIST sentence names three loop requirements, not printing conditions.",
+    hint: "A tented arch can look like a loop but is missing one of three loop requirements, not a printing condition.",
     explanation:
       "NIST states that tented arches may be similar to a loop, except that they lack one of the three requirements (recurve, delta, or ridge count).",
     cognitiveDemand: "application",
@@ -354,7 +354,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 3,
     prompt:
-      "NIST describes a plain whorl as one or more ridges that make a complete circuit, with two deltas, and what relationship to an imaginary line between those deltas?",
+      "A plain whorl has one or more ridges that make a complete circuit and two deltas. What is true of an imaginary line between those deltas?",
     choiceTexts: [
       "The line never comes near the inner pattern",
       "At least one recurving ridge within the inner pattern area is cut or touched",
@@ -376,7 +376,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 2,
     prompt:
-      "OpenStax states that fingerprints form in a growing fetus where cells of the stratum basale meet what?",
+      "Fingerprints form in a growing fetus where cells of the stratum basale meet what?",
     choiceTexts: [
       "The hypodermis only",
       "The nails and hair follicles",
@@ -384,7 +384,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "The stratum corneum surface only",
     ],
     correctChoiceId: "c",
-    hint: "Use the inspected OpenStax sentence about where the stratum basale meets the dermis.",
+    hint: "Think about where the stratum basale meets the dermis.",
     explanation:
       "OpenStax: fingerprints form where the cells of the stratum basale meet the papillae of the underlying dermal layer (papillary layer). The same chapter says the two main skin layers are epidermis and dermis.",
     cognitiveDemand: "application",
@@ -398,7 +398,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "hair-fiber",
     difficulty: 1,
     prompt:
-      "Which five hair sources does the 2027 Crime Busters Hair/Fiber section name?",
+      "Which five hair sources should you be able to distinguish in this event?",
     choiceTexts: [
       "Human, dog, cat, squirrel, and mouse",
       "Human, horse, cow, sheep, and goat",
@@ -420,7 +420,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "hair-fiber",
     difficulty: 1,
     prompt:
-      "According to the inspected DOJ hair-examination document, the hair shaft is made of which three layers?",
+      "The hair shaft is made of which three layers?",
     choiceTexts: [
       "Epidermis, dermis, and hypodermis",
       "Cuticle, cortex, and medulla",
@@ -442,7 +442,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "hair-fiber",
     difficulty: 2,
     prompt:
-      "In the DOJ comparison table, how is the human medulla typically described relative to shaft width?",
+      "How is the human hair medulla typically described relative to shaft width?",
     choiceTexts: [
       "Always absent",
       "Always more than one-half the shaft width",
@@ -464,7 +464,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "hair-fiber",
     difficulty: 3,
     prompt:
-      "In the DOJ table, which cuticle description is given for human hair?",
+      "Which cuticle description matches human hair?",
     choiceTexts: [
       "Spinous scales that always look like flower petals",
       "A wide range of repeating crown-like patterns along the shaft",
@@ -486,7 +486,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "hair-fiber",
     difficulty: 1,
     prompt:
-      "The 2027 rules say participants will be asked to distinguish which six named fibers?",
+      "Which six fibers should you be able to tell apart in this event?",
     choiceTexts: [
       "Wool, acrylic, spandex, hemp, jute, and acetate",
       "Cotton, linen, silk, nylon, rayon, and polyester",
@@ -508,7 +508,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "hair-fiber",
     difficulty: 2,
     prompt:
-      "Which three fiber-class words does the 2027 Crime Busters Hair/Fiber section print?",
+      "Fibers are grouped into which three classes?",
     choiceTexts: [
       "Animal, vegetable, and synthetic",
       "Natural, manufactured, and mineral",
@@ -530,7 +530,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "hair-fiber",
     difficulty: 2,
     prompt:
-      "Which name is not one of the six fibers the 2027 Crime Busters rules list for distinction?",
+      "Which name is not one of the six fibers you should distinguish in this event?",
     choiceTexts: [
       "Rayon",
       "Polyester",
@@ -552,7 +552,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "hair-fiber",
     difficulty: 3,
     prompt:
-      "An inspected chemistry lab text states that cotton fibrils are almost entirely which carbohydrate?",
+      "Cotton fibrils are almost entirely which carbohydrate?",
     choiceTexts: [
       "Sucrose",
       "Starch",
@@ -560,7 +560,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Cellulose",
     ],
     correctChoiceId: "d",
-    hint: "Use the inspected sentence about cotton fibrils, not the names of storage sugars.",
+    hint: "Think about cotton fibrils, not the names of storage sugars.",
     explanation:
       "The LibreTexts page states that cotton fibrils and filter paper are almost entirely cellulose (about 95%), and that cellulose is a fibrous carbohydrate found in all plants. This does not assign every official fiber to animal, vegetable, or synthetic.",
     cognitiveDemand: "application",
@@ -574,7 +574,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "soil",
     difficulty: 1,
     prompt:
-      "Which six soil types does the 2027 Crime Busters rules list for identification from provided samples?",
+      "Which six soil types should you be able to identify from samples in this event?",
     choiceTexts: [
       "Peaty, Loamy, Sandy, Clay, Chalky, and Silty",
       "Sand, silt, clay, gravel, loam, and bedrock",
@@ -596,7 +596,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "soil",
     difficulty: 1,
     prompt:
-      "Which official 2027 soil-type name is the list adjective for the RHS “peat soils” type?",
+      "The soil type that is high in peat is listed as which name?",
     choiceTexts: [
       "Muck",
       "Peaty",
@@ -618,7 +618,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "soil",
     difficulty: 2,
     prompt:
-      "The inspected RHS soil guide describes clay soils as which of the following?",
+      "How are clay soils typically described?",
     choiceTexts: [
       "Light, dry, warm, and low in nutrients",
       "Very high in organic matter and seldom found in gardens",
@@ -640,7 +640,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "soil",
     difficulty: 2,
     prompt:
-      "According to the inspected RHS guide, sandy soils are typically which of these?",
+      "How are sandy soils typically described?",
     choiceTexts: [
       "Heavy and slow to drain",
       "Sticky when wet and easy to roll into a long sausage",
@@ -662,7 +662,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "soil",
     difficulty: 2,
     prompt:
-      "How does the inspected RHS guide describe peat soils?",
+      "How are peat soils typically described?",
     choiceTexts: [
       "Very high in organic matter and moisture",
       "Made mostly of visible white chalk stones only",
@@ -684,7 +684,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "soil",
     difficulty: 2,
     prompt:
-      "The inspected RHS guide says chalky soils are very alkaline and also contain what?",
+      "Chalky soils are very alkaline and also contain what?",
     choiceTexts: [
       "Only peat and leaf mould",
       "Calcium carbonate or lime",
@@ -706,12 +706,12 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "soil",
     difficulty: 3,
     prompt:
-      "On the 2027 Crime Busters lists, Chalky soil and Calcium carbonate (Chalk) powder should be treated how?",
+      "Chalky soil and chalk powder (calcium carbonate) both appear in this event. What is true?",
     choiceTexts: [
-      "As identical items that always share one answer",
-      "As two names from two different official lists",
-      "As USDA texture classes with published sand percentages",
-      "As liquids identified only with pH strips",
+      "They are the same item and always share one answer",
+      "They are two different listed items: a soil type and a powder",
+      "They are USDA texture classes with published sand percentages",
+      "They are liquids identified only with pH strips",
     ],
     correctChoiceId: "b",
     hint: "Check which competition heading each printed name sits under.",
@@ -728,7 +728,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "chemical",
     difficulty: 1,
     prompt:
-      "PubChem identifies table salt / sodium chloride with which chemical formula?",
+      "What is the chemical formula for table salt (sodium chloride)?",
     choiceTexts: [
       "NaHCO3",
       "CaCO3",
@@ -736,7 +736,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "NaCl",
     ],
     correctChoiceId: "d",
-    hint: "Use the molecular formula on the inspected sodium chloride / table salt record.",
+    hint: "Use the molecular formula for sodium chloride / table salt.",
     explanation:
       "PubChem: sodium chloride is an ionic compound with the formula NaCl and is also called table salt. NaHCO3 is sodium bicarbonate; CaCO3 is calcium carbonate; C12H22O11 is sucrose.",
     cognitiveDemand: "recall",
@@ -750,7 +750,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "chemical",
     difficulty: 1,
     prompt:
-      "PubChem lists table sugar as a synonym of sucrose. What formula does that record give?",
+      "Table sugar is sucrose. What is its chemical formula?",
     choiceTexts: [
       "C12H22O11",
       "NaCl",
@@ -758,7 +758,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "NaClO",
     ],
     correctChoiceId: "a",
-    hint: "Use the molecular formula on the inspected sucrose record.",
+    hint: "Use the molecular formula for sucrose.",
     explanation:
       "PubChem CID 5988: sucrose has formula C12H22O11 and lists Table sugar among synonyms. This item treats contest “Sugar” as sucrose only when named as table sugar/sucrose.",
     cognitiveDemand: "recall",
@@ -772,7 +772,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "chemical",
     difficulty: 1,
     prompt:
-      "What formula does PubChem give for sodium bicarbonate (baking soda)?",
+      "What is the chemical formula for sodium bicarbonate (baking soda)?",
     choiceTexts: [
       "NaCl",
       "NaHCO3",
@@ -780,7 +780,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "H2O",
     ],
     correctChoiceId: "b",
-    hint: "Use the molecular formula on the inspected sodium bicarbonate record.",
+    hint: "Use the molecular formula for sodium bicarbonate.",
     explanation:
       "PubChem CID 516892 uses molecular formula NaHCO3 for sodium bicarbonate.",
     cognitiveDemand: "recall",
@@ -794,7 +794,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "chemical",
     difficulty: 1,
     prompt:
-      "What formula does PubChem give for calcium carbonate, which the 2027 powder list also names as Chalk?",
+      "What is the chemical formula for calcium carbonate, also listed as chalk powder?",
     choiceTexts: [
       "NaHCO3",
       "NaCl",
@@ -802,7 +802,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "C12H22O11",
     ],
     correctChoiceId: "c",
-    hint: "Use the molecular formula on the inspected calcium carbonate record.",
+    hint: "Use the molecular formula for calcium carbonate.",
     explanation:
       "PubChem: calcium carbonate has formula CaCO3 and is discussed as chalk. That powder name is separate from soil type Chalky.",
     cognitiveDemand: "recall",
@@ -816,7 +816,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "chemical",
     difficulty: 1,
     prompt:
-      "What molecular formula does PubChem list for hydrogen peroxide?",
+      "What is the molecular formula for hydrogen peroxide?",
     choiceTexts: [
       "H2O",
       "CH3COOH",
@@ -838,7 +838,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "chemical",
     difficulty: 2,
     prompt:
-      "Which use of sodium bicarbonate is stated on the inspected PubChem identification-and-use text?",
+      "What is one common use of sodium bicarbonate (baking soda)?",
     choiceTexts: [
       "Ingredient of baking powder and a source of carbon dioxide",
       "The only official Crime Busters chromatography solvent",
@@ -860,7 +860,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "chemical",
     difficulty: 2,
     prompt:
-      "Besides industrial filler uses, PubChem states that calcium carbonate is therapeutically used as which of the following?",
+      "Besides industrial uses, calcium carbonate is also used as which of the following?",
     choiceTexts: [
       "A bleach active ingredient",
       "An antacid",
@@ -868,7 +868,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "A pH-strip dye",
     ],
     correctChoiceId: "b",
-    hint: "Use the therapeutic uses listed on the inspected calcium carbonate record.",
+    hint: "Think about therapeutic uses of calcium carbonate, such as settling an upset stomach.",
     explanation:
       "PubChem: calcium carbonate is therapeutically used as a food additive, a dietary supplement, an antacid, and a phosphate binder.",
     cognitiveDemand: "recognition",
@@ -882,7 +882,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "chemical",
     difficulty: 2,
     prompt:
-      "In the inspected iodine/KI starch procedure, a positive test for starch is which color change?",
+      "In an iodine test for starch, a positive result is which color change?",
     choiceTexts: [
       "The mixture stays yellow-brown and that means starch is present",
       "The mixture turns brick red after boiling with Benedict’s reagent",
@@ -904,7 +904,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "chemical",
     difficulty: 2,
     prompt:
-      "According to the inspected OpenStax chemistry remix, carbonates reacting with acids form a salt, water, and which gas?",
+      "When a carbonate reacts with an acid, it forms a salt, water, and which gas?",
     choiceTexts: [
       "Oxygen",
       "Ammonia",
@@ -912,7 +912,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Carbon dioxide",
     ],
     correctChoiceId: "d",
-    hint: "Use the inspected carbonate-plus-acid products list.",
+    hint: "Carbonates plus acid make a salt, water, and a gas.",
     explanation:
       "LibreTexts OpenStax remix: carbonates react with acids to form salts of the metal, gaseous carbon dioxide, and water. Example: CaCO3 + 2 HCl → CaCl2 + CO2 + H2O. Hydrogen carbonates also form CO2 with acids, so this test alone does not uniquely identify chalk versus baking soda.",
     cognitiveDemand: "application",
@@ -926,7 +926,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "chemical",
     difficulty: 3,
     prompt:
-      "The 2027 rules say powder tests will strictly provide which three materials?",
+      "Powder tests in this event provide which three materials?",
     choiceTexts: [
       "Iodine, HCl, and distilled water",
       "Benedict’s reagent, limewater, and vinegar",
@@ -948,7 +948,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "chemical",
     difficulty: 3,
     prompt:
-      "PubChem notes that isopropanol is sold in about 70% aqueous solution as which household product named in the 2027 liquid list?",
+      "Isopropanol sold as about a 70% water solution is which household product on the liquid list?",
     choiceTexts: [
       "Lemon juice",
       "Rubbing alcohol",
@@ -956,7 +956,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Liquid bleach",
     ],
     correctChoiceId: "b",
-    hint: "Use the household-product wording on the inspected isopropanol record.",
+    hint: "Think of the household name for about 70% isopropanol in water.",
     explanation:
       "PubChem: sold in 70% aqueous solution as rubbing alcohol. The rules print Rubbing alcohol (isopropyl). The bottle is still a mixture (HR6); this item only matches the named product.",
     cognitiveDemand: "application",
@@ -970,7 +970,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "chemical",
     difficulty: 3,
     prompt:
-      "PubChem describes sodium hypochlorite as commonly found in which 2027-listed liquid?",
+      "Sodium hypochlorite is commonly found in which listed liquid?",
     choiceTexts: [
       "Water",
       "Hydrogen peroxide (3%)",
@@ -978,7 +978,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Lemon juice",
     ],
     correctChoiceId: "c",
-    hint: "Use the household-product wording on the inspected sodium hypochlorite record.",
+    hint: "Think of the household product that often contains sodium hypochlorite.",
     explanation:
       "PubChem: sodium hypochlorite is commonly found in household bleach (formula NaClO on that record). Liquid bleach is still a commercial mixture (HR6).",
     cognitiveDemand: "application",
@@ -992,12 +992,12 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "safety",
     difficulty: 1,
     prompt:
-      "What do the 2027 Crime Busters rules say about the powders and liquids used for testing?",
+      "What is the safety rule for the powders and liquids in this event?",
     choiceTexts: [
       "Teams must taste each unknown to confirm identity",
       "Only liquids may be tasted; powders may not",
-      "Unknowns may be consumed if pH is near 7",
-      "Do not consume the powders/liquids used in this event for testing",
+      "Unknowns may be eaten if pH is near 7",
+      "Do not taste or eat them",
     ],
     correctChoiceId: "d",
     hint: "Read the printed NOTE under Chemical Analysis.",
@@ -1014,8 +1014,8 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 1,
     prompt:
-      "Look at this handbook drawing of a fingerprint. Which 2027 fundamental pattern family is it?",
-    choiceTexts: ["Loop", "Whorl", "Arch", "Minutiae"],
+      "What fingerprint pattern is shown?",
+    choiceTexts: ["Loop", "Whorl", "Arch", "Tented arch"],
     correctChoiceId: "a",
     hint: "Watch whether ridges come back out on the same side, make a complete circuit, or rise and leave on the other side.",
     explanation:
@@ -1038,8 +1038,8 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 2,
     prompt:
-      "Look at this second handbook drawing of a fingerprint. Which 2027 fundamental pattern family is it?",
-    choiceTexts: ["Arch", "Minutiae", "Loop", "Whorl"],
+      "Which fingerprint pattern family is shown here?",
+    choiceTexts: ["Arch", "Tented arch", "Loop", "Whorl"],
     correctChoiceId: "c",
     hint: "Watch whether ridges come back out on the same side, make a complete circuit, or rise and leave on the other side.",
     explanation:
@@ -1062,8 +1062,8 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 1,
     prompt:
-      "Look at this photographed fingerprint. Which 2027 fundamental pattern family is it?",
-    choiceTexts: ["Arch", "Whorl", "Loop", "Skin layer"],
+      "This photographed print belongs to which pattern family?",
+    choiceTexts: ["Arch", "Whorl", "Loop", "Tented arch"],
     correctChoiceId: "b",
     hint: "Watch whether ridges come back out on the same side, make a complete circuit, or rise and leave on the other side.",
     explanation:
@@ -1086,8 +1086,8 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 2,
     prompt:
-      "Look at this close-up fingerprint. Which 2027 fundamental pattern family is it?",
-    choiceTexts: ["Loop", "Whorl", "Minutiae", "Arch"],
+      "Which pattern family is this fingerprint?",
+    choiceTexts: ["Loop", "Whorl", "Double loop", "Arch"],
     correctChoiceId: "d",
     hint: "Watch whether ridges come back out on the same side, make a complete circuit, or rise and leave on the other side.",
     explanation:

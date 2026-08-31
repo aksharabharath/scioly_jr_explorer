@@ -18,19 +18,20 @@ export function EventPracticeProgress({
     return (
       <section
         aria-labelledby="event-progress-heading"
-        className="mt-8 rounded-3xl border border-stone-200/80 bg-surface p-5 sm:p-6"
+        className="journal-panel rounded-3xl p-4 sm:p-5"
       >
         <h2
           id="event-progress-heading"
-          className="font-display text-2xl font-semibold tracking-tight text-ink"
+          className="font-display text-xl font-semibold tracking-tight text-ink"
         >
-          Your Progress
+          Ground covered
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-stone-600">
-          You haven&apos;t practiced this event yet.
+          You haven&apos;t practiced this field site yet.
         </p>
         <p className="mt-2 text-sm leading-relaxed text-stone-600">
-          Start a 10-question practice set to begin tracking your progress.
+          Start a 10-question expedition to begin tracking what you&apos;ve
+          explored.
         </p>
       </section>
     );
@@ -44,50 +45,32 @@ export function EventPracticeProgress({
   return (
     <section
       aria-labelledby="event-progress-heading"
-      className="mt-8 rounded-3xl border border-stone-200/80 bg-surface p-5 sm:p-6"
+      className="journal-panel rounded-3xl p-4 sm:p-5"
     >
       <h2
         id="event-progress-heading"
-        className="font-display text-2xl font-semibold tracking-tight text-ink"
+        className="font-display text-xl font-semibold tracking-tight text-ink"
       >
-        Your {eventName} Progress
+        Ground covered
       </h2>
-      <p className="mt-2 text-sm text-stone-600">
-        Practice activity, not a mastery grade.
+      <p className="mt-1 text-sm text-stone-600">
+        Question coverage, not a mastery grade.
       </p>
-      <dl className="mt-4 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-2xl bg-parchment/80 px-4 py-3">
-          <dt className="text-sm text-stone-500">Questions practiced</dt>
-          <dd className="mt-1 font-display text-2xl font-semibold text-ink">
-            {progress.totalQuestions}
-          </dd>
-        </div>
-        <div className="rounded-2xl bg-parchment/80 px-4 py-3">
-          <dt className="text-sm text-stone-500">Unique questions tried</dt>
-          <dd className="mt-1 font-display text-2xl font-semibold text-ink">
-            {progress.uniqueQuestions}
-          </dd>
-        </div>
-        <div className="rounded-2xl bg-parchment/80 px-4 py-3">
-          <dt className="text-sm text-stone-500">Expeditions completed</dt>
-          <dd className="mt-1 font-display text-2xl font-semibold text-ink">
-            {expeditionsCompleted}
-          </dd>
-        </div>
-      </dl>
-      <div className="mt-5">
-        <div className="mb-2 flex items-baseline justify-between gap-3">
-          <span className="text-sm text-stone-600">Unique questions tried</span>
-          <span className="font-mono text-sm tabular-nums text-stone-500">
-            {progress.uniqueQuestions} / {liveBankSize}
-          </span>
-        </div>
+      <p className="mt-3 text-sm font-medium text-ink">
+        {progress.uniqueQuestions} of {liveBankSize} explored
+      </p>
+      <div className="mt-2">
         <ProgressBar
           value={uniquePercent}
           label={`Unique ${eventName} questions tried`}
-          fillClassName="bg-gold"
+          fillClassName="bg-gold-dark"
         />
       </div>
+      <p className="mt-2 text-sm text-stone-600">
+        {expeditionsCompleted === 1
+          ? "1 expedition completed"
+          : `${expeditionsCompleted} expeditions completed`}
+      </p>
     </section>
   );
 }

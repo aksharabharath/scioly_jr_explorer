@@ -3,6 +3,7 @@
 import { useLocalCalendarDate } from "@/components/useLocalCalendarDate";
 import { recentAchievements } from "@/lib/recent-achievements";
 import type { BadgeProgressAttempt } from "@/lib/badges";
+import type { DailyPracticeGoal } from "@/lib/student-preferences";
 import type { Question } from "@/lib/types";
 import Link from "next/link";
 
@@ -10,12 +11,14 @@ type RecentAchievementsProps = {
   attempts: BadgeProgressAttempt[];
   questions: Question[];
   streakDays: number;
+  dailyPracticeGoal: DailyPracticeGoal;
 };
 
 export function RecentAchievements({
   attempts,
   questions,
   streakDays,
+  dailyPracticeGoal,
 }: RecentAchievementsProps) {
   const practiceDate = useLocalCalendarDate();
   const items =
@@ -26,6 +29,7 @@ export function RecentAchievements({
           questions,
           streakDays,
           practiceDate,
+          dailyPracticeGoal,
         });
 
   return (
@@ -35,7 +39,7 @@ export function RecentAchievements({
           id="recent-achievements-heading"
           className="font-display text-2xl font-semibold tracking-tight text-ink"
         >
-          Recent achievements
+          Recent discoveries
         </h2>
         <Link
           href="/badges"
@@ -48,15 +52,15 @@ export function RecentAchievements({
         <p className="mt-3 text-sm text-stone-600">Loading achievements…</p>
       ) : items.length === 0 ? (
         <p className="mt-3 text-sm text-stone-600">
-          Finish an expedition to see badges, streaks, and today&apos;s mission
-          here.
+          Finish an expedition to see discoveries, streaks, and today&apos;s
+          expedition here.
         </p>
       ) : (
         <ul className="mt-4 space-y-3">
           {items.map((item) => (
             <li
               key={item.id}
-              className="rounded-2xl border border-stone-200/80 bg-surface px-4 py-3"
+              className="journal-panel rounded-2xl px-4 py-3"
             >
               <p className="font-display text-lg font-semibold text-ink">
                 {item.title}

@@ -8,6 +8,7 @@ import {
   completedSessionCountForEvent,
   expeditionLogEntries,
   hasCompletedExpeditionOnLocalDate,
+  questionsPracticedOnLocalDate,
   uniqueQuestionsPracticed,
   type ExpeditionAttempt,
 } from "@/lib/expeditions";
@@ -107,6 +108,14 @@ check(
 check(
   "completed expedition does not count for an unrelated day",
   !hasCompletedExpeditionOnLocalDate(full, "1999-01-01"),
+);
+check(
+  "questions practiced today matches the full set",
+  questionsPracticedOnLocalDate(full, today) === PRACTICE_SET_SIZE,
+);
+check(
+  "questions practiced on another day is zero",
+  questionsPracticedOnLocalDate(full, "1999-01-01") === 0,
 );
 
 const log = expeditionLogEntries(full, questions, {

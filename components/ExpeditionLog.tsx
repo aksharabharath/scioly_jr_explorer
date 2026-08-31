@@ -1,66 +1,80 @@
 import { EventIcon } from "@/components/EventIcon";
 import { formatXpGain } from "@/lib/gamification";
 import type { ExpeditionLogEntry } from "@/lib/expeditions";
-import type { EventIconId } from "@/lib/types";
-
-const EVENT_ICONS: Record<string, EventIconId> = {
-  entomology: "bug",
-  "anatomy-physiology": "body",
-  "water-quality": "water",
-  ecology: "leaf",
-  "crime-busters": "search",
-};
+import { getKnownEvent } from "@/lib/mock/events";
+import Link from "next/link";
 
 type ExpeditionLogProps = {
   entries: ExpeditionLogEntry[];
 };
 
+function formatEndedAt(endedAt: string | null): string | null {
+  if (!endedAt) {
+    return null;
+  }
+  const date = new Date(endedAt);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+  return date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 export function ExpeditionLog({ entries }: ExpeditionLogProps) {
   return (
     <section aria-labelledby="expedition-log-heading">
-      <h2
+      <h1
         id="expedition-log-heading"
         className="font-display text-2xl font-semibold tracking-tight text-ink"
       >
         Expedition log
-      </h2>
+      </h1>
       <p className="mt-1 text-sm text-stone-600">
-        Recent completed 10-question sets. XP is from this set&apos;s published
-        rules, not a second scoreboard.
+        Finished 10-question expeditions. Open an entry to visit that field
+        site.
       </p>
       {entries.length === 0 ? (
         <p className="mt-4 text-sm text-stone-600">
-          Finish an expedition to write your first log entry.
+          Your field log is empty. Finish an expedition and it will be written
+          here.
         </p>
       ) : (
-        <ul className="mt-4 space-y-3">
-          {entries.map((entry) => (
-            <li
-              key={entry.sessionId}
-              className="rounded-3xl border border-stone-200/80 bg-surface p-4 sm:p-5"
-            >
-              <div className="flex items-start gap-3">
-                <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-parchment text-teal-dark">
-                  <EventIcon
-                    id={EVENT_ICONS[entry.eventId] ?? "star"}
-                    className="h-6 w-6"
-                  />
-                </span>
-                <div>
-                  <h3 className="font-display text-lg font-semibold text-ink">
-                    {entry.eventName}
-                  </h3>
-                  <p className="mt-1 text-sm text-stone-600">
-                    {entry.questionsAnswered} questions · {entry.correctAnswers}{" "}
-                    correct
-                  </p>
-                  <p className="mt-1 font-display text-xl font-semibold tabular-nums text-ink">
-                    {formatXpGain(entry.derivedXp)}
-                  </p>
-                </div>
-              </div>
-            </li>
-          ))}
+        <ul className="mt-4 space-y-2">
+          {entries.map((entry) => {
+            const when = formatEndedAt(entry.endedAt);
+            const icon = getKnownEvent(entry.eventId)?.icon ?? "star";
+            return (
+              <li key={entry.sessionId}>
+                <Link
+                  href={`/events/${entry.eventId}`}
+                  className="journal-panel block rounded-2xl p-3 outline-offset-4 transition hover:-translate-y-0.5 sm:p-3.5"
+                >
+                  <div className="flex items-start gap-3 md:grid md:grid-cols-[8.5rem_minmax(0,1fr)_auto_auto] md:items-center md:gap-4">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-parchment text-teal-dark md:hidden">
+                      <EventIcon id={icon} className="h-5 w-5" />
+                    </span>
+                    <div className="min-w-0 md:contents">
+                      <p className="text-xs font-medium text-stone-500 md:text-sm">
+                        {when ?? "—"}
+                      </p>
+                      <h2 className="font-display text-base font-semibold text-ink md:text-lg">
+                        {entry.eventName}
+                      </h2>
+                      <p className="mt-1 text-sm font-medium text-ink md:mt-0 md:text-right">
+                        {entry.correctAnswers}/{entry.questionsAnswered} correct
+                      </p>
+                      <p className="mt-1 text-sm tabular-nums text-stone-600 md:mt-0 md:text-right">
+                        {formatXpGain(entry.derivedXp)}
+                      </p>
+                    </div>
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>

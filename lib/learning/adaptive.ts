@@ -54,6 +54,26 @@ export function hasWeakTopics(history: LearningAttempt[]): boolean {
   return topicsNeedingRevisit(history).length > 0;
 }
 
+/** Live (or other) bank items whose topic is currently weak. */
+export function eligibleWeakQuestions(
+  bank: Question[],
+  history: LearningAttempt[],
+): Question[] {
+  const weakTopicIds = new Set(topicsNeedingRevisit(history));
+  if (weakTopicIds.size === 0) {
+    return [];
+  }
+  return bank.filter((question) => weakTopicIds.has(question.topicId));
+}
+
+/** Tricky Topics expeditions use at most 10 items, or fewer if the weak pool is smaller. */
+export function weakPracticeSetSize(eligibleCount: number): number {
+  if (eligibleCount <= 0) {
+    return 0;
+  }
+  return Math.min(PRACTICE_SET_SIZE, eligibleCount);
+}
+
 export function attemptFromQuestion(
   question: Question,
   isCorrect: boolean,
@@ -224,6 +244,20 @@ function remainingCorrectsToClear(
   return Math.max(0, CORRECTS_TO_CLEAR_WEAK_TOPIC - laterCorrect);
 }
 
+function historyBeforeThisSession(
+  history: LearningAttempt[],
+  askedQuestionIds: string[],
+): LearningAttempt[] {
+  if (askedQuestionIds.length === 0) {
+    return history;
+  }
+  const sessionStart = history.length - askedQuestionIds.length;
+  if (sessionStart <= 0) {
+    return [];
+  }
+  return history.slice(0, sessionStart);
+}
+
 function availableQuestions(input: SelectNextQuestionInput): Question[] {
   const unused = input.bank.filter(
     (question) => !input.askedQuestionIds.includes(question.id),
@@ -232,16 +266,18 @@ function availableQuestions(input: SelectNextQuestionInput): Question[] {
     return unused;
   }
 
-  const weakTopicIds = topicsNeedingRevisit(input.history);
+  const weakTopicIds = topicsNeedingRevisit(
+    historyBeforeThisSession(input.history, input.askedQuestionIds),
+  );
   if (weakTopicIds.length === 0) {
-    return unused;
+    return [];
   }
 
   const unusedWeak = unused.filter((question) =>
     weakTopicIds.includes(question.topicId),
   );
   if (unusedWeak.length === 0) {
-    return unused;
+    return [];
   }
 
   const lastTopicId = input.sessionTopicSequence.at(-1) ?? null;
@@ -252,12 +288,7 @@ function availableQuestions(input: SelectNextQuestionInput): Question[] {
   const rotatedWeak = unusedWeak.filter(
     (question) => question.topicId !== lastTopicId,
   );
-  if (rotatedWeak.length > 0) {
-    return rotatedWeak;
-  }
-
-  const mixed = unused.filter((question) => question.topicId !== lastTopicId);
-  return mixed.length > 0 ? mixed : unusedWeak;
+  return rotatedWeak.length > 0 ? rotatedWeak : unusedWeak;
 }
 
 function recentQuestionIds(

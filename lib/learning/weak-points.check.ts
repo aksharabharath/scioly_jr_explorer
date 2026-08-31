@@ -7,11 +7,13 @@ import {
 } from "@/lib/mock/astronomy";
 import {
   PRACTICE_SET_SIZE,
+  eligibleWeakQuestions,
   hasWeakTopics,
   parsePracticeMode,
   selectNextQuestion,
   targetDifficulty,
   toLearningAttempts,
+  weakPracticeSetSize,
   type LearningAttempt,
   type PracticeMode,
 } from "@/lib/learning/adaptive";
@@ -58,14 +60,25 @@ function next(
 function playSet(
   startingHistory: LearningAttempt[],
   mode: PracticeMode,
+  limit = PRACTICE_SET_SIZE,
 ): Question[] {
   const questions: Question[] = [];
   let history = [...startingHistory];
   const asked: string[] = [];
   const sessionTopics: string[] = [];
 
-  for (let index = 0; index < PRACTICE_SET_SIZE; index += 1) {
-    const question = next(history, asked, sessionTopics, mode);
+  for (let index = 0; index < limit; index += 1) {
+    const question = selectNextQuestion({
+      bank,
+      history,
+      askedQuestionIds: asked,
+      sessionTopicSequence: sessionTopics,
+      lastWasRevisitEvidence: false,
+      mode,
+    });
+    if (!question) {
+      break;
+    }
     questions.push(question);
     asked.push(question.id);
     sessionTopics.push(question.topicId);
@@ -86,8 +99,21 @@ function check(name: string, ok: boolean) {
 check("mode=weak is parsed", parsePracticeMode("weak") === "weak");
 check("other query values are normal practice", parsePracticeMode("nope") === "normal");
 
-const noHistoryFirst = next([], [], [], "weak");
-check("a new student can start Work on Weak Points", Boolean(noHistoryFirst.id));
+check(
+  "a new student has no tricky topics",
+  !hasWeakTopics([]) &&
+    selectNextQuestion({
+      bank,
+      history: [],
+      askedQuestionIds: [],
+      sessionTopicSequence: [],
+      lastWasRevisitEvidence: false,
+      mode: "weak",
+    }) === null,
+);
+check("empty weak pool has session size 0", weakPracticeSetSize(0) === 0);
+check("four eligible tricky items make a 4-question set", weakPracticeSetSize(4) === 4);
+check("ten or more eligible items stay at 10", weakPracticeSetSize(12) === PRACTICE_SET_SIZE);
 
 const moonWeak: LearningAttempt[] = [
   attempt("astro-q3", false),
@@ -120,12 +146,54 @@ check(
   "multiple weak topics can both appear",
   mixedTopics.has("the-moon") && mixedTopics.has("sun-and-stars"),
 );
+check(
+  "weak mode does not pull unrelated topics",
+  [...mixedTopics].every(
+    (topicId) => topicId === "the-moon" || topicId === "sun-and-stars",
+  ),
+);
 
 const weakSet = playSet(moonWeak, "weak");
 const weakIds = weakSet.map((question) => question.id);
 check(
-  "weak-point session contains 10 questions",
+  "weak-point session contains 10 questions when the weak pool is large enough",
   weakSet.length === PRACTICE_SET_SIZE,
+);
+check(
+  "a large weak pool stays on the weak topic",
+  weakSet.every((question) => question.topicId === "the-moon"),
+);
+const moonOnly = bank.filter((question) => question.topicId === "the-moon");
+const shortEligible = eligibleWeakQuestions(moonOnly.slice(0, 4), moonWeak);
+check(
+  "eligible weak questions come only from weak topics",
+  shortEligible.length === 4 &&
+    shortEligible.every((question) => question.topicId === "the-moon"),
+);
+const shortAsked: string[] = [];
+const shortTopics: string[] = [];
+const shortSet: Question[] = [];
+let shortHistory = [...moonWeak];
+for (let index = 0; index < PRACTICE_SET_SIZE; index += 1) {
+  const question = selectNextQuestion({
+    bank: moonOnly.slice(0, 4),
+    history: shortHistory,
+    askedQuestionIds: shortAsked,
+    sessionTopicSequence: shortTopics,
+    lastWasRevisitEvidence: false,
+    mode: "weak",
+  });
+  if (!question) {
+    break;
+  }
+  shortSet.push(question);
+  shortAsked.push(question.id);
+  shortTopics.push(question.topicId);
+  shortHistory = [...shortHistory, attempt(question.id, true)];
+}
+check(
+  "fewer than 10 eligible tricky questions ends the set early",
+  shortSet.length === 4 && new Set(shortSet.map((question) => question.id)).size === 4,
 );
 check(
   "weak-point session IDs are unique",

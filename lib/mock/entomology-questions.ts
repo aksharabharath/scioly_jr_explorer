@@ -196,7 +196,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "taxonomy",
     difficulty: 1,
     prompt:
-      "On the 2027 ESO Entomology List, which order includes both cockroaches and termites?",
+      "Which order includes both cockroaches and termites?",
     choiceTexts: [
       "Mantodea",
       "Blattodea",
@@ -219,7 +219,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "taxonomy",
     difficulty: 1,
     prompt:
-      "What official common names does the 2027 ESO list give for Subclass Collembola?",
+      "What common names are listed for Subclass Collembola?",
     choiceTexts: [
       "diplurans",
       "silverfish, firebrats",
@@ -242,12 +242,12 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "visual-id",
     difficulty: 1,
     prompt:
-      "[IMAGE REQUIRED: eight-legged arthropod with a fused body.] Using the 2027 list, how is this specimen grouped?",
+      "[IMAGE REQUIRED: eight-legged arthropod with a fused body.] Look at the photo. How is this animal classified?",
     choiceTexts: [
       "As an insect order in Class Insecta",
       "As a beetle family in Coleoptera",
       "As a true-bug family in Hemiptera",
-      "As a non-insect arthropod family (hardback ticks)",
+      "As a non-insect arthropod family",
     ],
     correctChoiceId: "d",
     hint: "Count the walking legs and find the list heading that is separate from Class Insecta.",
@@ -270,7 +270,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     id: "ento-q4",
     topicId: "taxonomy",
     difficulty: 1,
-    prompt: "Mayflies are listed on the 2027 ESO list as which order?",
+    prompt: "Mayflies belong to which order?",
     choiceTexts: [
       "Odonata",
       "Plecoptera",
@@ -293,7 +293,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "visual-id",
     difficulty: 2,
     prompt:
-      "[IMAGE REQUIRED: hairy flower-visiting insect with two pairs of wings.] Using the 2027 list, which family is this insect?",
+      "[IMAGE REQUIRED: hairy flower-visiting insect with two pairs of wings.] Which family is this insect?",
     choiceTexts: [
       "Bombyliidae — bee flies",
       "Formicidae — ants",
@@ -322,7 +322,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "visual-id",
     difficulty: 1,
     prompt:
-      "[IMAGE REQUIRED: worker ant in side view.] Using the 2027 list, which family is this insect?",
+      "[IMAGE REQUIRED: worker ant in side view.] Which family is this insect?",
     choiceTexts: [
       "Vespidae — paper wasps, hornets, yellowjackets",
       "Formicidae — ants",
@@ -351,7 +351,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "visual-id",
     difficulty: 2,
     prompt:
-      "[IMAGE REQUIRED: butterfly with tailed hindwings.] Which listed Lepidoptera family best matches this specimen?",
+      "[IMAGE REQUIRED: butterfly with tailed hindwings.] Look at the photo. Which family is this butterfly?",
     choiceTexts: [
       "Nymphalidae — brush-footed butterflies",
       "Saturniidae — Giant Silkworm moths",
@@ -413,7 +413,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     choiceTexts: [
       "Tenebrionidae — darkling beetles",
       "Scarabaeidae — dung beetles",
-      "Coccinellidae — lady-bird beetles(ladybugs)",
+      "Coccinellidae — lady-bird beetles (ladybugs)",
       "Curculionidae — weevils",
     ],
     correctChoiceId: "d",
@@ -438,7 +438,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "visual-id",
     difficulty: 3,
     prompt:
-      "[IMAGE REQUIRED: tiny six-legged arthropod with a forked jumping organ under the abdomen, no wings.] Using the 2027 list, what is the best identification?",
+      "[IMAGE REQUIRED: tiny six-legged arthropod with a forked jumping organ under the abdomen, no wings.] What is the best identification?",
     choiceTexts: [
       "Order Zygentoma — silverfish, firebrats",
       "Subclass Collembola — springtails, snow fleas",
@@ -490,12 +490,12 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "comparison",
     difficulty: 3,
     prompt:
-      "[IMAGE REQUIRED: two aquatic beetles labeled A and B.] Two aquatic beetles are shown as A and B. Which pairing matches the 2027 list?",
+      "[IMAGE REQUIRED: two aquatic beetles labeled A and B.] Look at beetles A and B. Which statement matches what you see?",
     choiceTexts: [
-      "Threadlike antennae = Hydrophilidae; clubbed hidden antennae = Dytiscidae",
+      "A has clubbed antennae (Hydrophilidae); B has threadlike antennae (Dytiscidae)",
       "Both are Lampyridae because they glow underwater",
-      "Threadlike antennae and hunting hind-leg kickers = Dytiscidae; clubbed antennae = Hydrophilidae",
-      "Both must be Curculionidae because they live in water",
+      "A has threadlike antennae (Dytiscidae); B has clubbed antennae (Hydrophilidae)",
+      "Both are Curculionidae because they live in water",
     ],
     correctChoiceId: "c",
     hint: "Match each beetle to its official 2027 family common name. Antenna characters are not printed on the list.",
@@ -519,12 +519,12 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "comparison",
     difficulty: 3,
     prompt:
-      "[IMAGE REQUIRED: two flies labeled A and B.] Two flies are shown as A and B. Which listed families are being compared, and which one has piercing mouthparts used to take blood in many species?",
+      "[IMAGE REQUIRED: two flies labeled A and B.] Look at flies A and B. Which choice correctly names them, including the mosquito family?",
     choiceTexts: [
-      "Tipulidae (crane flies) have the piercing mouthparts; Culicidae do not bite.",
-      "Both are Bombyliidae (bee flies).",
-      "Culicidae (mosquitoes) include many blood-feeding species; Tipulidae (crane flies) do not have a mosquito-like piercing proboscis.",
-      "Both are Calliphoridae (blow flies).",
+      "A and B are crane flies (Tipulidae); mosquitoes (Culicidae) are not shown.",
+      "A and B are both bee flies (Bombyliidae).",
+      "One is a mosquito (Culicidae) and one is a crane fly (Tipulidae).",
+      "A and B are both blow flies (Calliphoridae).",
     ],
     correctChoiceId: "c",
     hint: "Crane flies are often mistaken for mosquitoes but are a different listed family.",
@@ -616,7 +616,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "external-anatomy",
     difficulty: 2,
     prompt:
-      "[IMAGE REQUIRED: labeled insect rear end.] Cerci, when present, are paired appendages located where?",
+      "[IMAGE REQUIRED: labeled insect rear end.] When an insect has cerci, where are they?",
     choiceTexts: [
       "On the antennae",
       "On the tarsi of the front legs",
@@ -645,12 +645,12 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "dichotomous-keys",
     difficulty: 3,
     prompt:
-      "Use this simple key for listed taxa.\n\n1a. Aquatic true bug (Hemiptera) that swims at the surface … go to 2\n1b. Not an aquatic true bug … not keyed here\n2a. Typically swims with the back downward (on its back) … Notonectidae\n2b. Typically swims with the back upward … Corixidae\n\nA listed water bug is observed swimming on its back. What is the keyed identification?",
+      "Use this key.\n\n1a. Aquatic true bug that swims at the surface → go to 2\n1b. Not an aquatic true bug → stop; not in this key\n2a. Usually swims on its back → Notonectidae\n2b. Usually swims right-side up → Corixidae\n\nA water bug is swimming on its back. Which family does the key give?",
     choiceTexts: [
       "Corixidae",
       "Notonectidae",
       "Dytiscidae",
-      "The key cannot finish because beetles are Hemiptera",
+      "The key cannot finish; this animal is a beetle, not a true bug",
     ],
     correctChoiceId: "b",
     hint: "Follow couplet 1, then couplet 2 using swimming orientation.",
@@ -668,7 +668,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "dichotomous-keys",
     difficulty: 3,
     prompt:
-      "Use this key for listed Orthoptera families.\n\n1a. Official common name short-horned grasshoppers … Acrididae\n1b. Official common name not short-horned grasshoppers … go to 2\n2a. Official common name katydids … Tettigoniidae\n2b. Official common names crickets/tree crickets … Gryllidae\n\nA listed orthopteran is printed as short-horned grasshoppers. What does the key give?",
+      "Follow this key from the top.\n\n1a. Listed common name is short-horned grasshoppers → Acrididae\n1b. Any other grasshopper or cricket name → go to 2\n2a. Listed common name is katydids → Tettigoniidae\n2b. Listed common name is crickets/tree crickets → Gryllidae\n\nA specimen’s listed common name is short-horned grasshoppers. Which family do you reach?",
     choiceTexts: [
       "Tettigoniidae",
       "Gryllidae",
@@ -691,12 +691,12 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "dichotomous-keys",
     difficulty: 3,
     prompt:
-      "You must write the first couplet of a simple key for these listed taxa only: Dytiscidae, Hydrophilidae, Acrididae, and Gryllidae. Which first split is most useful?",
+      "You are making a simple two-step key for these listed groups only: Dytiscidae, Hydrophilidae, Acrididae, and Gryllidae. What is the best first split?",
     choiceTexts: [
-      "Printed names mention diving or water versus printed names are grasshoppers or crickets",
-      "Has six legs vs has eight legs",
-      "Can glow vs cannot glow",
-      "Is a tick vs is an insect",
+      "Water beetles versus grasshoppers or crickets",
+      "Has six legs versus has eight legs",
+      "Can glow versus cannot glow",
+      "Is a tick versus is an insect",
     ],
     correctChoiceId: "a",
     hint: "Look at the official common names: two mention diving or water; two are grasshoppers or crickets.",
@@ -782,7 +782,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "behavior-adaptations",
     difficulty: 2,
     prompt:
-      "[IMAGE REQUIRED: aquatic beetle hind legs flattened like oars.] What is the name of this leg adaptation, and which listed family commonly shows it?",
+      "[IMAGE REQUIRED: aquatic beetle hind legs flattened like oars.] The photo shows flattened hind legs used for swimming. Which choice names that kind of leg and a beetle family that has it?",
     choiceTexts: [
       "Fossorial legs in Acrididae",
       "Raptorial legs in Mantodea",
@@ -834,7 +834,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "human-impact",
     difficulty: 2,
     prompt:
-      "Why are mosquitoes (Culicidae) an important public-health family on the 2027 list?",
+      "Why are mosquitoes (Culicidae) an important public-health family?",
     choiceTexts: [
       "They pollinate all U.S. food crops and never bite animals",
       "Some species can transmit pathogens that cause human and animal disease",
@@ -926,7 +926,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "climate",
     difficulty: 2,
     prompt:
-      "Mayflies (Ephemeroptera) and stoneflies (Plecoptera) often need cool, well-oxygenated freshwater as immatures. If a stream becomes warmer and holds less oxygen, what is the most reasonable 2027-scope concern?",
+      "Mayflies (Ephemeroptera) and stoneflies (Plecoptera) often need cool, well-oxygenated freshwater as young insects. If a stream becomes warmer and holds less oxygen, what is the most reasonable concern?",
     choiceTexts: [
       "Those aquatic naiads may decline because the habitat no longer matches what they need",
       "They will immediately become terrestrial beetles (Coleoptera)",
@@ -949,7 +949,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "taxonomy",
     difficulty: 1,
     prompt:
-      "The 2027 ESO list prints Family Scutelleridae with which official common names?",
+      "What common name is listed for family Scutelleridae?",
     choiceTexts: [
       "Stink bugs",
       "metallic shield bugs",
@@ -971,7 +971,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "taxonomy",
     difficulty: 1,
     prompt:
-      "On the 2027 ESO list, “Stink bugs” is the official common name for which family?",
+      "“Stink bugs” is the listed common name for which family?",
     choiceTexts: [
       "Scutelleridae",
       "Membracidae",
@@ -994,12 +994,12 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "visual-id",
     difficulty: 2,
     prompt:
-      "[IMAGE REQUIRED: large insect with clear wings folded roof-like over the back.] Using the 2027 list, which family is this insect?",
+      "[IMAGE REQUIRED: large insect with clear wings folded roof-like over the back.] Which family is this insect?",
     choiceTexts: [
       "Membracidae — treehoppers",
       "Cicadidae — cicadas",
       "Scutelleridae — metallic shield bugs",
-      "Coccinellidae — lady-bird beetles(ladybugs)",
+      "Coccinellidae — lady-bird beetles (ladybugs)",
     ],
     correctChoiceId: "b",
     hint: "Match the specimen to a listed Hemiptera family common name. Do not pick a beetle family.",
@@ -1023,7 +1023,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "taxonomy",
     difficulty: 1,
     prompt:
-      "What official common name does the 2027 ESO list give for Order Megaloptera?",
+      "What common name is listed for Order Megaloptera?",
     choiceTexts: [
       "stoneflies",
       "dragon/damselflies",
@@ -1045,12 +1045,12 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "visual-id",
     difficulty: 2,
     prompt:
-      "[IMAGE REQUIRED: round beetles with spotted wing covers.] Using the 2027 list, which family is this?",
+      "[IMAGE REQUIRED: round beetles with spotted wing covers.] Which family is this?",
     choiceTexts: [
       "Curculionidae — weevils",
       "Scarabaeidae — dung beetles",
       "Tenebrionidae — darkling beetles",
-      "Coccinellidae — lady-bird beetles(ladybugs)",
+      "Coccinellidae — lady-bird beetles (ladybugs)",
     ],
     correctChoiceId: "d",
     hint: "Among listed beetle families, match the specimen to its official common name. Keep the official punctuation.",
@@ -1074,7 +1074,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "taxonomy",
     difficulty: 1,
     prompt:
-      "Which official common name does the 2027 list print for Family Zopheridae?",
+      "What common name is listed for Family Zopheridae?",
     choiceTexts: [
       "diabolical ironclad Beetles",
       "dung beetles",
@@ -1118,7 +1118,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "visual-id",
     difficulty: 1,
     prompt:
-      "[IMAGE REQUIRED: insect with a triangular head and folded grasping front legs.] Using the 2027 list, which order is this?",
+      "[IMAGE REQUIRED: insect with a triangular head and folded grasping front legs.] Which order is this?",
     choiceTexts: [
       "Zygentoma — silverfish, firebrats",
       "Blattodea — cockroaches/termites",
@@ -1147,7 +1147,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "taxonomy",
     difficulty: 2,
     prompt:
-      "Siphonaptera is printed on the 2027 list as fleas. How is it grouped?",
+      "Siphonaptera is listed as fleas. How is it grouped?",
     choiceTexts: [
       "As an insect order with no families listed",
       "As a family under Diptera",
@@ -1170,7 +1170,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "comparison",
     difficulty: 3,
     prompt:
-      "[IMAGE REQUIRED: two flower-visiting insects labeled A and B.] Two insects are shown as A and B. Which pairing matches the 2027 list?",
+      "[IMAGE REQUIRED: two flower-visiting insects labeled A and B.] Look at insects A and B. Which pairing is correct?",
     choiceTexts: [
       "A and B are both Apidae in Hymenoptera",
       "A = Bombyliidae in Diptera; B = Apidae in Hymenoptera",
@@ -1199,7 +1199,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "visual-id",
     difficulty: 1,
     prompt:
-      "[IMAGE REQUIRED: yellow-and-black flying insect with a narrow waist.] Using the 2027 list, which family is this?",
+      "[IMAGE REQUIRED: yellow-and-black flying insect with a narrow waist.] Which family is this?",
     choiceTexts: [
       "Formicidae — ants",
       "Apidae — bees",
@@ -1228,7 +1228,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "taxonomy",
     difficulty: 2,
     prompt:
-      "Giant Silkworm moths are the official common name for Family Saturniidae. Which order contains that family?",
+      "Saturniidae (Giant Silkworm moths) belong to which order?",
     choiceTexts: [
       "Lepidoptera",
       "Diptera",
@@ -1250,7 +1250,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "taxonomy",
     difficulty: 3,
     prompt:
-      "On the 2027 list, how do Collembola and Diplura differ in rank?",
+      "On the list, what ranks are Collembola and Diplura?",
     choiceTexts: [
       "Both are families in Class Insecta",
       "Both are insect orders in Class Insecta",
@@ -1273,7 +1273,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "visual-id",
     difficulty: 2,
     prompt:
-      "[IMAGE REQUIRED: small insect with a peaked shield over the back.] Using the 2027 list, which family is this?",
+      "[IMAGE REQUIRED: small insect with a peaked shield over the back.] Which family is this?",
     choiceTexts: [
       "Acrididae — short-horned grasshoppers",
       "Cicadidae — cicadas",
@@ -1302,7 +1302,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "dichotomous-keys",
     difficulty: 3,
     prompt:
-      "Use this simple key for listed taxa.\n\n1a. Listed under Non-Insect Arthropods … Ixodidae\n1b. Listed in Class Insecta … go to 2\n2a. Official common name bees … Apidae\n2b. Official common name ants … Formicidae\n\nA specimen is a hardback tick on the 2027 list. What is the keyed identification?",
+      "Follow this key from the top.\n\n1a. Listed under Non-Insect Arthropods → Ixodidae\n1b. Listed in Class Insecta → go to 2\n2a. Listed common name is bees → Apidae\n2b. Listed common name is ants → Formicidae\n\nThe specimen is a hardback tick. Which family do you reach?",
     choiceTexts: [
       "Ixodidae",
       "Apidae",
@@ -1325,7 +1325,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "dichotomous-keys",
     difficulty: 3,
     prompt:
-      "Use this simple key for listed taxa.\n\n1a. Family in Hemiptera … go to 2\n1b. Family in Coleoptera … not keyed here\n2a. Official common name cicadas … Cicadidae\n2b. Official common name metallic shield bugs … Scutelleridae\n\nA listed hemipteran family is printed as metallic shield bugs. What does the key give?",
+      "Follow this key from the top.\n\n1a. Family in Hemiptera (true bugs) → go to 2\n1b. Family in Coleoptera (beetles) → stop; not in this key\n2a. Listed common name is cicadas → Cicadidae\n2b. Listed common name is metallic shield bugs → Scutelleridae\n\nA specimen’s listed common name is metallic shield bugs. Which family do you reach?",
     choiceTexts: [
       "Cicadidae",
       "Pentatomidae",
@@ -1348,7 +1348,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "dichotomous-keys",
     difficulty: 3,
     prompt:
-      "Use this simple key for listed orders.\n\n1a. Official common name thrips … Thysanoptera\n1b. Not thrips … go to 2\n2a. Official common name dobsonflies … Megaloptera\n2b. Official common name caddisflies … Trichoptera\n\nA listed order’s official common name is dobsonflies. What is the keyed identification?",
+      "Follow this key from the top.\n\n1a. Listed common name is thrips → Thysanoptera\n1b. Not thrips → go to 2\n2a. Listed common name is dobsonflies → Megaloptera\n2b. Listed common name is caddisflies → Trichoptera\n\nA specimen’s listed common name is dobsonflies. Which order do you reach?",
     choiceTexts: [
       "Thysanoptera",
       "Megaloptera",
@@ -1371,7 +1371,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "dichotomous-keys",
     difficulty: 2,
     prompt:
-      "Use this simple key for listed families.\n\n1a. Family in Diptera … go to 2\n1b. Family in Hymenoptera … not keyed here\n2a. Official common name mosquitoes … Culicidae\n2b. Official common names fruit flies, husk fly … Tephritidae\n\nA listed fly family is printed as fruit flies, husk fly. What does the key give?",
+      "Follow this key from the top.\n\n1a. Family in Diptera (true flies) → go to 2\n1b. Family in Hymenoptera (bees, ants, wasps) → stop; not in this key\n2a. Listed common name is mosquitoes → Culicidae\n2b. Listed common name is fruit flies, husk fly → Tephritidae\n\nA specimen’s listed common name is fruit flies, husk fly. Which family do you reach?",
     choiceTexts: [
       "Culicidae",
       "Apidae",
@@ -1394,10 +1394,10 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "dichotomous-keys",
     difficulty: 3,
     prompt:
-      "You must write the first couplet of a simple key for these listed taxa only: Collembola, Blattodea, and Ixodidae. Which first split is most useful?",
+      "You are making a simple key for these listed groups only: Collembola, Blattodea, and Ixodidae. What is the best first split?",
     choiceTexts: [
       "Lives in water versus lives on land",
-      "Listed in Class Entognatha versus Class Insecta versus Non-Insect Arthropods",
+      "Entognatha versus Insecta versus non-insect arthropods",
       "Has wings versus has no wings",
       "Can glow versus cannot glow",
     ],
@@ -1417,7 +1417,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "dichotomous-keys",
     difficulty: 2,
     prompt:
-      "Use this simple key for listed beetle families.\n\n1a. Family in Coleoptera … go to 2\n1b. Family in Diptera … not keyed here\n2a. Official common names metallic wood-boring/jewel beetles … Buprestidae\n2b. Official common name diabolical ironclad Beetles … Zopheridae\n\nA listed beetle family is printed as metallic wood-boring/jewel beetles. What does the key give?",
+      "Follow this key from the top.\n\n1a. Family in Coleoptera (beetles) → go to 2\n1b. Family in Diptera (true flies) → stop; not in this key\n2a. Listed common name is metallic wood-boring/jewel beetles → Buprestidae\n2b. Listed common name is diabolical ironclad Beetles → Zopheridae\n\nA specimen’s listed common name is metallic wood-boring/jewel beetles. Which family do you reach?",
     choiceTexts: [
       "Buprestidae",
       "Zopheridae",
@@ -1531,7 +1531,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "life-cycles",
     difficulty: 2,
     prompt:
-      "Dragon/damselflies are listed as Order Odonata. According to this bank’s life-cycle teaching, do they have a pupal stage?",
+      "Dragonflies and damselflies are listed as Order Odonata. Do they have a pupal stage?",
     choiceTexts: [
       "Yes; Odonata are holometabolous like Lepidoptera",
       "No; Odonata have incomplete development without a pupa",
@@ -1554,7 +1554,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "ecology-habitat",
     difficulty: 2,
     prompt:
-      "Students collect immatures from a freshwater pond. The listed order they want has the official common name caddisflies. Which order is that?",
+      "Students collect young insects from a freshwater pond. The order they want is listed as caddisflies. Which order is that?",
     choiceTexts: [
       "Ephemeroptera",
       "Plecoptera",
@@ -1599,7 +1599,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "behavior-adaptations",
     difficulty: 1,
     prompt:
-      "Which listed family is this bank’s example of insects that make a familiar night chirp by rubbing body parts together (stridulation)?",
+      "Which listed family is known for a familiar night chirp made by rubbing body parts together (stridulation)?",
     choiceTexts: [
       "Lampyridae",
       "Culicidae",
@@ -1622,7 +1622,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "interactions",
     difficulty: 1,
     prompt:
-      "Family Cynipidae is printed as gall wasps. That official common name points to a listed relationship with which of the following?",
+      "Gall wasps (Cynipidae) are known for their relationship with what?",
     choiceTexts: [
       "Plants",
       "Hardback ticks only",
@@ -1645,7 +1645,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "human-impact",
     difficulty: 2,
     prompt:
-      "Which listed family is this bank’s public-health example of insects of which some species can transmit pathogens?",
+      "Which listed family includes species that can transmit pathogens to people or animals?",
     choiceTexts: [
       "Apidae",
       "Scarabaeidae",
@@ -1655,7 +1655,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     correctChoiceId: "d",
     hint: "Eliminate bees, dung beetles, and Giant Silkworm moths using their official common names.",
     explanation:
-      "The existing public-health item treats Culicidae (mosquitoes) as a family in which some species can transmit pathogens. Apidae are bees (food/pollination in this bank). Scarabaeidae are dung beetles. Saturniidae are Giant Silkworm moths. This stem does not name a specific disease.",
+      "The existing public-health item treats Culicidae (mosquitoes) as a family in which some species can transmit pathogens. Apidae are bees (food/pollination). Scarabaeidae are dung beetles. Saturniidae are Giant Silkworm moths. This stem does not name a specific disease.",
     taxonomyTags: ["Culicidae", "Diptera"],
     cognitiveDemand: "recognition",
     sourceType: "generated",

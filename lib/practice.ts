@@ -32,7 +32,7 @@ export function recommendNextStep(
   if (accuracyPercent === 100) {
     return {
       headline: "Beautiful work — you got every one.",
-      detail: `Try this set again later to stay sharp, or head back to ${eventName} and pick a new topic. Your XP is safe either way.`,
+      detail: `Try this expedition again later to stay sharp, or head back to ${eventName} and pick a new topic. Your XP is safe either way.`,
     };
   }
 
@@ -40,13 +40,13 @@ export function recommendNextStep(
     return {
       headline: "You are building real understanding.",
       detail:
-        "Read any explanations you missed, then try the set again. Mistakes never take XP away.",
+        "Read any explanations you missed, then try the expedition again. Misses never take XP away.",
     };
   }
 
   return {
     headline: "Every miss is a clue, not a penalty.",
     detail:
-      "Look at the explanations, then give the questions another try. Practice is how explorers learn — XP stays with you.",
+      "Look at the explanations, then give the questions another try. Explorers learn by going again — XP stays with you.",
   };
 }

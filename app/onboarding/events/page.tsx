@@ -24,12 +24,11 @@ export default async function OnboardingEventsPage() {
     <main className="flex flex-1 flex-col">
       <div className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         <h1 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-          Choose your events
+          Which field sites appear at Base camp?
         </h1>
         <p className="mt-3 text-base leading-relaxed text-stone-600">
-          Water Quality, Ecology, Entomology, Anatomy & Physiology, and Crime
-          Busters are ready to practice. Other events are coming later. Pick at
-          least one to continue.
+          Pick at least one ready field site. You will start expeditions from
+          Base camp, not from this list. Other events are coming later.
         </p>
         <EventSelectionForm
           events={events}
@@ -41,7 +40,7 @@ export default async function OnboardingEventsPage() {
             "crime-busters",
           ]}
           submitLabel="Continue"
-          description="You can practice Water Quality, Ecology, Entomology, Anatomy & Physiology, and Crime Busters today."
+          description="Water Quality, Ecology, Entomology, Anatomy & Physiology, and Crime Busters are ready. Keep at least one selected."
         />
       </div>
     </main>

@@ -81,6 +81,18 @@ check(
   firstExpedition.some((item) => item.id === "daily-mission"),
 );
 
+const highGoal = recentAchievements({
+  attempts: full,
+  questions,
+  streakDays: 1,
+  practiceDate: today,
+  dailyPracticeGoal: 20,
+});
+check(
+  "daily mission stays incomplete when today's answers are below the goal",
+  !highGoal.some((item) => item.id === "daily-mission"),
+);
+
 const streakDay = recentAchievements({
   attempts: full,
   questions,

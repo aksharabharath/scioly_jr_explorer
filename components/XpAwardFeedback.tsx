@@ -29,7 +29,7 @@ export function XpAwardFeedback({
 
   return (
     <div
-      className="rounded-2xl border border-gold/40 bg-gold/15 px-4 py-3"
+      className="rounded-xl border border-gold-dark/30 bg-gold/15 px-3 py-2"
       aria-live="polite"
     >
       <ul className="space-y-1">
@@ -38,7 +38,7 @@ export function XpAwardFeedback({
             key={`${line.amount}-${line.reason}`}
             className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5"
           >
-            <span className="xp-float font-display text-2xl font-semibold tabular-nums text-ink">
+            <span className="xp-float font-display text-lg font-semibold tabular-nums text-ink">
               {formatXpGain(line.amount)}
             </span>
             <span className="text-sm font-medium text-stone-700">

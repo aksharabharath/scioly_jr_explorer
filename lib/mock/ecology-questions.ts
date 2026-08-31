@@ -406,7 +406,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
     topicId: "populations-and-evolution",
     difficulty: 2,
     prompt:
-      "Which life-history pattern matches r-selected species as described here?",
+      "Which life-history pattern matches r-selected species?",
     choiceTexts: [
       "They live long, mature late, and give long-term parental care to few offspring",
       "They always occupy the same niche as a K-selected species",
@@ -626,7 +626,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
     topicId: "terrestrial-ecosystems",
     difficulty: 1,
     prompt:
-      "When ecologists measure biodiversity as used here, what do they take into account?",
+      "When ecologists measure biodiversity, what do they take into account?",
     choiceTexts: [
       "Only the height of the tallest trees",
       "Both the number of species and their relative abundance",
@@ -758,7 +758,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
     topicId: "human-impact",
     difficulty: 1,
     prompt:
-      "Which organisms are invasive species as used here?",
+      "Which organisms are invasive species?",
     choiceTexts: [
       "Native keystone species that stay inside their historic range",
       "Nonnative organisms that, when introduced outside their native range, threaten the ecosystem balance of that habitat",
@@ -846,7 +846,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
     topicId: "human-impact",
     difficulty: 3,
     prompt:
-      "Nutrient runoff can cause eutrophication. What happens in that process as described here?",
+      "Nutrient runoff can cause eutrophication. What happens in that process?",
     choiceTexts: [
       "Excess growth of microorganisms depletes dissolved oxygen and kills ecosystem fauna",
       "The ocean absorbs CO2 and immediately becomes a desert",
@@ -868,7 +868,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
     topicId: "human-impact",
     difficulty: 2,
     prompt:
-      "Which environmental concern is tied to nuclear power in this source?",
+      "Which environmental concern is tied to nuclear power?",
     choiceTexts: [
       "Nuclear reactors release large amounts of carbon dioxide while they operate",
       "Radioactive waste can remain radioactive and dangerous to human health for thousands of years, and the United States has no permanent disposal facility for high-level nuclear waste",

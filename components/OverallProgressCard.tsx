@@ -10,7 +10,7 @@ export function OverallProgressCard({ progress }: OverallProgressCardProps) {
   return (
     <section
       aria-labelledby="practice-progress-heading"
-      className="rounded-3xl border border-stone-200/80 bg-surface p-5 sm:p-6"
+      className="journal-panel rounded-3xl p-4 sm:p-5"
     >
       <h2
         id="practice-progress-heading"
@@ -20,12 +20,12 @@ export function OverallProgressCard({ progress }: OverallProgressCardProps) {
       </h2>
       <p className="mt-1 text-sm text-stone-600">
         Every question you have tried, including repeats. This can include
-        events that are not on your list right now.
+        field sites that are not on your Base camp list right now.
       </p>
 
       {empty ? (
         <p className="mt-5 text-sm leading-relaxed text-stone-600">
-          No questions yet. Pick an event and tap Practice.
+          No questions yet. Open a field site and start an expedition.
         </p>
       ) : (
         <dl className="mt-5 grid gap-3 sm:grid-cols-3">
@@ -42,7 +42,7 @@ export function OverallProgressCard({ progress }: OverallProgressCardProps) {
             </dd>
           </div>
           <div className="rounded-2xl bg-parchment/80 px-4 py-3">
-            <dt className="text-sm text-stone-500">Events tried</dt>
+            <dt className="text-sm text-stone-500">Field sites</dt>
             <dd className="mt-1 font-display text-2xl font-semibold text-ink">
               {progress.eventsPracticed}
             </dd>

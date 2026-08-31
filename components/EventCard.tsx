@@ -1,25 +1,8 @@
 import { EventIcon } from "@/components/EventIcon";
+import { fieldSiteSubtitle, fieldSiteTint } from "@/lib/field-sites";
 import { eventDashboardCta, isPlayablePracticeEvent } from "@/lib/mock/events";
-import type { EventAccent, ScienceEvent } from "@/lib/types";
+import type { ScienceEvent } from "@/lib/types";
 import Link from "next/link";
-
-const ACCENTS: Record<EventAccent, { wrap: string; icon: string }> = {
-  amber: { wrap: "bg-amber-100", icon: "text-amber-800" },
-  sky: { wrap: "bg-sky-100", icon: "text-sky-800" },
-  rose: { wrap: "bg-rose-100", icon: "text-rose-800" },
-  emerald: {
-    wrap: "bg-emerald-100",
-    icon: "text-emerald-800",
-  },
-  violet: {
-    wrap: "bg-violet-100",
-    icon: "text-violet-800",
-  },
-  indigo: {
-    wrap: "bg-indigo-100",
-    icon: "text-indigo-800",
-  },
-};
 
 type EventCardProps = {
   event: ScienceEvent;
@@ -30,22 +13,21 @@ type EventCardProps = {
 };
 
 export function EventCard({ event, href, cta, progressLine }: EventCardProps) {
-  const accent = ACCENTS[event.accent];
+  const tint = fieldSiteTint(event.id);
+  const site = fieldSiteSubtitle(event.id);
   const locked = !event.unlocked;
   const playable = isPlayablePracticeEvent(event);
   const label = cta ?? eventDashboardCta(event);
 
   const card = (
     <article
-      className={`flex h-full flex-col rounded-3xl border bg-surface p-5 ${
-        locked
-          ? "border-dashed border-stone-300"
-          : "border-stone-200/80"
-      }`}
+      className={`flex h-full flex-col rounded-3xl border journal-panel p-4 ${
+        locked ? "border-dashed border-stone-300" : ""
+      } ${!locked && playable ? tint.wash : ""}`}
     >
       <div className="flex items-start gap-3">
         <span
-          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${accent.wrap} ${accent.icon}`}
+          className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${tint.wrap} ${tint.icon}`}
         >
           {locked ? (
             <LockIcon />
@@ -58,7 +40,12 @@ export function EventCard({ event, href, cta, progressLine }: EventCardProps) {
             {event.name}
             {locked ? <span className="sr-only"> (coming later)</span> : null}
           </h3>
-          <p className="mt-1 text-sm leading-relaxed text-stone-600">
+          {site && !locked ? (
+            <p className="mt-0.5 text-xs font-medium uppercase tracking-[0.12em] text-stone-500">
+              {site}
+            </p>
+          ) : null}
+          <p className="mt-1.5 text-sm leading-relaxed text-stone-600">
             {event.shortDescription}
           </p>
           {progressLine && !locked && playable ? (
@@ -69,10 +56,10 @@ export function EventCard({ event, href, cta, progressLine }: EventCardProps) {
 
       {locked || !playable ? (
         <p className="mt-5 rounded-2xl bg-stone-100 px-3 py-2 text-sm font-medium text-stone-600">
-          🔒 Coming later
+          Coming later
         </p>
       ) : (
-        <p className="mt-auto pt-5 text-sm font-semibold text-teal-dark">
+        <p className="mt-auto pt-4 text-sm font-semibold text-teal-dark">
           {label}
         </p>
       )}

@@ -34,8 +34,13 @@ import {
   type StreakMilestone,
 } from "@/lib/gamification";
 import {
-  hasCompletedExpeditionOnLocalDate,
+  questionsPracticedOnLocalDate,
 } from "@/lib/expeditions";
+import {
+  DEFAULT_DAILY_PRACTICE_GOAL,
+  isDailyMissionComplete,
+  type DailyPracticeGoal,
+} from "@/lib/student-preferences";
 import type { PracticeFollowUp, PracticeSummary, Question } from "@/lib/types";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -50,6 +55,7 @@ type PracticeQuizProps = {
   initialAttemptCount: number;
   initialXp?: number;
   initialStreakDays?: number;
+  dailyPracticeGoal?: DailyPracticeGoal;
   mode?: PracticeMode;
 };
 
@@ -167,6 +173,7 @@ export function PracticeQuiz({
   initialAttemptCount,
   initialXp = 0,
   initialStreakDays = 0,
+  dailyPracticeGoal = DEFAULT_DAILY_PRACTICE_GOAL,
   mode = "normal",
 }: PracticeQuizProps) {
   const [state, setState] = useState<QuizState>(() =>
@@ -223,10 +230,12 @@ export function PracticeQuiz({
       baselineStreakRef.current,
       streakAfter,
     );
-    const alreadyCompletedToday = hasCompletedExpeditionOnLocalDate(
+    const practiceDate = localCalendarDate();
+    const practicedBefore = questionsPracticedOnLocalDate(
       badgeAttemptsRef.current,
-      localCalendarDate(),
+      practiceDate,
     );
+    const practicedAfter = practicedBefore + nextRecords.length;
     badgeAttemptsRef.current = [
       ...badgeAttemptsRef.current,
       ...toSessionBadgeAttempts(
@@ -255,7 +264,8 @@ export function PracticeQuiz({
         streakAfter,
       ),
       dailyMissionComplete:
-        nextRecords.length >= PRACTICE_SET_SIZE && !alreadyCompletedToday,
+        isDailyMissionComplete(practicedAfter, dailyPracticeGoal) &&
+        !isDailyMissionComplete(practicedBefore, dailyPracticeGoal),
     };
   }
 
@@ -454,172 +464,211 @@ export function PracticeQuiz({
     });
   }
 
+  const sessionNumber = state.records.length + 1;
+  const progressPercent =
+    plannedTotal === 0 ? 0 : Math.round((sessionNumber / plannedTotal) * 100);
+
+  const hasImage = Boolean(question.imageSrc);
+
   return (
-    <section className="rounded-3xl border border-stone-200/80 bg-surface p-4 shadow-[0_8px_30px_rgba(28,45,41,0.05)] sm:p-5">
-      <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
-        <p className="font-medium text-stone-600">
-          Question {state.records.length + 1} of {plannedTotal}
+    <section className="journal-panel rounded-3xl p-4 sm:p-5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="font-medium text-stone-700">
+          Question {sessionNumber} of {plannedTotal}
         </p>
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-sm text-stone-500">
-            You&apos;ve answered {state.attemptCount} questions in total
-          </span>
-          <span className="rounded-full bg-indigo-100 px-2.5 py-1 text-xs font-semibold text-indigo-800">
-            {DIFFICULTY_LEVEL_LABEL[question.difficulty]}
-          </span>
-        </div>
+        <span className="rounded-full bg-parchment px-2.5 py-1 text-xs font-semibold text-ink">
+          {DIFFICULTY_LEVEL_LABEL[question.difficulty]}
+        </span>
       </div>
-
-      <h2 className="mt-3 font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
-        {question.prompt}
-      </h2>
-      {question.imageSrc ? (
-        <figure className="mt-3 overflow-hidden rounded-2xl border border-stone-200/80 bg-parchment">
-          {/* Local public JPEGs (and any other static imageSrc); next/image is not required. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={question.imageSrc}
-            alt={question.imageAlt ?? ""}
-            className="mx-auto max-h-56 w-full object-contain p-2 sm:max-h-64 lg:max-h-72"
-          />
-          {question.imageCredit ? (
-            <figcaption className="px-3 pb-2 text-center text-xs leading-snug text-stone-500">
-              {question.imageCredit}
-            </figcaption>
-          ) : null}
-        </figure>
-      ) : null}
-
-      <div className="mt-4 space-y-2" role="group" aria-label="Answer choices">
-        {question.choices.map((choice) => {
-          const selected = state.selectedChoiceId === choice.id;
-          const correctChoice = choice.id === question.correctChoiceId;
-          let choiceClass =
-            "border-stone-200 bg-parchment/50 hover:border-teal/40 hover:bg-parchment";
-
-          if (state.submitted && correctChoice) {
-            choiceClass = "border-emerald-300 bg-emerald-50 text-emerald-950";
-          } else if (state.submitted && selected && !correctChoice) {
-            choiceClass = "border-rose-200 bg-rose-50 text-rose-950";
-          } else if (!state.submitted && selected) {
-            choiceClass = "border-teal bg-teal/10 text-teal-dark";
-          }
-
-          return (
-            <button
-              key={choice.id}
-              type="button"
-              disabled={state.submitted}
-              onClick={() => selectChoice(choice.id)}
-              className={`flex w-full items-start gap-3 rounded-2xl border px-4 py-2.5 text-left text-base transition disabled:cursor-default ${choiceClass}`}
-            >
-              <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-sm font-semibold text-stone-600">
-                {choice.id.toUpperCase()}
-              </span>
-              <span>{choice.text}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {!state.submitted ? (
-        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <button
-            type="button"
-            onClick={() => setState({ ...state, revealedHint: true })}
-            className="text-sm font-medium text-teal underline-offset-4 hover:underline"
-          >
-            {state.revealedHint ? "Hint is showing" : "Need a hint?"}
-          </button>
-          <button
-            type="button"
-            onClick={checkAnswer}
-            disabled={!state.selectedChoiceId || state.submitted}
-            className="rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment transition enabled:hover:bg-teal disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Check answer
-          </button>
-        </div>
-      ) : null}
-
-      {state.revealedHint && !state.submitted ? (
-        <p className="mt-3 rounded-2xl bg-amber-50 px-4 py-2.5 text-sm leading-relaxed text-amber-950">
-          <span className="font-semibold">Hint: </span>
-          {question.hint}
-        </p>
-      ) : null}
-
-      {state.submitted ? (
+      <div
+        className="mt-2 h-1.5 overflow-hidden rounded-full bg-stone-200"
+        role="progressbar"
+        aria-valuemin={1}
+        aria-valuemax={plannedTotal}
+        aria-valuenow={sessionNumber}
+        aria-label={`Question ${sessionNumber} of ${plannedTotal}`}
+      >
         <div
-          ref={feedbackRef}
-          className="mt-4 space-y-3"
-          aria-live="polite"
-        >
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <p
-              className={`rounded-2xl px-4 py-2.5 text-sm font-semibold sm:flex-1 ${
-                isCorrect
-                  ? "bg-emerald-50 text-emerald-900"
-                  : "bg-sky-50 text-sky-950"
-              }`}
-            >
-              {isCorrect
-                ? "That's right — nice exploring."
-                : "Good try! Mistakes don't take anything away. Here's the idea:"}
-            </p>
-            <button
-              type="button"
-              onClick={continueToNext}
-              disabled={!state.saved}
-              className="shrink-0 rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment transition enabled:hover:bg-teal disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {isLast ? "See results" : "Next question"}
-            </button>
-          </div>
-          {state.saved && state.xpAward ? (
-            <XpAwardFeedback
-              attemptXp={state.xpAward.attemptXp}
-              sessionBonusXp={state.xpAward.sessionBonusXp}
-              isCorrect={isCorrect}
-              hintUsed={state.revealedHint}
-            />
+          className="h-full rounded-full bg-teal transition-[width]"
+          style={{ width: `${progressPercent}%` }}
+        />
+      </div>
+
+      <div
+        className={`mt-4 grid gap-4 lg:items-start lg:gap-6 ${
+          hasImage
+            ? "lg:grid-cols-[minmax(0,0.42fr)_minmax(0,0.58fr)]"
+            : "lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]"
+        }`}
+      >
+        <div>
+          <h2 className="font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
+            {question.prompt}
+          </h2>
+          {question.imageSrc ? (
+            <figure className="mt-3 overflow-hidden rounded-2xl border border-stone-200/80 bg-parchment">
+              {/* Local public JPEGs (and any other static imageSrc); next/image is not required. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={question.imageSrc}
+                alt={question.imageAlt ?? ""}
+                className="mx-auto max-h-[min(36vh,280px)] w-full object-contain p-2"
+              />
+              {question.imageCredit ? (
+                <figcaption className="px-3 pb-2 text-center text-xs leading-snug text-stone-500">
+                  {question.imageCredit}
+                </figcaption>
+              ) : null}
+            </figure>
           ) : null}
-          <p className="text-sm leading-relaxed text-stone-700">
-            {question.explanation}
-          </p>
-          {!isCorrect ? (
-            <p className="text-sm leading-relaxed text-stone-600">
-              <span className="font-semibold text-ink">Hint: </span>
+        </div>
+
+        <div>
+          <div
+            className={state.submitted ? "space-y-1.5" : "space-y-2"}
+            role="group"
+            aria-label="Answer choices"
+          >
+            {question.choices.map((choice) => {
+              const selected = state.selectedChoiceId === choice.id;
+              const correctChoice = choice.id === question.correctChoiceId;
+              let choiceClass =
+                "border-stone-200 bg-parchment/50 hover:border-teal/40 hover:bg-parchment";
+
+              if (state.submitted && correctChoice) {
+                choiceClass =
+                  "choice-pulse border-teal bg-teal/10 text-teal-dark";
+              } else if (state.submitted && selected && !correctChoice) {
+                choiceClass = "border-stone-400 bg-stone-100 text-ink";
+              } else if (!state.submitted && selected) {
+                choiceClass = "border-teal bg-teal/10 text-teal-dark";
+              }
+
+              return (
+                <button
+                  key={choice.id}
+                  type="button"
+                  disabled={state.submitted}
+                  onClick={() => selectChoice(choice.id)}
+                  className={`flex w-full items-start text-left transition disabled:cursor-default ${
+                    state.submitted
+                      ? "gap-2 rounded-xl border px-3 py-1.5 text-sm"
+                      : "min-h-11 gap-3 rounded-2xl border px-4 py-2.5 text-base"
+                  } ${choiceClass}`}
+                >
+                  <span
+                    className={`mt-0.5 flex shrink-0 items-center justify-center rounded-full bg-white font-semibold text-stone-600 ${
+                      state.submitted
+                        ? "h-6 w-6 text-xs"
+                        : "h-7 w-7 text-sm"
+                    }`}
+                  >
+                    {choice.id.toUpperCase()}
+                  </span>
+                  <span>{choice.text}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {!state.submitted ? (
+            <div className="mt-3 space-y-2">
+              <button
+                type="button"
+                onClick={() => setState({ ...state, revealedHint: true })}
+                className="text-sm font-medium text-teal underline-offset-4 hover:underline"
+              >
+                {state.revealedHint ? "Hint is showing" : "Need a hint?"}
+              </button>
+              <button
+                type="button"
+                onClick={checkAnswer}
+                disabled={!state.selectedChoiceId || state.submitted}
+                className="min-h-11 w-full rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment transition enabled:hover:bg-teal disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Check answer
+              </button>
+            </div>
+          ) : null}
+
+          {state.revealedHint && !state.submitted ? (
+            <p className="mt-2 rounded-2xl bg-amber-50 px-4 py-2.5 text-sm leading-relaxed text-amber-950">
+              <span className="font-semibold">Hint: </span>
               {question.hint}
             </p>
           ) : null}
-          {!state.saved ? (
-            <div className="space-y-2">
-              {state.saveError ? (
-                <p className="rounded-2xl bg-amber-50 px-4 py-2.5 text-sm text-amber-950">
-                  {state.saveError}
+
+          {state.submitted ? (
+            <div
+              ref={feedbackRef}
+              className="mt-3 space-y-2 rounded-2xl border border-stone-200/80 bg-parchment/50 p-3"
+              aria-live="polite"
+            >
+              <p
+                className={`rounded-xl px-3 py-2 text-sm font-semibold ${
+                  isCorrect
+                    ? "border border-teal/30 bg-teal/10 text-teal-dark"
+                    : "border border-stone-200 bg-surface text-ink"
+                }`}
+              >
+                {isCorrect
+                  ? "Correct."
+                  : "Not quite. Explorers miss things. Here is what this was asking."}
+              </p>
+              <p className="text-sm leading-snug text-stone-700">
+                {question.explanation}
+              </p>
+              {!isCorrect ? (
+                <p className="text-sm leading-snug text-stone-600">
+                  <span className="font-semibold text-ink">Hint: </span>
+                  {question.hint}
                 </p>
-              ) : state.saving ? (
-                <p className="text-sm text-stone-500">Saving your answer…</p>
-              ) : (
-                <p className="rounded-2xl bg-amber-50 px-4 py-2.5 text-sm text-amber-950">
-                  Your answer was checked, but it could not be saved. Try
-                  saving again to continue.
-                </p>
-              )}
-              {!state.saving ? (
-                <button
-                  type="button"
-                  onClick={checkAnswer}
-                  className="text-sm font-medium text-teal underline-offset-4 hover:underline"
-                >
-                  Try saving again
-                </button>
               ) : null}
+              {state.saved && state.xpAward ? (
+                <XpAwardFeedback
+                  attemptXp={state.xpAward.attemptXp}
+                  sessionBonusXp={state.xpAward.sessionBonusXp}
+                  isCorrect={isCorrect}
+                  hintUsed={state.revealedHint}
+                />
+              ) : null}
+              {!state.saved ? (
+                <div className="space-y-2">
+                  {state.saveError ? (
+                    <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-950">
+                      {state.saveError}
+                    </p>
+                  ) : state.saving ? (
+                    <p className="text-sm text-stone-500">Saving your answer…</p>
+                  ) : (
+                    <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-950">
+                      Your answer was checked, but it could not be saved. Try
+                      saving again to continue.
+                    </p>
+                  )}
+                  {!state.saving ? (
+                    <button
+                      type="button"
+                      onClick={checkAnswer}
+                      className="text-sm font-medium text-teal underline-offset-4 hover:underline"
+                    >
+                      Try saving again
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
+              <button
+                type="button"
+                onClick={continueToNext}
+                disabled={!state.saved}
+                className="min-h-11 w-full rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment transition enabled:hover:bg-teal disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isLast ? "See results" : "Next question →"}
+              </button>
             </div>
           ) : null}
         </div>
-      ) : null}
+      </div>
     </section>
   );
 }
@@ -666,7 +715,7 @@ function ResultsCard({
   const [showCelebration, setShowCelebration] = useState(hasRewards);
 
   return (
-    <section className="rounded-3xl border border-stone-200/80 bg-surface p-5 shadow-[0_8px_30px_rgba(28,45,41,0.05)] sm:p-7">
+    <section className="journal-panel rounded-3xl p-5 sm:p-7">
       {showCelebration ? (
         <ExpeditionRewardsOverlay
           eventName={eventName}
@@ -681,9 +730,9 @@ function ResultsCard({
       <h2 className="font-display text-3xl font-semibold tracking-tight text-ink">
         Expedition complete!
       </h2>
-      <p className="mt-2 text-sm text-stone-600">
-        You finished this {eventName} set. No XP was removed.
-      </p>
+          <p className="mt-2 text-sm text-stone-600">
+            You finished this {eventName} expedition. No XP was removed.
+          </p>
 
       <dl className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="rounded-2xl bg-parchment/80 px-4 py-3">
@@ -736,12 +785,12 @@ function ResultsCard({
         )}
         {dailyMissionComplete ? (
           <p className="mt-2 text-sm font-medium text-ink">
-            Daily mission complete
+            Daily expedition complete
           </p>
         ) : null}
         {newlyEarned.length > 0 ? (
           <p className="mt-2 text-sm font-medium text-ink">
-            {newlyEarned.length > 1 ? "New badges unlocked" : "New badge unlocked"}
+            {newlyEarned.length > 1 ? "New discoveries" : "New discovery"}
           </p>
         ) : null}
       </div>
@@ -762,7 +811,7 @@ function ResultsCard({
           onClick={onTryAgain}
           className="rounded-full bg-teal-dark px-5 py-2.5 text-center text-sm font-semibold text-parchment hover:bg-teal"
         >
-          Try this set again
+          Try this expedition again
         </button>
         <Link
           href={`/events/${eventId}`}
@@ -774,7 +823,7 @@ function ResultsCard({
           href="/"
           className="rounded-full border border-stone-200 px-5 py-2.5 text-center text-sm font-semibold text-ink hover:bg-parchment"
         >
-          Dashboard
+          Base camp
         </Link>
       </div>
     </section>

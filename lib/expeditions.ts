@@ -91,6 +91,19 @@ export function uniqueQuestionsPracticed(
   return ids.size;
 }
 
+export function questionsPracticedOnLocalDate(
+  attempts: ExpeditionAttempt[],
+  practiceDate: string,
+): number {
+  let count = 0;
+  for (const attempt of attempts) {
+    if (localDateFromAnsweredAt(attempt.answeredAt) === practiceDate) {
+      count += 1;
+    }
+  }
+  return count;
+}
+
 export function hasCompletedExpeditionOnLocalDate(
   attempts: ExpeditionAttempt[],
   practiceDate: string,
