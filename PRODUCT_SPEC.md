@@ -4,7 +4,7 @@ Behavior as implemented in the current source. The code is authoritative if this
 
 Legend:
 
-- **IMPLEMENTED** — students can use this in the app (assuming env + migrations)
+- **IMPLEMENTED** — students can use this in the app (env + hosted tables/RPC; live persistence verified 2026-09-01, see `DATABASE.md`)
 - **PLANNED** — mentioned in code comments as a later replacement, not shipped
 - **NOT YET IMPLEMENTED** — not in the product
 

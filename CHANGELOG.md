@@ -8,7 +8,7 @@ Astronomy is not a 2027 student catalog event. The bank remains for checks. Stud
 
 **2027 catalog (9 events):** five unlocked quiz events (all with live banks) and four locked **Coming later** (Codebusters + three builds). Entomology live practice is **36** of 60 registered items (19 text + 17 Commons photographs with non-spoiling overlays). Crime Busters live practice is **44** of 44 (40 text + 4 Loop / Whorl / Arch photos). CC BY / CC BY-SA photos show a credit line under the figure.
 
-**Gamification v1 is real in source:** Explorer XP, Explorer Level (derived from XP), and daily streak. Session size is 10; +20 once per completed session UUID after `20260824_practice_session_size_10.sql` is applied. Daily mission does not award extra XP.
+**Gamification v1 is real:** Explorer XP, Explorer Level (derived from XP), and daily streak. Live RPC (2026-09-01) uses session size **10** and +20 once per completed session UUID. Daily mission does not award extra XP.
 
 **Event Selection v1 is real in source:** chosen event IDs live in `student_events`. Only selectable IDs can be saved. Unselected event URLs redirect home. Deselecting an event does not delete attempts or XP.
 
@@ -18,9 +18,15 @@ Astronomy is not a 2027 student catalog event. The bank remains for checks. Stud
 
 **Not in the product:** Trial Mode, lessons, AI, leaderboards, Codebusters practice, quiz practice for build events, password reset. Entomology practice **does** include Commons specimen JPEGs (see `docs/events/entomology/IMAGE_QA_2027.md`).
 
-Whether hosted migrations are applied is **not recorded in this repo**. The session-size migration must be run in the SQL Editor so hosted +20 matches the 10-question set.
+**Hosted persistence (verified 2026-09-01):** five application tables, RLS own-row policies, RPC `session_size = 10`, `practice_attempts` SELECT+INSERT only. Two test accounts: isolation held; save and XP still worked. Details: `DATABASE.md`.
 
 Git history in this clone may lag the working tree. Product slices below are marked **Undated** when ship dates are unknown.
+
+---
+
+## 2026-09-01 — practice_attempts ACL documentation
+
+Production `authenticated` privileges on `practice_attempts` were tightened to SELECT+INSERT (REVOKE ALL then GRANT). `supabase/migrations/20260901_practice_attempts_authenticated_privileges.sql` records that SQL for other environments; **it was not executed on production** because the dashboard change was already live. RLS policies were not changed.
 
 ---
 
@@ -82,9 +88,9 @@ Astronomy bank grown to **48** questions (ids `astro-q1` … `astro-q48`), four 
 
 ## Undated — Gamification v1
 
-Replaces mock Explorer XP/Level on the dashboard (and Explorer Level on the Astronomy hero) with persisted XP, derived level, and daily streak. **Source of displayed XP:** `getMyGamification()` → `student_gamification`, not `MOCK_EXPLORER`. Session UUID on attempts; +20 once at 8/8. Results show XP gained this set. Rule copy lives in `lib/gamification.ts`; increments go through `record_practice_attempt_and_award`.
+Replaces mock Explorer XP/Level on the dashboard (and Explorer Level on the Astronomy hero) with persisted XP, derived level, and daily streak. **Source of displayed XP:** `getMyGamification()` → `student_gamification`, not `MOCK_EXPLORER`. Session UUID on attempts; this slice used +20 at **8** answers. Later `20260824_practice_session_size_10.sql` moved the bonus to **10**; **live RPC (2026-09-01) uses 10**. Results show XP gained this set. Rule copy lives in `lib/gamification.ts`; increments go through `record_practice_attempt_and_award`.
 
-Migration: `20260824_gamification.sql` (must be run in the Supabase SQL Editor if not already applied; this repo does not prove it is live). Older attempts are not backfilled into XP.
+Migration: `20260824_gamification.sql` (on the hosted project as of 2026-09-01). Older attempts are not backfilled into XP.
 
 ## Undated — Gamification v1 student-facing display
 
@@ -94,7 +100,7 @@ Keeps the existing XP / Level / streak rules and schema. After a saved answer, s
 
 Students choose which catalog events to study. IDs persist in `student_events` (RLS: select/insert/delete own rows). Empty selection after login goes to `/onboarding/events`. Dashboard lists selected events only. **My Events** (`/profile/events`) updates the set. Astronomy was the only implemented curriculum at the time of this slice. Deselect does not delete practice or XP. Trial Mode is still not implemented.
 
-Migration: `20260824_student_events.sql` (run in the Supabase SQL Editor; this repo does not prove it is live).
+Migration: `20260824_student_events.sql` (present on the hosted project as of 2026-09-01).
 
 ## Undated — 2027 event catalog + Entomology practice
 

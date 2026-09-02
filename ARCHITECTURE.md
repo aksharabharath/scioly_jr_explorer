@@ -1,6 +1,6 @@
 # Jr. Explorer — architecture
 
-How the app is structured in this repository, and why. Source code wins if this drifts.
+How the app is structured in this repository, and why. Source code wins if this drifts. Next.js is hosted on Vercel; GitHub is the source / deploy trigger. Persistence is the five-table Supabase model in `DATABASE.md` (not a 13-table curriculum schema).
 
 ## High-level flow
 
@@ -210,7 +210,7 @@ Check answer (PracticeQuiz)
   → RPC record_practice_attempt_and_award   ← XP is ADDED here
        insert practice_attempts (ON CONFLICT id DO NOTHING)
        XP from saved is_correct / hint_used (10 / 6 / 2)
-       unique attempt award; unique session award at 8/8 (+20)
+       unique attempt award; unique session award at 10 attempts (+20)
        update student_gamification.xp + streak_days + last_practice_date
   → quiz shows RPC attemptXp / sessionBonusXp; accumulates them for results
   → results: session XP sum, Explorer Level from returned total xp, streakDays
@@ -235,7 +235,9 @@ Dashboard / event Explorer Level
 
 **Why duplicate 10/6/2/20 in SQL:** Postgres cannot import `lib/gamification.ts`. Keep comments in sync; `lib/gamification.check.ts` covers the TS side.
 
-**Security limitations:** students cannot UPDATE `xp` via RLS. They can SELECT their gamification row. Award tables have no authenticated grants. The RPC is `GRANT EXECUTE` to `authenticated`, so a custom client could call it with a false `p_is_correct`. Direct `INSERT` on `practice_attempts` is still allowed by RLS and would **not** award XP by itself. No service-role key in the Next app. `lib/supabase/client.ts` is unused.
+**Table privileges (live, 2026-09-01):** `practice_attempts` SELECT+INSERT; `student_events` SELECT+INSERT+DELETE; `student_gamification` SELECT only; award tables none for `authenticated`. RLS policies match `DATABASE.md`. Two-account test after the attempts ACL fix: B could not see A’s practice data; save/XP still worked.
+
+**Security limitations:** Cross-student isolation is enforced. This is **not** exam-grade anti-cheat. Students cannot UPDATE `xp` via RLS. They can SELECT their gamification row. Award tables have no authenticated grants. The RPC is `GRANT EXECUTE` to `authenticated` and takes `p_is_correct` from the caller, so a custom client could spoof correctness **for their own account**. Direct `INSERT` on `practice_attempts` is still allowed by RLS and would **not** award XP by itself. No service-role key in the Next app. `lib/supabase/client.ts` is unused.
 
 ## Component responsibilities
 
@@ -275,7 +277,7 @@ Dashboard / event Explorer Level
 | Validated catalog event IDs | Arbitrary strings as event IDs; `student_id` from the browser |
 | RLS + definer function | Service role in the Next app |
 
-Limitation (honest): an authenticated client **could** call `record_practice_attempt_and_award` with a spoofed `p_is_correct`, same class of issue as the RLS `INSERT` on `practice_attempts`. The shipped UI does not do that; correctness is computed in `insertPracticeAttempt` first. Students still cannot `UPDATE student_gamification.xp` directly.
+Limitation (honest): an authenticated client **could** call `record_practice_attempt_and_award` with a spoofed `p_is_correct`, same class of issue as the RLS `INSERT` on `practice_attempts`. That can inflate **their own** XP, not another student’s. The shipped UI does not do that; correctness is computed in `insertPracticeAttempt` first. Students still cannot `UPDATE student_gamification.xp` directly.
 
 ## Where logic belongs
 

@@ -1,6 +1,10 @@
 # Jr. Explorer — database
 
-**Source of truth for this document:** migration files under `supabase/migrations/` and the TypeScript that calls Supabase. The live hosted project was **not** inspected here. **Do not claim a migration is applied remotely** unless you verify it in the Supabase dashboard. The gamification migration file itself says to run it in the SQL Editor and not assume it is live.
+**Implemented persistence (this repo + live project):** five application tables, Supabase Auth, RLS, and `record_practice_attempt_and_award`. There is **no** `docs/DATABASE_SCHEMA.md` in this repository. A larger 13-table design (`students`, `events`, `topics`, `questions`, `question_options`, `practice_sessions`, `question_attempts`, `topic_mastery`, `event_progress`, `explorer_progress`, `xp_transactions`, `unlocks`, plus `student_events`) is **not** the live schema. Curriculum stays in TypeScript.
+
+**Live project (verified 2026-09-01, dashboard read-only + two-account app test):** the five tables exist; RLS and grants match the sections below; the RPC is `SECURITY DEFINER`, uses `auth.uid()`, `session_size = 10`, session bonus +20; `authenticated` can `EXECUTE` the RPC. After tightening `practice_attempts` privileges, two test students could each use the app, **B could not see A’s practice data**, and A still saw A’s data. Practice save and XP still worked.
+
+Vercel hosts the Next.js app. GitHub is the source repo / deploy trigger. The Next app uses only the public Supabase URL + publishable/anon key (no service-role key).
 
 Never commit or paste secret values. This file lists **variable names only**.
 
@@ -46,7 +50,7 @@ Reads (`getMyPracticeAttempts`, `getMyGamification`, etc.) use the same server c
 
 ## What is persisted vs still mock
 
-**Persisted (if the corresponding migration has been applied):**
+**Persisted (live project, 2026-09-01):**
 
 - Auth users (Supabase Auth)
 - `practice_attempts` (answers, correctness, hint flag, session id after gamification migration)
@@ -107,9 +111,11 @@ The practice UI displays `attemptXp` and `sessionBonusXp` from the RPC return. I
 | UPDATE | none |
 | DELETE | none |
 
-Grants: `SELECT, INSERT` to `authenticated`. Revoked from `public` and `anon`.
+**Table privileges (live, 2026-09-01):** `authenticated` has **SELECT and INSERT only**. No UPDATE, DELETE, TRUNCATE, REFERENCES, or TRIGGER. `public` and `anon` have no access.
 
-**Security notes:** RLS insert is still allowed, so a custom client could insert rows without going through the Server Action. The current app inserts via the definer RPC (which also awards XP). Direct inserts do not, by themselves, write award tables. Historical rows may have `session_id` null and `hint_used` false (unknown). The RPC is executable by `authenticated`, so a custom client could also call it with a spoofed `p_is_correct`. Students cannot `UPDATE` `xp` on `student_gamification`.
+The original `20260824_practice_attempts.sql` granted SELECT/INSERT **without** `REVOKE ALL FROM authenticated`, so default privileges left `authenticated` with `arwdDxtm`. Production was corrected with REVOKE ALL from `public`/`anon`/`authenticated` then GRANT SELECT, INSERT. That change is recorded in `20260901_practice_attempts_authenticated_privileges.sql` so other environments can match. **That file was not executed against production** because production was already fixed in the dashboard.
+
+**Security notes:** Cross-student isolation is enforced by RLS (`student_id = auth.uid()`). This is **not** exam-grade anti-cheat: RLS insert is still allowed, so a custom client could insert own rows without the Server Action. The shipped app inserts via the definer RPC (which also awards XP). Direct inserts do not, by themselves, write award tables. The RPC is executable by `authenticated` and accepts `p_is_correct` from the caller; SQL awards XP from the **stored** flags, so a custom client could spoof correctness **for their own account**. Students cannot `UPDATE` `xp` on `student_gamification`. Historical rows may have `session_id` null and `hint_used` false.
 
 ---
 
@@ -134,7 +140,7 @@ Grants: `SELECT, INSERT` to `authenticated`. Revoked from `public` and `anon`.
 | UPDATE | none for `authenticated` |
 | DELETE | none |
 
-After revoke-all, `authenticated` is granted **SELECT only**. Rows are created/updated inside `record_practice_attempt_and_award`. Missing row → app treats as 0 XP, 0 streak.
+After revoke-all, `authenticated` is granted **SELECT only** (live 2026-09-01). Rows are created/updated inside `record_practice_attempt_and_award`. Missing row → app treats as 0 XP, 0 streak.
 
 ---
 
@@ -149,7 +155,7 @@ After revoke-all, `authenticated` is granted **SELECT only**. Rows are created/u
 | `xp` | `integer` | — | `CHECK (xp >= 0)` amount granted that once |
 | `awarded_at` | `timestamptz` | `now()` | |
 
-**RLS:** enabled. **No policies. No grants** to `anon` or `authenticated`. Only the definer function writes here. `ON CONFLICT (attempt_id) DO NOTHING`.
+**RLS:** enabled. **No student policies. No grants** to `anon` or `authenticated` (live 2026-09-01). Only the definer function writes here. `ON CONFLICT (attempt_id) DO NOTHING`.
 
 ---
 
@@ -164,7 +170,7 @@ After revoke-all, `authenticated` is granted **SELECT only**. Rows are created/u
 | `xp` | `integer` | — | `CHECK (xp >= 0)` (20 in the function) |
 | `awarded_at` | `timestamptz` | `now()` | |
 
-**RLS:** enabled. **No policies. No grants** to `anon` or `authenticated`. Bonus when `count(*)` of this student’s attempts with that `session_id` is ≥ 10 (`session_size` constant in SQL).
+**RLS:** enabled. **No student policies. No grants** to `anon` or `authenticated` (live 2026-09-01). Bonus when `count(*)` of this student’s attempts with that `session_id` is ≥ 10 (`session_size` constant in SQL; live function uses 10).
 
 ---
 
@@ -175,7 +181,7 @@ After revoke-all, `authenticated` is granted **SELECT only**. Rows are created/u
 | Column | Type | Default | Notes |
 |---|---|---|---|
 | `student_id` | `uuid` | — | Part of PK, FK `auth.users(id)` ON DELETE CASCADE |
-| `event_id` | `text` | — | Part of PK. Must match a mock **catalog** id (enforced in app code, not a DB FK). Current catalog: `water-quality`, `ecology`, `entomology`, `anatomy-physiology`, `codebusters`, `crime-busters`, `engineering-cad`, `hovercraft`, `rubber-band-catapult`. **MVP selectable:** `entomology`, `anatomy-physiology`. Astronomy is an extra practice event, not a catalog id. |
+| `event_id` | `text` | — | Part of PK. Must match a mock **catalog** id (enforced in app code, not a DB FK). Catalog IDs: `water-quality`, `ecology`, `entomology`, `anatomy-physiology`, `codebusters`, `crime-busters`, `engineering-cad`, `hovercraft`, `rubber-band-catapult`. **Selectable (unlocked quiz events):** those five playable events. Locked catalog IDs cannot be saved. Astronomy is an extra practice event, not a catalog id. |
 | `created_at` | `timestamptz` | `now()` | |
 
 **Primary key:** `(student_id, event_id)` — no duplicate selections.
@@ -191,7 +197,7 @@ After revoke-all, `authenticated` is granted **SELECT only**. Rows are created/u
 | UPDATE | none |
 | DELETE | `students_delete_own_events`: `student_id = auth.uid()` |
 
-Grants: `SELECT, INSERT, DELETE` to `authenticated`. Revoked from `public` and `anon`.
+Grants: `SELECT, INSERT, DELETE` to `authenticated`. Revoked from `public` and `anon` (live 2026-09-01).
 
 Writes go through `setMySelectedEvents` using `getCurrentUser().id`. The client may submit event IDs; the server validates them against `getCatalogEventIds()` and never takes `student_id` from the browser. Unknown or legacy IDs (including old `astronomy` selections) are dropped on read by `filterKnownEventIds`.
 
@@ -229,17 +235,20 @@ Amounts are duplicated from `lib/gamification.ts` — keep them aligned.
 
 Do not edit old files that have already been applied. Add new ones.
 
-**Exception:** `20260824_practice_session_size_10.sql` was repaired in place because the original function body was truncated (missing `end; $$;`) and could not have been applied. Use the current file.
+**Exception:** `20260824_practice_session_size_10.sql` was repaired in place because an earlier truncated body (missing `end; $$;`) could not have been applied. Use the current file in git.
 
 | File | What it does |
 |---|---|
-| `20260824_practice_attempts.sql` | Creates `practice_attempts` (without hint/session), RLS select/insert own, grants |
+| `20260824_practice_attempts.sql` | Creates `practice_attempts` (without hint/session), RLS select/insert own. Grants SELECT/INSERT **without** revoking default `authenticated` privileges (see ACL fix below). |
 | `20260824_practice_attempts_hint_used.sql` | `ADD COLUMN hint_used boolean NOT NULL DEFAULT false` |
-| `20260824_gamification.sql` | `session_id`, gamification tables, RLS, `record_practice_attempt_and_award` |
+| `20260824_gamification.sql` | `session_id`, gamification tables, RLS, first `record_practice_attempt_and_award` (`session_size` 8 in that file) |
 | `20260824_student_events.sql` | `student_events` + RLS select/insert/delete own rows |
-| `20260824_practice_session_size_10.sql` | Replaces `record_practice_attempt_and_award` so +20 fires at 10 saved answers. Must include `end; $$;` before GRANT/REVOKE. |
+| `20260824_practice_session_size_10.sql` | Replaces the RPC so +20 fires at **10** saved answers. **Live RPC uses this session size.** |
+| `20260901_practice_attempts_authenticated_privileges.sql` | REVOKE ALL from `public`/`anon`/`authenticated`, GRANT SELECT+INSERT. **Documents the production ACL fix.** Not executed on production (already applied in the dashboard). Re-run on a new environment after the 20260824 files. |
 
-The gamification, student_events, and session-size files say to **run them in the Supabase SQL Editor** and not assume they are already on the live project. This repository has no evidence they have been applied remotely. Apply all five files in filename order.
+**Live (2026-09-01):** the five application tables, RLS as in this document, RPC with `session_size = 10`, and tightened `practice_attempts` grants are present on the hosted project. A two-account test after the ACL fix showed isolation and that save/XP still worked.
+
+For a **new** Supabase project, apply the 20260824 files in filename order, then the 20260901 privileges file (or the same REVOKE/GRANT in the SQL Editor).
 
 Older `practice_attempts` are **not** backfilled into XP by the migration.
 

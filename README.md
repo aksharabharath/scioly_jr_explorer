@@ -23,10 +23,12 @@ Do not treat a full competition bank as MVP work. Remaining Entomology `needs-re
 
 ## Tech stack
 
-- Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS 4
-- Supabase Auth (email/password). `students.id` is `auth.users.id` — there is no separate student profile table
-- Supabase Postgres for attempts, XP, streak, and event selection
+- Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS 4, hosted on Vercel
+- GitHub is the source repository / deployment trigger
+- Supabase Auth (email/password). Identity is `auth.users.id` — there is no separate `students` table
+- Supabase Postgres + RLS + RPC for attempts, XP, streak, and event selection
 - Question banks and event metadata live in TypeScript (`lib/mock/`)
+- No service-role key in the Next.js app
 
 ## Local development
 
@@ -72,19 +74,20 @@ Signup uses the request origin for `emailRedirectTo` (`app/auth/actions.ts`). Th
 
 ## Database migrations
 
-There is **no** `students` or `practice_sessions` table. Identity is `auth.users`. A practice set is a client-generated `session_id` on `practice_attempts`.
+There is **no** `students` or `practice_sessions` table. Identity is `auth.users`. A practice set is a client-generated `session_id` on `practice_attempts`. Persistence is **five** application tables (`practice_attempts`, `student_events`, `student_gamification`, `gamification_attempt_awards`, `gamification_session_awards`), not a 13-table curriculum schema.
 
-Apply these files **in order** in the Supabase SQL Editor. Do not assume they are already live.
+The **hosted** project already has these tables, RLS, the session-size-10 RPC, and `practice_attempts` SELECT+INSERT-only grants (verified 2026-09-01). Details: `DATABASE.md`.
+
+For a **new** Supabase project, apply these files **in order** in the SQL Editor:
 
 1. `supabase/migrations/20260824_practice_attempts.sql`
 2. `supabase/migrations/20260824_practice_attempts_hint_used.sql`
 3. `supabase/migrations/20260824_gamification.sql`
 4. `supabase/migrations/20260824_student_events.sql`
-5. `supabase/migrations/20260824_practice_session_size_10.sql` — required so the +20 session bonus fires at **10** answers, not 8
+5. `supabase/migrations/20260824_practice_session_size_10.sql` — +20 session bonus at **10** answers, not 8
+6. `supabase/migrations/20260901_practice_attempts_authenticated_privileges.sql` — SELECT+INSERT only for `authenticated` (already applied on production in the dashboard; this file records that fix)
 
-Details: `DATABASE.md`.
-
-Without these, a student can sign in and open Entomology practice, but **Check answer cannot save**.
+Without the 20260824 files, a student can sign in and open practice, but **Check answer cannot save**.
 
 ## Checks
 
@@ -116,4 +119,3 @@ Other engine checks: `lib/gamification.check.ts`, `lib/mock/events.check.ts`, `l
 - Codebusters practice
 - Full 120–150 question competition banks
 - Password reset / resend confirmation
-- Hosted migrations are **not recorded as applied** in this repo — run the SQL files in the Supabase SQL Editor

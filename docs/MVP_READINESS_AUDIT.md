@@ -26,7 +26,7 @@ A previous overlay labeled “Current MVP (code, 2026-08-29)” mixed newer Ento
 | `npx tsc --noEmit` | Pass (also re-run inside `next build`) |
 | `npm run build` | Pass — Next.js 16.3.2, all app routes dynamic |
 
-This is **not** a claim that hosted Supabase has the migrations applied. The live project was not inspected.
+This 2026-08-26 inspection did **not** look at hosted Supabase. **Later (2026-09-01):** the live project was verified to have the five application tables, matching RLS, RPC `session_size = 10`, and SELECT+INSERT-only grants on `practice_attempts`. Two-account isolation held after that ACL fix. Current schema/security truth is `DATABASE.md`, not the “unknown hosted / broken session-size file” notes in the body below.
 
 ---
 

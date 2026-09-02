@@ -99,7 +99,7 @@ Next.js in this repo may differ from older App Router docs. Prefer `node_modules
 | `lib/mock/curriculum.ts` | Generic event → bank → `Question[]` registry used by practice |
 | `lib/mock/*-questions.ts` | Per-event banks |
 | `lib/mock/explorer.ts` | Mock recs/next steps; `MOCK_EXPLORER` is leftover and **not** used for XP |
-| `supabase/migrations/` | Schema as defined in git — not proof the live project has applied them |
+| `supabase/migrations/` | Schema as defined in git. Live tables/RLS/RPC/grants were verified 2026-09-01 (`DATABASE.md`) |
 
 ## Authentication
 
@@ -126,7 +126,7 @@ The database stores those **IDs only**. Names/descriptions stay in the mock cata
 - Invalid / locked IDs rejected on save. Unique `(student_id, event_id)`.
 - Deselect does **not** touch `practice_attempts` or gamification.
 
-**Uncertain:** whether `20260824_student_events.sql` is applied on hosted Supabase. Run it in the SQL Editor; this repo does not record a live apply.
+**Live (2026-09-01):** `student_events` exists with own-row SELECT/INSERT/DELETE RLS. A two-account test showed B cannot see A’s practice data.
 
 ## Practice
 
@@ -178,9 +178,9 @@ Explorer XP, Explorer Level, and daily streak are **real application systems**, 
 | When it updates | Each successful `savePracticeAttempt` → RPC. Not on page refresh. Not on Check answer unless the attempt is saved. |
 | What the student sees | After save: `+N XP` from the RPC `attemptXp` / `sessionBonusXp` (not client math). Results: session XP sum, Explorer Level from returned total `xp`, persisted streak. Dashboard: `getMyGamification()`. |
 
-New student / missing row / read error: `EMPTY_GAMIFICATION` → 0 XP, Level 1, 0 streak. If the gamification migration is not applied, the dashboard still shows zeros; **saves fail** because the RPC is missing.
+New student / missing row / read error: `EMPTY_GAMIFICATION` → 0 XP, Level 1, 0 streak. If the RPC is missing on a **new** project, the dashboard still shows zeros and **saves fail**.
 
-**Uncertain:** whether `20260824_gamification.sql`, `20260824_student_events.sql`, and `20260824_practice_session_size_10.sql` have been applied to the hosted Supabase project. The files tell you to run them in the SQL Editor; this repo does not record a live apply. Until the session-size migration runs, hosted +20 still fires at 8 saved answers while the UI runs 10-question sets.
+**Live (2026-09-01):** gamification tables, `student_events`, and `record_practice_attempt_and_award` with `session_size = 10` are on the hosted project. Session bonus is +20 at 10 answers. See `DATABASE.md`.
 
 Comments in `lib/types.ts` (“types are filled by mock data”) and `lib/progress.ts` (“Separate from mock Explorer XP”) are **stale**. Current behavior: Explorer XP is real; Event Level / mastery / event percent remain mock.
 
@@ -224,7 +224,9 @@ Astronomy is not in that catalog. `/events/astronomy` **404s** for students. The
 - Award XP from **saved** attempts, not from clicking Check answer.
 - RLS on application tables; `anon` has no table access.
 - Prefer server-side mutations (Server Actions + RPC).
-- Limitation: `authenticated` can still `INSERT` `practice_attempts` via RLS, and can `EXECUTE` the award RPC, so a custom client could pass a spoofed `p_is_correct`. The shipped UI computes correctness in `insertPracticeAttempt` first. Students cannot set `xp` with a direct table update.
+- Cross-student isolation: RLS `student_id = auth.uid()` on student-readable tables. Verified with two test accounts after the `practice_attempts` ACL tightening (2026-09-01): B could not access A’s practice data; both could still use the app; save and XP still worked.
+- This is **not** exam-grade anti-cheat. `authenticated` can still `INSERT` `practice_attempts` via RLS, and can `EXECUTE` the award RPC, which accepts `p_is_correct` from the caller. A custom client could spoof correctness **for their own account**. The shipped UI computes correctness in `insertPracticeAttempt` first. Students cannot set `xp` with a direct table update.
+- Live `practice_attempts` table privileges for `authenticated` are SELECT and INSERT only (`20260901_practice_attempts_authenticated_privileges.sql` documents the dashboard fix; it was not re-run on production).
 
 ## Development principles
 
@@ -232,7 +234,7 @@ Astronomy is not in that catalog. `/events/astronomy` **404s** for students. The
 - Do not fold Explorer Level, Event Level, and Topic Mastery into one number.
 - Keep XP rules in `lib/gamification.ts`, not in UI `if`s. Display helpers (`describeXpAward`, `xpBarPercent`) label server amounts; they are not a second XP system.
 - Additive migrations only; do not edit old migration files.
-- After a new migration, tell the human to run it in the Supabase SQL Editor. Do not claim it is live.
+- After a new migration, tell the human to run it in the Supabase SQL Editor unless they already applied the same SQL in the dashboard. Do not claim a file was executed if it was only used as a record of a live change.
 - Check scripts: `lib/progress.check.ts`, `lib/learning/adaptive.check.ts`, `lib/learning/weak-points.check.ts`, `lib/gamification.check.ts`, `lib/badges.check.ts`, `lib/expeditions.check.ts`, `lib/recent-achievements.check.ts`, `lib/mock/astronomy-questions.check.ts`, `lib/mock/entomology-questions.check.ts`, `lib/mock/anatomy-physiology-questions.check.ts`, `lib/mock/water-quality-questions.check.ts`, `lib/mock/ecology-questions.check.ts`, `lib/mock/crime-busters-questions.check.ts`, `lib/mock/events.check.ts`, `lib/mock/curriculum.check.ts`, `lib/student-events.check.ts`
 
 ## Explicitly not implemented
