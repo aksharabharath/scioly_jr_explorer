@@ -32,15 +32,9 @@ export default async function OnboardingEventsPage() {
         </p>
         <EventSelectionForm
           events={events}
-          initialSelectedIds={[
-            "water-quality",
-            "ecology",
-            "entomology",
-            "anatomy-physiology",
-            "crime-busters",
-          ]}
+          initialSelectedIds={[]}
           submitLabel="Continue"
-          description="Water Quality, Ecology, Entomology, Anatomy & Physiology, and Crime Busters are ready. Keep at least one selected."
+          description="Water Quality, Ecology, Entomology, Anatomy & Physiology, and Crime Busters are ready. Choose at least one."
         />
       </div>
     </main>

@@ -5,7 +5,7 @@ import { EventIcon } from "@/components/EventIcon";
 import { fieldSiteSubtitle, fieldSiteTint } from "@/lib/field-sites";
 import { isPlayablePracticeEvent, isSelectableEvent } from "@/lib/mock/events";
 import type { ScienceEvent } from "@/lib/types";
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useMemo, useState, type FormEvent } from "react";
 
 const INITIAL_STATE: SaveEventsState = {};
 
@@ -36,6 +36,7 @@ export function EventSelectionForm({
         ),
       ),
   );
+  const [needsSelection, setNeedsSelection] = useState(false);
   const [state, action, pending] = useActionState(
     saveSelectedEvents,
     INITIAL_STATE,
@@ -56,6 +57,7 @@ export function EventSelectionForm({
     if (!selectableIds.has(eventId)) {
       return;
     }
+    setNeedsSelection(false);
     setSelected((current) => {
       const next = new Set(current);
       if (next.has(eventId)) {
@@ -67,9 +69,22 @@ export function EventSelectionForm({
     });
   }
 
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    if (selected.size === 0 || !hasPlayableSelection) {
+      event.preventDefault();
+      setNeedsSelection(true);
+    }
+  }
+
   return (
-    <form action={action} className="mt-6">
+    <form action={action} onSubmit={handleSubmit} className="mt-6">
       <p className="text-sm leading-relaxed text-stone-600">{description}</p>
+
+      {needsSelection ? (
+        <p className="mt-4 rounded-2xl border border-stone-200 bg-parchment px-4 py-3 text-sm text-ink">
+          Choose at least one event to continue.
+        </p>
+      ) : null}
 
       {state.error ? (
         <p className="mt-4 rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-950">
@@ -177,7 +192,7 @@ export function EventSelectionForm({
         </p>
         <button
           type="submit"
-          disabled={pending || selected.size === 0 || !hasPlayableSelection}
+          disabled={pending}
           className="min-h-11 rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment transition enabled:hover:bg-teal disabled:cursor-not-allowed disabled:opacity-50"
         >
           {pending ? "Saving..." : submitLabel}
