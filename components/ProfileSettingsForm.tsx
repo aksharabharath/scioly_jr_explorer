@@ -67,9 +67,6 @@ export function ProfileSettingsForm({
           <p className="mt-1 text-sm text-stone-600">
             {email ?? "No email on this account."}
           </p>
-          <p className="mt-1 text-xs text-stone-500">
-            Ask a grown-up if you need to change this.
-          </p>
         </div>
 
         <fieldset>

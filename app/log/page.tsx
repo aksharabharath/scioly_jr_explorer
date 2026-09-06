@@ -24,7 +24,12 @@ export default async function LogPage() {
   const eventNameById = Object.fromEntries(
     events.map((event) => [event.id, event.name]),
   );
-  const logEntries = expeditionLogEntries(attempts, questions, eventNameById);
+  const logEntries = expeditionLogEntries(
+    attempts,
+    questions,
+    eventNameById,
+    Number.MAX_SAFE_INTEGER,
+  );
 
   return (
     <main className="flex flex-1 flex-col">

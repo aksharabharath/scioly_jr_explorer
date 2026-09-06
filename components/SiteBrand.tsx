@@ -26,33 +26,25 @@ function CompassMark() {
 }
 
 type SiteBrandProps = {
-  /** Logged-in home is Base camp. Logged-out `/` is the public landing page. */
-  showBaseCampLabel?: boolean;
+  highlightHome?: boolean;
 };
 
-export function SiteBrand({ showBaseCampLabel = false }: SiteBrandProps) {
+export function SiteBrand({ highlightHome = false }: SiteBrandProps) {
   const pathname = usePathname() ?? "";
-  const atBaseCamp = Boolean(showBaseCampLabel) && pathname === "/";
+  const atHome = Boolean(highlightHome) && pathname === "/";
 
   return (
     <Link
       href="/"
-      aria-current={atBaseCamp ? "page" : undefined}
-      aria-label={atBaseCamp ? "Jr. Explorer, Base camp" : "Jr. Explorer, home"}
+      aria-current={atHome ? "page" : undefined}
+      aria-label="Jr. Explorer"
       className={`flex shrink-0 items-center gap-2.5 rounded-lg px-1 py-0.5 outline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-teal ${
-        atBaseCamp ? "bg-parchment/80" : "hover:bg-parchment/70"
+        atHome ? "bg-parchment/80" : "hover:bg-parchment/70"
       }`}
     >
       <CompassMark />
-      <span className="leading-tight">
-        <span className="block font-display text-base font-semibold tracking-tight text-ink sm:text-lg">
-          Jr. Explorer
-        </span>
-        {atBaseCamp ? (
-          <span className="block text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-teal">
-            Base camp
-          </span>
-        ) : null}
+      <span className="font-display text-base font-semibold tracking-tight text-ink sm:text-lg">
+        Jr. Explorer
       </span>
     </Link>
   );

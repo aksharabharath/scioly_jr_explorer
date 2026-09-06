@@ -1,25 +1,32 @@
-import { EventPracticeProgress } from "@/components/EventPracticeProgress";
+import {
+  EventNotebookCallout,
+  EventStrongestTopic,
+} from "@/components/EventHomeNotes";
 import { EventIcon } from "@/components/EventIcon";
+import { EventPracticeProgress } from "@/components/EventPracticeProgress";
+import { EventTrickyTopics } from "@/components/EventTrickyTopics";
+import { ExplorerTrail } from "@/components/ExplorerTrail";
 import { getCurrentUser } from "@/lib/auth/session";
 import {
-  completedSessionCountForEvent,
-  uniqueQuestionsPracticed,
-} from "@/lib/expeditions";
+  eventHomeCallout,
+  recentMissCountForTopic,
+  strongestTopicsForEventHome,
+  trickyTopicsForEventHome,
+} from "@/lib/event-home-notes";
+import { completedSessionCountForEvent } from "@/lib/expeditions";
 import { fieldSiteSubtitle, fieldSiteTint } from "@/lib/field-sites";
-import {
-  toLearningAttempts,
-  topicsNeedingRevisit,
-} from "@/lib/learning/adaptive";
-import { getAllQuestions, getEventPageData, isLivePracticeQuestion } from "@/lib/mock/curriculum";
+import { toLearningAttempts } from "@/lib/learning/adaptive";
+import { getAllQuestions, getEventPageData } from "@/lib/mock/curriculum";
 import { isStudentCatalogEventId } from "@/lib/mock/events";
 import {
+  getMyGamification,
   getMyPracticeAttempts,
   getMyRecentPracticeAttempts,
 } from "@/lib/practice-attempts";
 import { calculateEventProgress } from "@/lib/progress";
+import { hasEventRules } from "@/lib/event-rules";
 import { requireSelectedEvent } from "@/lib/student-events";
 import type { Metadata } from "next";
-import { ExplorerTrail } from "@/components/ExplorerTrail";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -55,36 +62,64 @@ export default async function EventPage({ params }: EventRouteProps) {
 
   const { event, overview, topics, hasPractice } = data;
   const user = await getCurrentUser();
-  const [attempts, recentAttempts, questions] = await Promise.all([
+  const [attempts, recentAttempts, questions, gamification] = await Promise.all([
     getMyPracticeAttempts(),
     getMyRecentPracticeAttempts(),
     getAllQuestions(),
+    getMyGamification(),
   ]);
   const eventQuestions = questions.filter(
     (question) => question.eventId === event.id,
   );
-  const liveBankSize = eventQuestions.filter(isLivePracticeQuestion).length;
-  const eventProgress = {
-    ...calculateEventProgress(
-      event.id,
-      attempts,
-      questions,
-      topics.length,
-    ),
-    uniqueQuestions: uniqueQuestionsPracticed(event.id, attempts, questions),
-  };
+  const eventProgress = calculateEventProgress(
+    event.id,
+    attempts,
+    questions,
+    topics.length,
+  );
+  const questionsAnswered = eventProgress.uniqueQuestions;
+  const topicsExplored = eventProgress.topicsPracticed;
+  const expeditionsCompleted = completedSessionCountForEvent(
+    event.id,
+    attempts,
+    questions,
+  );
   const topicNames = new Map(topics.map((topic) => [topic.id, topic.name]));
-  const weakTopicNames =
+  const learningHistory = toLearningAttempts(recentAttempts, eventQuestions);
+  const trickyTopics =
     user && hasPractice
-      ? topicsNeedingRevisit(
-          toLearningAttempts(recentAttempts, eventQuestions),
-        )
-          .map((topicId) => topicNames.get(topicId))
-          .filter((name): name is string => Boolean(name))
-          .slice(0, 4)
+      ? trickyTopicsForEventHome(learningHistory).flatMap((topicId) => {
+          const name = topicNames.get(topicId);
+          if (!name) {
+            return [];
+          }
+          return [
+            {
+              id: topicId,
+              name,
+              recentMisses: recentMissCountForTopic(learningHistory, topicId),
+            },
+          ];
+        })
       : [];
+  const strongestTopicNames =
+    user && hasPractice
+      ? strongestTopicsForEventHome(learningHistory).flatMap((topicId) => {
+          const name = topicNames.get(topicId);
+          return name ? [name] : [];
+        })
+      : [];
+  const callout = eventHomeCallout({
+    eventName: event.name,
+    streakDays: gamification.streakDays,
+    expeditionsCompleted,
+    questionsAnswered,
+  });
   const site = fieldSiteSubtitle(event.id);
   const tint = fieldSiteTint(event.id);
+  const rulesHref = hasEventRules(event.id)
+    ? `/events/${event.id}/rules`
+    : null;
 
   return (
     <main className="flex flex-1 flex-col">
@@ -96,7 +131,7 @@ export default async function EventPage({ params }: EventRouteProps) {
           ]}
         />
 
-        <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-start lg:gap-6">
+        <div className="mt-4 flex flex-col gap-3">
           <div className={`rounded-3xl journal-panel p-4 sm:p-5 ${tint.wash}`}>
             <div className="flex items-start gap-3">
               <span
@@ -117,84 +152,85 @@ export default async function EventPage({ params }: EventRouteProps) {
             <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:text-base">
               {overview}
             </p>
+            {rulesHref ? (
+              <p className="mt-3">
+                <Link
+                  href={rulesHref}
+                  className="text-sm font-medium text-teal underline-offset-4 hover:underline"
+                >
+                  Event Rules & Overview
+                </Link>
+              </p>
+            ) : null}
           </div>
 
-          <div className="flex flex-col gap-4">
-            {!event.unlocked ? (
-              <div className="journal-panel rounded-3xl p-4 sm:p-5">
-                <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
-                  Coming later
-                </h2>
-                <p className="mt-2 text-sm text-stone-600">
-                  This event is not open for practice yet.
-                </p>
-              </div>
-            ) : hasPractice ? (
-              <>
+          {!event.unlocked ? (
+            <div className="journal-panel rounded-3xl p-4 sm:p-5">
+              <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
+                Coming later
+              </h2>
+              <p className="mt-2 text-sm text-stone-600">
+                This event is not open for practice yet.
+              </p>
+            </div>
+          ) : hasPractice ? (
+            <>
+              <div className="grid gap-3 lg:grid-cols-2 lg:items-stretch">
                 <EventPracticeProgress
-                  eventName={event.name}
-                  progress={eventProgress}
-                  expeditionsCompleted={completedSessionCountForEvent(
-                    event.id,
-                    attempts,
-                    questions,
-                  )}
-                  liveBankSize={liveBankSize}
+                  questionsAnswered={questionsAnswered}
+                  topicsExplored={topicsExplored}
+                  expeditionsCompleted={expeditionsCompleted}
                 />
+                <EventNotebookCallout title={callout.title} body={callout.body} />
+              </div>
 
-                <div className="journal-panel rounded-3xl p-4 sm:p-5">
-                  <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
-                    Ready for an expedition?
-                  </h2>
-                  <p className="mt-1 text-sm text-stone-600">
-                    10 questions. Hints are there if you need them.
-                  </p>
-                  <div className="mt-4 flex flex-col gap-2">
-                    <Link
-                      href={`/events/${event.id}/practice`}
-                      className="inline-flex min-h-11 justify-center rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment hover:bg-teal"
-                    >
-                      Start expedition
-                    </Link>
+              <div className="grid gap-3 lg:grid-cols-2 lg:items-stretch">
+                <EventStrongestTopic topicNames={strongestTopicNames} />
+                <EventTrickyTopics topics={trickyTopics} />
+              </div>
+
+              <div className="journal-panel rounded-3xl p-3 sm:p-4">
+                <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
+                  Ready for an expedition?
+                </h2>
+                <p className="mt-1 text-sm text-stone-600">
+                  10 questions. Hints are there if you need them.
+                </p>
+                <div className="mt-4 flex flex-col gap-2">
+                  <Link
+                    href={`/events/${event.id}/practice`}
+                    className="inline-flex min-h-11 justify-center rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment hover:bg-teal"
+                  >
+                    Start expedition
+                  </Link>
+                  {trickyTopics.length > 0 ? (
                     <Link
                       href={`/events/${event.id}/practice?mode=weak`}
                       className="inline-flex min-h-11 justify-center rounded-full border border-stone-200 px-5 py-2.5 text-sm font-semibold text-ink hover:bg-parchment"
                     >
                       Revisit tricky topics
                     </Link>
-                  </div>
-                  {weakTopicNames.length > 0 ? (
-                    <div className="mt-4 border-t border-stone-200/80 pt-3">
-                      <h3
-                        id="weak-topics-heading"
-                        className="text-sm font-semibold text-ink"
-                      >
-                        Worth revisiting
-                      </h3>
-                      <p className="mt-1 text-xs text-stone-600">
-                        A miss marks a topic as tricky. Three later correct
-                        answers in that topic mark it strong again.
-                      </p>
-                      <ul className="mt-2 list-disc space-y-0.5 pl-5 text-sm text-stone-600">
-                        {weakTopicNames.map((name) => (
-                          <li key={name}>{name}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
+                  ) : (
+                    <Link
+                      href={`/events/${event.id}/practice`}
+                      className="inline-flex min-h-11 justify-center rounded-full border border-stone-200 px-5 py-2.5 text-sm font-semibold text-ink hover:bg-parchment"
+                    >
+                      Keep exploring
+                    </Link>
+                  )}
                 </div>
-              </>
-            ) : (
-              <div className="journal-panel rounded-3xl p-4 sm:p-5">
-                <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
-                  This site is on your list
-                </h2>
-                <p className="mt-2 text-sm text-stone-600">
-                  Expeditions for {event.name} will be here soon.
-                </p>
               </div>
-            )}
-          </div>
+            </>
+          ) : (
+            <div className="journal-panel rounded-3xl p-4 sm:p-5">
+              <h2 className="font-display text-xl font-semibold tracking-tight text-ink">
+                This site is on your list
+              </h2>
+              <p className="mt-2 text-sm text-stone-600">
+                Expeditions for {event.name} will be here soon.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </main>

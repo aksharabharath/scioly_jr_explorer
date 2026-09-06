@@ -200,6 +200,83 @@ export function expeditionLogEntries(
   return entries.slice(0, limit);
 }
 
+export type WeeklyFieldJournalEvent = {
+  eventId: string;
+  eventName: string;
+  expeditions: number;
+  questionsAnswered: number;
+};
+
+export type WeeklyFieldJournalWeek = {
+  weekStart: string;
+  events: WeeklyFieldJournalEvent[];
+  expeditionCount: number;
+  fieldSiteCount: number;
+};
+
+/** Monday of the local calendar week containing `dateStr` (YYYY-MM-DD). */
+export function startOfLocalWeek(dateStr: string): string {
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+  const weekday = date.getDay();
+  const daysFromMonday = weekday === 0 ? 6 : weekday - 1;
+  date.setDate(date.getDate() - daysFromMonday);
+  return localCalendarDate(date);
+}
+
+export function groupExpeditionLogByLocalWeek(
+  entries: ExpeditionLogEntry[],
+): WeeklyFieldJournalWeek[] {
+  const byWeek = new Map<
+    string,
+    Map<string, { eventName: string; expeditions: number; questionsAnswered: number }>
+  >();
+
+  for (const entry of entries) {
+    const localDate = localDateFromAnsweredAt(entry.endedAt);
+    if (!localDate) {
+      continue;
+    }
+    const weekStart = startOfLocalWeek(localDate);
+    const events = byWeek.get(weekStart) ?? new Map();
+    const current = events.get(entry.eventId) ?? {
+      eventName: entry.eventName,
+      expeditions: 0,
+      questionsAnswered: 0,
+    };
+    current.expeditions += 1;
+    current.questionsAnswered += entry.questionsAnswered;
+    events.set(entry.eventId, current);
+    byWeek.set(weekStart, events);
+  }
+
+  const weeks: WeeklyFieldJournalWeek[] = [];
+  for (const [weekStart, events] of byWeek) {
+    const eventRows: WeeklyFieldJournalEvent[] = [...events.entries()]
+      .map(([eventId, row]) => ({
+        eventId,
+        eventName: row.eventName,
+        expeditions: row.expeditions,
+        questionsAnswered: row.questionsAnswered,
+      }))
+      .sort((a, b) => {
+        if (b.expeditions !== a.expeditions) {
+          return b.expeditions - a.expeditions;
+        }
+        return a.eventName.localeCompare(b.eventName);
+      });
+    weeks.push({
+      weekStart,
+      events: eventRows,
+      expeditionCount: eventRows.reduce((sum, row) => sum + row.expeditions, 0),
+      fieldSiteCount: eventRows.length,
+    });
+  }
+
+  weeks.sort((a, b) => (a.weekStart < b.weekStart ? 1 : a.weekStart > b.weekStart ? -1 : 0));
+  return weeks;
+}
+
 function sessionCounts(attempts: ExpeditionAttempt[]): number[] {
   const counts = new Map<string, number>();
   for (const attempt of attempts) {

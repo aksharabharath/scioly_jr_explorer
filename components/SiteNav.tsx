@@ -7,19 +7,19 @@ type NavItem = {
   href: string;
   label: string;
   match: (pathname: string) => boolean;
-  icon: "map" | "log" | "badges" | "events" | "profile";
+  icon: "camp" | "log" | "badges" | "events" | "profile";
 };
 
 const ITEMS: NavItem[] = [
   {
-    href: "/map",
-    label: "Map",
-    match: (path) => path === "/map" || path.startsWith("/map/"),
-    icon: "map",
+    href: "/",
+    label: "Base camp",
+    match: (path) => path === "/",
+    icon: "camp",
   },
   {
     href: "/log",
-    label: "Log",
+    label: "Expedition log",
     match: (path) => path === "/log" || path.startsWith("/log/"),
     icon: "log",
   },
@@ -57,11 +57,12 @@ function NavIcon({ name }: { name: NavItem["icon"] }) {
   };
 
   switch (name) {
-    case "map":
+    case "camp":
       return (
         <svg {...common}>
-          <path d="M3.5 6.5 9 4.5l6 2 5.5-2v13l-5.5 2-6-2-5.5 2z" />
-          <path d="M9 4.5v13M15 6.5v13" />
+          <path d="M4 19.5 12 5l8 14.5" />
+          <path d="M8.5 19.5h7" />
+          <path d="M12 12.5v7" />
         </svg>
       );
     case "log":
@@ -105,7 +106,6 @@ export function SiteNav() {
       <ul className="flex min-w-0 flex-wrap items-center justify-end gap-0.5 sm:flex-nowrap sm:gap-1">
         {ITEMS.map((item) => {
           const active = item.match(pathname);
-          const keepLabel = item.icon === "map";
           return (
             <li key={item.href} className="shrink-0">
               <Link
@@ -119,9 +119,7 @@ export function SiteNav() {
                 }`}
               >
                 <NavIcon name={item.icon} />
-                <span className={keepLabel ? undefined : "hidden min-[480px]:inline"}>
-                  {item.label}
-                </span>
+                <span className="hidden min-[480px]:inline">{item.label}</span>
               </Link>
             </li>
           );
