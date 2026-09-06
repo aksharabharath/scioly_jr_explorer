@@ -17,9 +17,19 @@ export function SignupForm() {
         </p>
       ) : null}
       {state.info ? (
-        <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-950">
-          {state.info}
-        </p>
+        <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-emerald-950">
+          <p className="font-display text-lg font-semibold tracking-tight">
+            Check your inbox
+          </p>
+          <p className="mt-1 text-sm leading-relaxed">
+            We sent you a confirmation email. Open it and confirm your email
+            address to start exploring Science Olympiad.
+          </p>
+          <p className="mt-2 text-sm leading-relaxed text-emerald-900/80">
+            Can&apos;t find it? Check your spam or junk folder, or search your
+            inbox for &ldquo;Jr. Explorer&rdquo;.
+          </p>
+        </div>
       ) : null}
 
       <div>
