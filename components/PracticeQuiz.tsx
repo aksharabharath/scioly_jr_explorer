@@ -589,7 +589,7 @@ export function PracticeQuiz({
                 choiceClass =
                   "choice-pulse border-teal bg-teal/10 text-teal-dark";
               } else if (viewedSubmitted && selected && !correctChoice) {
-                choiceClass = "border-stone-400 bg-stone-100 text-ink";
+                choiceClass = "border-rose-300 bg-rose-50 text-rose-950";
               } else if (!viewedSubmitted && selected) {
                 choiceClass = "border-teal bg-teal/10 text-teal-dark";
               }
@@ -623,15 +623,15 @@ export function PracticeQuiz({
 
           {viewingCurrent && !state.submitted ? (
             <div className="mt-3 space-y-2">
-              <div>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
                 <button
                   type="button"
                   onClick={() => setState({ ...state, revealedHint: true })}
-                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-teal/40 bg-teal/10 px-5 py-2.5 text-sm font-semibold text-teal-dark transition hover:bg-teal/15"
+                  className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-teal/40 bg-teal/10 px-5 py-2.5 text-sm font-semibold text-teal-dark transition hover:bg-teal/15"
                 >
                   {state.revealedHint ? "Hint is showing" : "Need a hint?"}
                 </button>
-                <p className="mt-1.5 text-sm leading-relaxed text-stone-600">
+                <p className="min-w-0 flex-1 text-sm leading-relaxed text-stone-600">
                   {state.revealedHint
                     ? `Hint used — this question can earn up to ${XP_CORRECT_WITH_HINT} XP instead of ${XP_CORRECT} XP.`
                     : "Using a hint means a little less XP for this question."}
