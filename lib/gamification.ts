@@ -10,6 +10,10 @@ export const XP_CORRECT = 10;
 export const XP_CORRECT_WITH_HINT = 6;
 export const XP_INCORRECT = 2;
 export const XP_SESSION_COMPLETION = 20;
+/** Unhinted 3rd correct in a row in the same expedition. */
+export const XP_STREAK_3 = 12;
+/** Unhinted 5th correct in a row in the same expedition. */
+export const XP_STREAK_5 = 15;
 
 /** Matches the current 10-question practice set. */
 export const GAMIFICATION_SESSION_SIZE = 10;
@@ -32,6 +36,11 @@ const UUID_RE =
 export type AttemptXpInput = {
   isCorrect: boolean;
   hintUsed: boolean;
+  /**
+   * Consecutive unhinted-correct answers in this expedition, including
+   * this one. Hinted and incorrect answers omit this; the server counts it.
+   */
+  unhintedCorrectStreak?: number;
 };
 
 export type XpProgress = {
@@ -76,9 +85,19 @@ export const EMPTY_GAMIFICATION: GamificationState = {
 export function calculateAttemptXp({
   isCorrect,
   hintUsed,
+  unhintedCorrectStreak,
 }: AttemptXpInput): number {
+  if (isCorrect && hintUsed) {
+    return XP_CORRECT_WITH_HINT;
+  }
   if (isCorrect) {
-    return hintUsed ? XP_CORRECT_WITH_HINT : XP_CORRECT;
+    if (unhintedCorrectStreak === 3) {
+      return XP_STREAK_3;
+    }
+    if (unhintedCorrectStreak === 5) {
+      return XP_STREAK_5;
+    }
+    return XP_CORRECT;
   }
   return XP_INCORRECT;
 }

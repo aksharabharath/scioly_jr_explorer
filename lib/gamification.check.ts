@@ -23,6 +23,8 @@ import {
   XP_CORRECT_WITH_HINT,
   XP_INCORRECT,
   XP_SESSION_COMPLETION,
+  XP_STREAK_3,
+  XP_STREAK_5,
 } from "@/lib/gamification";
 import { PRACTICE_SET_SIZE } from "@/lib/learning/adaptive";
 
@@ -57,6 +59,77 @@ check(
 check(
   "hint + correct must not earn 10 XP",
   calculateAttemptXp({ isCorrect: true, hintUsed: true }) !== 10,
+);
+check(
+  "1st and 2nd unhinted correct stay +10",
+  calculateAttemptXp({
+    isCorrect: true,
+    hintUsed: false,
+    unhintedCorrectStreak: 1,
+  }) === 10 &&
+    calculateAttemptXp({
+      isCorrect: true,
+      hintUsed: false,
+      unhintedCorrectStreak: 2,
+    }) === 10,
+);
+check(
+  "3rd unhinted correct in a row is +12",
+  calculateAttemptXp({
+    isCorrect: true,
+    hintUsed: false,
+    unhintedCorrectStreak: 3,
+  }) === XP_STREAK_3 &&
+    calculateAttemptXp({
+      isCorrect: true,
+      hintUsed: false,
+      unhintedCorrectStreak: 3,
+    }) === 12,
+);
+check(
+  "4th unhinted correct in a row stays +10",
+  calculateAttemptXp({
+    isCorrect: true,
+    hintUsed: false,
+    unhintedCorrectStreak: 4,
+  }) === 10,
+);
+check(
+  "5th unhinted correct in a row is +15",
+  calculateAttemptXp({
+    isCorrect: true,
+    hintUsed: false,
+    unhintedCorrectStreak: 5,
+  }) === XP_STREAK_5 &&
+    calculateAttemptXp({
+      isCorrect: true,
+      hintUsed: false,
+      unhintedCorrectStreak: 5,
+    }) === 15,
+);
+check(
+  "6th unhinted correct in a row stays +10",
+  calculateAttemptXp({
+    isCorrect: true,
+    hintUsed: false,
+    unhintedCorrectStreak: 6,
+  }) === 10,
+);
+check(
+  "hinted correct at a 3-streak does not get the +12 bonus",
+  calculateAttemptXp({
+    isCorrect: true,
+    hintUsed: true,
+    unhintedCorrectStreak: 3,
+  }) === 6,
+);
+check(
+  "incorrect after a streak is still +2",
+  calculateAttemptXp({
+    isCorrect: false,
+    hintUsed: false,
+    unhintedCorrectStreak: 3,
+  }) === 2,
 );
 
 check("0 XP → Level 1", calculateLevelFromXp(0) === 1);
@@ -231,6 +304,24 @@ check(
     hintUsed: false,
   })[0]?.amount === 10,
 );
+check(
+  "streak bonus copy uses the server amount 12",
+  describeXpAward({
+    attemptXp: 12,
+    sessionBonusXp: 0,
+    isCorrect: true,
+    hintUsed: false,
+  })[0]?.amount === 12,
+);
+check(
+  "streak bonus copy uses the server amount 15",
+  describeXpAward({
+    attemptXp: 15,
+    sessionBonusXp: 0,
+    isCorrect: true,
+    hintUsed: false,
+  })[0]?.amount === 15,
+);
 
 check(
   "10-question session XP total: 8 independent correct + 1 hint + 1 miss + completion",
@@ -378,6 +469,32 @@ check(
 check(
   "session bonus is unique per session_id",
   /on conflict \(session_id\) do nothing/.test(sessionSizeSql),
+);
+
+const streakXpSql = readFileSync(
+  join(process.cwd(), "supabase/migrations/20260906_streak_milestone_xp.sql"),
+  "utf8",
+);
+check(
+  "streak-xp migration awards 12 and 15 only at 3rd and 5th",
+  /correct_streak = 3/.test(streakXpSql) &&
+    /attempt_xp := 12/.test(streakXpSql) &&
+    /correct_streak = 5/.test(streakXpSql) &&
+    /attempt_xp := 15/.test(streakXpSql) &&
+    /attempt_xp := 10/.test(streakXpSql) &&
+    /attempt_xp := 6/.test(streakXpSql) &&
+    /attempt_xp := 2/.test(streakXpSql),
+);
+check(
+  "streak-xp migration skips hinted correct answers when counting",
+  /prior\.is_correct and prior\.hint_used/.test(streakXpSql) &&
+    /continue;/.test(streakXpSql),
+);
+check(
+  "streak-xp migration still awards session bonus once at 10 answers",
+  /session_size constant integer := 10/.test(streakXpSql) &&
+    /session_bonus_xp constant integer := 20/.test(streakXpSql) &&
+    /on conflict \(session_id\) do nothing/.test(streakXpSql),
 );
 
 if (failures.length > 0) {
