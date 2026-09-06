@@ -250,6 +250,33 @@ function cappedProgress(
   return { id, current: safeCurrent, required: safeRequired, noun };
 }
 
+function pluralNoun(count: number, noun: BadgeProgressNoun): string {
+  const labels: Record<BadgeProgressNoun, [string, string]> = {
+    question: ["question", "questions"],
+    expedition: ["expedition", "expeditions"],
+    event: ["event", "events"],
+    topic: ["topic", "topics"],
+    day: ["day", "days"],
+  };
+  const [one, many] = labels[noun];
+  return count === 1 ? one : many;
+}
+
+/**
+ * Student-facing progress line from existing `getBadgeProgress()` values.
+ * Does not recalculate progress.
+ */
+export function formatBadgeProgress(row: BadgeProgress): string {
+  const amount = `${row.current} / ${row.required} ${pluralNoun(row.required, row.noun)}`;
+  if (row.noun === "question") {
+    return `${amount} answered`;
+  }
+  if (row.noun === "event") {
+    return `${amount} explored`;
+  }
+  return amount;
+}
+
 /**
  * Display progress toward each badge. Thresholds match `getEarnedBadgeIds`.
  * Displayed current is capped at the requirement.

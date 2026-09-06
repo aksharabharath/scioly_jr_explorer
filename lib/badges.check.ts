@@ -5,6 +5,7 @@
 import {
   BADGE_DEFINITIONS,
   definitionsForIds,
+  formatBadgeProgress,
   getBadgeProgress,
   getEarnedBadgeIds,
   getNewlyEarnedBadges,
@@ -365,6 +366,48 @@ check(
   fiveWqProgress.get("water-watcher")?.current ===
     fiveWqProgress.get("water-watcher")?.required &&
     earnedFromFiveWq.has("water-watcher"),
+);
+
+check(
+  "Curious Mind shelf copy uses questions answered",
+  formatBadgeProgress({
+    id: "curious-mind",
+    current: 56,
+    required: 100,
+    noun: "question",
+  }) === "56 / 100 questions answered",
+);
+check(
+  "Explorer shelf copy uses events explored",
+  formatBadgeProgress({
+    id: "three-event-explorer",
+    current: 2,
+    required: 3,
+    noun: "event",
+  }) === "2 / 3 events explored",
+);
+check(
+  "Practice Regular shelf copy uses expeditions",
+  formatBadgeProgress({
+    id: "practice-regular",
+    current: 3,
+    required: 5,
+    noun: "expedition",
+  }) === "3 / 5 expeditions",
+);
+check(
+  "Consistent Explorer shelf copy uses days",
+  formatBadgeProgress({
+    id: "consistent-explorer",
+    current: 5,
+    required: 7,
+    noun: "day",
+  }) === "5 / 7 days",
+);
+check(
+  "formatted progress still uses capped current / required",
+  formatBadgeProgress(hundredProgress.get("curious-mind")!) ===
+    "100 / 100 questions answered",
 );
 
 if (failures.length > 0) {
