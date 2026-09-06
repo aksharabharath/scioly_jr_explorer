@@ -26,6 +26,8 @@ import {
   type AnswerRecord,
 } from "@/lib/practice";
 import {
+  XP_CORRECT,
+  XP_CORRECT_WITH_HINT,
   calculateLevelFromXp,
   formatXpGain,
   localCalendarDate,
@@ -506,7 +508,13 @@ export function PracticeQuiz({
     : true;
   const viewedIsCorrect =
     viewedSelectedChoiceId === viewedQuestion.correctChoiceId;
-  const sessionNumber = state.viewIndex + 1;
+  const viewedAskedIndex = state.askedIds.indexOf(viewedQuestion.id);
+  const sessionNumber =
+    viewedAskedIndex >= 0
+      ? viewedAskedIndex + 1
+      : viewingCurrent
+        ? state.askedIds.length
+        : state.viewIndex + 1;
   const progressPercent =
     plannedTotal === 0 ? 0 : Math.round((sessionNumber / plannedTotal) * 100);
 
@@ -615,13 +623,20 @@ export function PracticeQuiz({
 
           {viewingCurrent && !state.submitted ? (
             <div className="mt-3 space-y-2">
-              <button
-                type="button"
-                onClick={() => setState({ ...state, revealedHint: true })}
-                className="inline-flex min-h-11 items-center justify-center rounded-full border border-teal/40 bg-teal/10 px-5 py-2.5 text-sm font-semibold text-teal-dark transition hover:bg-teal/15"
-              >
-                {state.revealedHint ? "Hint is showing" : "Need a hint?"}
-              </button>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setState({ ...state, revealedHint: true })}
+                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-teal/40 bg-teal/10 px-5 py-2.5 text-sm font-semibold text-teal-dark transition hover:bg-teal/15"
+                >
+                  {state.revealedHint ? "Hint is showing" : "Need a hint?"}
+                </button>
+                <p className="mt-1.5 text-sm leading-relaxed text-stone-600">
+                  {state.revealedHint
+                    ? `Hint used — this question can earn up to ${XP_CORRECT_WITH_HINT} XP instead of ${XP_CORRECT} XP.`
+                    : "Using a hint means a little less XP for this question."}
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={checkAnswer}
