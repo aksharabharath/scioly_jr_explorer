@@ -6,8 +6,11 @@
  *
  * Registered in curriculum.ts. The catalog event is unlocked for shared practice.
  */
+import { optionalSecondHintFields } from "@/lib/practice";
+import { optionalQuestionHelpFields } from "@/lib/question-help";
 import type {
   DifficultyLevel,
+  PromptTermRef,
   Question,
   QuestionVerificationStatus,
 } from "@/lib/types";
@@ -61,6 +64,9 @@ function eco(input: {
   choiceTexts: [string, string, string, string];
   correctChoiceId: "a" | "b" | "c" | "d";
   hint: string;
+  hint2?: string;
+  promptTerms?: PromptTermRef[];
+  wordingHelp?: string;
   explanation: string;
   cognitiveDemand: EcologyCognitiveDemand;
   sourceType: EcologySourceType;
@@ -82,6 +88,8 @@ function eco(input: {
     ],
     correctChoiceId: input.correctChoiceId,
     hint: input.hint,
+    ...optionalSecondHintFields(input.hint2),
+    ...optionalQuestionHelpFields(input),
     explanation: input.explanation,
     cognitiveDemand: input.cognitiveDemand,
     sourceType: input.sourceType,
@@ -304,6 +312,9 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Two species cannot occupy the same niche in a habitat",
     ],
     correctChoiceId: "d",
+    promptTerms: [{ glossaryId: "niche" }],
+    wordingHelp:
+      "This question is asking what the rule says about two species sharing a living space.",
     hint: "The principle is about the same niche and the same full set of resources, not about biomes or life-history labels.",
     explanation:
       "The competitive exclusion principle states that two species cannot occupy the same niche in a habitat: they cannot coexist if they compete for all the same resources. It does not require different biomes or forbid sharing a food web at different niches.",
@@ -370,6 +381,9 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Solar panel manufacturing and nuclear waste storage",
     ],
     correctChoiceId: "c",
+    promptTerms: [{ glossaryId: "density-dependent" }],
+    wordingHelp:
+      "This question is asking which group of things matches that kind of population limit.",
     hint: "Density-dependent examples here are living interactions and their by-products, not weather.",
     explanation:
       "Most density-dependent factors are biotic and include predation, inter- and intraspecific competition, accumulation of waste, and diseases. Weather, natural disasters, and pollution are typically density-independent.",
@@ -436,6 +450,8 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "An average phenotype, while selecting against extreme variation",
     ],
     correctChoiceId: "d",
+    promptTerms: [{ glossaryId: "phenotype" }],
+    wordingHelp: "This question is asking which kind of trait is favored.",
     hint: "Which part of the trait range is favored, and what happens to the extremes?",
     explanation:
       "If natural selection favors an average phenotype, selecting against extreme variation, the population undergoes stabilizing selection. Directional selection favors one end of the range. Diversifying/disruptive selection is not used as a keyed definition here.",
@@ -524,6 +540,9 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Enhanced only at the equator, never on mountains",
     ],
     correctChoiceId: "c",
+    promptTerms: [{ glossaryId: "precipitation" }],
+    wordingHelp:
+      "This question is asking where rain increases and where it drops a lot when wind hits mountains.",
     hint: "Windward faces the incoming wind; leeward is the other side of the range.",
     explanation:
       "In the rain shadow effect, winds normal to a mountain range result in enhanced precipitation on the windward side and drastically reduced precipitation on the leeward side.",
@@ -546,6 +565,9 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Lichens on polar ice only",
     ],
     correctChoiceId: "b",
+    promptTerms: [{ glossaryId: "temperate" }, { glossaryId: "biome" }],
+    wordingHelp:
+      "This question is asking what is most common in this type of environment.",
     hint: "Think of open plains rather than closed-canopy forest or ocean.",
     explanation:
       "Temperate grasslands are found throughout central North America, where they are also known as prairies. Savannas and temperate grasslands are dominated by grasses.",
@@ -987,6 +1009,8 @@ export function ecologyQuestionToPracticeQuestion(
     correctChoiceId: question.correctChoiceId,
     explanation: question.explanation,
     hint: question.hint,
+    ...optionalSecondHintFields(question.hint2),
+    ...optionalQuestionHelpFields(question),
     difficulty: question.difficulty,
     imageRequired: question.imageRequired,
     verificationStatus: question.verificationStatus,

@@ -166,7 +166,7 @@ check(
     return (
       lines.length === 1 &&
       lines[0].amount === 2 &&
-      lines[0].reason === "You still earned XP for trying"
+      lines[0].reason === "Thanks for trying"
     );
   })(),
 );

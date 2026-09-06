@@ -12,6 +12,9 @@ import {
   type EcologyCognitiveDemand,
   type EcologySourceType,
 } from "@/lib/mock/ecology-questions";
+import { optionalSecondHintIsValid } from "@/lib/practice";
+import { ECOLOGY_GLOSSARY } from "@/lib/mock/glossary/ecology";
+import { annotatePrompt, questionHelpIssues } from "@/lib/question-help";
 
 const failures: string[] = [];
 
@@ -79,6 +82,15 @@ for (const question of questions) {
     question.explanation.trim().length > 0,
   );
   check(`${question.id} has a non-empty hint`, question.hint.trim().length > 0);
+  check(
+    `${question.id} optional hint2 differs from hint when present`,
+    optionalSecondHintIsValid(question),
+  );
+  const helpIssues = questionHelpIssues(question, ECOLOGY_GLOSSARY);
+  check(
+    `${question.id} question help annotations are structurally valid`,
+    helpIssues.length === 0,
+  );
   check(`${question.id} has exactly 4 choices`, question.choices.length === 4);
   check(`${question.id} is text-only`, question.imageRequired === false);
   check(
@@ -197,6 +209,36 @@ check(
     const number = Number(question.id.replace("eco-q", ""));
     return number >= 1 && number <= 40;
   }),
+);
+
+const ecoQ21 = questions.find((question) => question.id === "eco-q21");
+check(
+  "eco-q21 has temperate and biome prompt terms",
+  ecoQ21?.promptTerms?.map((ref) => ref.glossaryId).join(",") ===
+    "temperate,biome",
+);
+check(
+  "eco-q21 has wording-only help",
+  ecoQ21?.wordingHelp ===
+    "This question is asking what is most common in this type of environment.",
+);
+check(
+  "eco-q21 prompt terms resolve in the prompt",
+  Boolean(
+    ecoQ21 &&
+      annotatePrompt(
+        ecoQ21.prompt,
+        ecoQ21.promptTerms,
+        ECOLOGY_GLOSSARY,
+      ).filter((span) => span.type === "term").length === 2,
+  ),
+);
+const pilotIds = questions
+  .filter((question) => question.promptTerms || question.wordingHelp)
+  .map((question) => question.id);
+check(
+  "ecology question-help pilot stays small",
+  pilotIds.join(",") === "eco-q10,eco-q13,eco-q16,eco-q20,eco-q21",
 );
 
 if (failures.length > 0) {

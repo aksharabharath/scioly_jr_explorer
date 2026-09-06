@@ -5,6 +5,7 @@
  * T1-RULES and inspected USGS quotes in
  * docs/events/water_quality/EVIDENCE_MATRIX_2027.md.
  */
+import { optionalSecondHintFields } from "@/lib/practice";
 import type {
   DifficultyLevel,
   Question,
@@ -51,6 +52,7 @@ function wq(input: {
   choiceTexts: [string, string, string, string];
   correctChoiceId: "a" | "b" | "c" | "d";
   hint: string;
+  hint2?: string;
   explanation: string;
   cognitiveDemand: WaterQualityCognitiveDemand;
   sourceType: WaterQualitySourceType;
@@ -72,6 +74,7 @@ function wq(input: {
     ],
     correctChoiceId: input.correctChoiceId,
     hint: input.hint,
+    ...optionalSecondHintFields(input.hint2),
     explanation: input.explanation,
     cognitiveDemand: input.cognitiveDemand,
     sourceType: input.sourceType,
@@ -493,7 +496,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Asian Carp",
     ],
     correctChoiceId: "b",
-    hint: "Class 3 has four table names. Asian Carp is on a different official list. Water Penny and Giant Water Bug are other table columns.",
+    hint: "Find each name on the 2027 lists and read the heading above it. Class 3 is a macro table column; do not mix it with the Aquatic Nuisance Animals sentence.",
     explanation:
       "Blackfly is Class 3. Water Penny is Class 1; Giant Water Bug is Class 5; Asian Carp is an Aquatic Nuisance Animals string, not a Class 3 table cell.",
     cognitiveDemand: "distinction",
@@ -537,7 +540,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Caddisfly",
     ],
     correctChoiceId: "a",
-    hint: "The plant list has three names. Zebra Mussel is an animal-list string. Mayfly and Caddisfly are table names.",
+    hint: "Use the printed Aquatic Nuisance Plants sentence. Do not pick a nuisance-animal string or a name from the adult-macroinvertebrate table.",
     explanation:
       "Purple Loosestrife is an Aquatic Nuisance Plants name. Zebra Mussel is an Aquatic Nuisance Animals string. Mayfly and Caddisfly are adult-macroinvertebrate table names.",
     cognitiveDemand: "recognition",
@@ -978,6 +981,7 @@ export function waterQualityQuestionToPracticeQuestion(
     correctChoiceId: question.correctChoiceId,
     explanation: question.explanation,
     hint: question.hint,
+    ...optionalSecondHintFields(question.hint2),
     difficulty: question.difficulty,
     imageRequired: question.imageRequired,
     verificationStatus: question.verificationStatus,

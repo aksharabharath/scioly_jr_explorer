@@ -21,7 +21,7 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   title: "Jr. Explorer",
   description:
-    "Science Olympiad learning for elementary explorers. Learn, practice, and master events.",
+    "Practice elementary Science Olympiad in short expeditions with Jr. Explorer.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -216,7 +216,7 @@ function attemptAwardReason(
     return "Correct — hints still count";
   }
   if (attemptXp === XP_INCORRECT) {
-    return "You still earned XP for trying";
+    return "Thanks for trying";
   }
   if (isCorrect && hintUsed) {
     return "Correct — hints still count";
@@ -224,7 +224,7 @@ function attemptAwardReason(
   if (isCorrect) {
     return "Correct answer";
   }
-  return "You still earned XP for trying";
+  return "Thanks for trying";
 }
 
 /**

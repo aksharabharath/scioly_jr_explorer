@@ -25,13 +25,17 @@ function CompassMark() {
   );
 }
 
-export function SiteBrand() {
+type SiteBrandProps = {
+  homeHref: "/" | "/camp";
+};
+
+export function SiteBrand({ homeHref }: SiteBrandProps) {
   const pathname = usePathname() ?? "";
-  const atBaseCamp = pathname === "/";
+  const atBaseCamp = pathname === "/camp";
 
   return (
     <Link
-      href="/"
+      href={homeHref}
       aria-current={atBaseCamp ? "page" : undefined}
       aria-label={atBaseCamp ? "Jr. Explorer, Base camp" : "Jr. Explorer, home"}
       className={`flex shrink-0 items-center gap-2.5 rounded-lg px-1 py-0.5 outline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-teal ${

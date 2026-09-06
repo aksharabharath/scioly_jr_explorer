@@ -7,6 +7,7 @@
  *
  * Registered in curriculum.ts. Unlocked for shared live practice.
  */
+import { optionalSecondHintFields } from "@/lib/practice";
 import type {
   DifficultyLevel,
   Question,
@@ -76,6 +77,7 @@ function cb(
     choiceTexts: [string, string, string, string];
     correctChoiceId: "a" | "b" | "c" | "d";
     hint: string;
+    hint2?: string;
     explanation: string;
     cognitiveDemand: CrimeBustersCognitiveDemand;
     sourceType: CrimeBustersSourceType;
@@ -107,6 +109,7 @@ function cb(
     ],
     correctChoiceId: input.correctChoiceId,
     hint: input.hint,
+    ...optionalSecondHintFields(input.hint2),
     explanation: input.explanation,
     cognitiveDemand: input.cognitiveDemand,
     sourceType: input.sourceType,
@@ -846,7 +849,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "The formula for liquid bleach",
     ],
     correctChoiceId: "a",
-    hint: "Look for baking-powder and carbon-dioxide language, not contest reagents.",
+    hint: "PubChem describes everyday uses of sodium bicarbonate. That is not a contest reagent key or the formula of a different chemical.",
     explanation:
       "PubChem: sodium bicarbonate is used as a source of carbon dioxide and as an ingredient of baking powder (among other uses). That is not a complete contest “uses of every powder” table.",
     cognitiveDemand: "recognition",
@@ -1120,6 +1123,7 @@ export function crimeBustersQuestionToPracticeQuestion(
     correctChoiceId: question.correctChoiceId,
     explanation: question.explanation,
     hint: question.hint,
+    ...optionalSecondHintFields(question.hint2),
     difficulty: question.difficulty,
     imageRequired: question.imageRequired,
     verificationStatus: question.verificationStatus,

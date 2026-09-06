@@ -2,11 +2,15 @@
 
 import { savePracticeAttempt } from "@/app/practice/actions";
 import { ExpeditionRewardsOverlay } from "@/components/ExpeditionRewardsOverlay";
+import { TrickyTopicsEmpty } from "@/components/TrickyTopicsEmpty";
+import { PromptWithTerms } from "@/components/PromptWithTerms";
 import { XpAwardFeedback } from "@/components/XpAwardFeedback";
+import { ECOLOGY_GLOSSARY } from "@/lib/mock/glossary/ecology";
 import {
   PRACTICE_SET_SIZE,
   attemptFromQuestion,
   friendlyRevisitNote,
+  hasWeakTopics,
   selectNextQuestion,
   type LearningAttempt,
   type PracticeMode,
@@ -21,6 +25,9 @@ import {
 } from "@/lib/badges";
 import {
   DIFFICULTY_LEVEL_LABEL,
+  attemptUsedAHint,
+  authoredSecondHint,
+  missedAnswerContrast,
   recommendNextStep,
   summarizePractice,
   type AnswerRecord,
@@ -43,7 +50,7 @@ import {
 } from "@/lib/student-preferences";
 import type { PracticeFollowUp, PracticeSummary, Question } from "@/lib/types";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 type PracticeQuizProps = {
   eventId: string;
@@ -66,6 +73,7 @@ type ActiveQuizState = {
   sessionTopics: string[];
   selectedChoiceId: string | null;
   revealedHint: boolean;
+  revealedHint2: boolean;
   submitted: boolean;
   records: AnswerRecord[];
   history: LearningAttempt[];
@@ -95,7 +103,13 @@ type CompleteQuizState = {
   dailyMissionComplete: boolean;
 };
 
-type QuizState = ActiveQuizState | CompleteQuizState;
+type ClearedWeakQuizState = {
+  status: "cleared-weak";
+  history: LearningAttempt[];
+  attemptCount: number;
+};
+
+type QuizState = ActiveQuizState | CompleteQuizState | ClearedWeakQuizState;
 
 function beginSet(
   questions: Question[],
@@ -113,6 +127,13 @@ function beginSet(
   });
 
   if (!question) {
+    if (mode === "weak") {
+      return {
+        status: "cleared-weak",
+        history,
+        attemptCount,
+      };
+    }
     return {
       status: "complete",
       records: [],
@@ -135,6 +156,7 @@ function beginSet(
     sessionTopics: [question.topicId],
     selectedChoiceId: null,
     revealedHint: false,
+    revealedHint2: false,
     submitted: false,
     records: [],
     history,
@@ -189,7 +211,14 @@ export function PracticeQuiz({
   const badgeAttemptsRef = useRef(priorBadgeAttempts);
   const baselineXpRef = useRef(initialXp);
   const baselineStreakRef = useRef(initialStreakDays);
-
+  const clueRegionId = useId();
+  const wordingHelpRegionId = useId();
+  const [wordingHelpQuestionId, setWordingHelpQuestionId] = useState<
+    string | null
+  >(null);
+  const activeQuestionId =
+    state.status === "active" ? state.question.id : "";
+  const wordingHelpOpen = wordingHelpQuestionId === activeQuestionId;
   const showFeedback = state.status === "active" && state.submitted;
 
   useEffect(() => {
@@ -269,6 +298,12 @@ export function PracticeQuiz({
     };
   }
 
+  if (state.status === "cleared-weak") {
+    return (
+      <TrickyTopicsEmpty eventId={eventId} eventName={eventName} />
+    );
+  }
+
   if (state.status === "complete") {
     const summary = summarizePractice(state.records);
     const followUp = recommendNextStep(summary.accuracyPercent, eventName);
@@ -280,6 +315,8 @@ export function PracticeQuiz({
         summary={summary}
         followUp={followUp}
         revisitNote={revisitNote}
+        practiceMode={mode}
+        stillWeak={mode === "weak" && hasWeakTopics(state.history)}
         onTryAgain={() => {
           startNewSession();
           setState(
@@ -346,7 +383,7 @@ export function PracticeQuiz({
       const result = await savePracticeAttempt({
         questionId: question.id,
         selectedOptionId: selectedChoiceId,
-        hintUsed: state.revealedHint,
+        hintUsed: attemptUsedAHint(state.revealedHint, state.revealedHint2),
         attemptId: attemptIdRef.current,
         sessionId: sessionIdRef.current,
         practiceDate: localCalendarDate(),
@@ -415,7 +452,7 @@ export function PracticeQuiz({
       return;
     }
 
-    const hintUsed = state.revealedHint;
+    const hintUsed = attemptUsedAHint(state.revealedHint, state.revealedHint2);
     const record: AnswerRecord = {
       questionId: question.id,
       selectedChoiceId: state.selectedChoiceId,
@@ -453,6 +490,7 @@ export function PracticeQuiz({
       sessionTopics: [...state.sessionTopics, nextQuestion.topicId],
       selectedChoiceId: null,
       revealedHint: false,
+      revealedHint2: false,
       submitted: false,
       records: nextRecords,
       history: nextHistory,
@@ -467,8 +505,17 @@ export function PracticeQuiz({
   const sessionNumber = state.records.length + 1;
   const progressPercent =
     plannedTotal === 0 ? 0 : Math.round((sessionNumber / plannedTotal) * 100);
+  const missContrast =
+    !isCorrect && state.selectedChoiceId
+      ? missedAnswerContrast(question, state.selectedChoiceId)
+      : null;
 
   const hasImage = Boolean(question.imageSrc);
+  const secondHint = authoredSecondHint(question);
+  const hintUsed = attemptUsedAHint(state.revealedHint, state.revealedHint2);
+  const wordingHelp = question.wordingHelp?.trim() ?? "";
+  const glossary =
+    question.eventId === "ecology" ? ECOLOGY_GLOSSARY : [];
 
   return (
     <section className="journal-panel rounded-3xl p-4 sm:p-5">
@@ -502,9 +549,13 @@ export function PracticeQuiz({
         }`}
       >
         <div>
-          <h2 className="font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
-            {question.prompt}
-          </h2>
+          <p className="font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
+            <PromptWithTerms
+              prompt={question.prompt}
+              promptTerms={question.promptTerms}
+              glossary={glossary}
+            />
+          </p>
           {question.imageSrc ? (
             <figure className="mt-3 overflow-hidden rounded-2xl border border-stone-200/80 bg-parchment">
               {/* Local public JPEGs (and any other static imageSrc); next/image is not required. */}
@@ -573,13 +624,56 @@ export function PracticeQuiz({
 
           {!state.submitted ? (
             <div className="mt-3 space-y-2">
-              <button
-                type="button"
-                onClick={() => setState({ ...state, revealedHint: true })}
-                className="text-sm font-medium text-teal underline-offset-4 hover:underline"
-              >
-                {state.revealedHint ? "Hint is showing" : "Need a hint?"}
-              </button>
+              {wordingHelp ? (
+                <div>
+                  <button
+                    type="button"
+                    aria-expanded={wordingHelpOpen}
+                    aria-controls={wordingHelpRegionId}
+                    onClick={() =>
+                      setWordingHelpQuestionId((current) =>
+                        current === activeQuestionId ? null : activeQuestionId,
+                      )
+                    }
+                    className="text-sm font-medium text-teal-dark underline-offset-4 hover:underline"
+                  >
+                    Explain this question
+                  </button>
+                  {wordingHelpOpen ? (
+                    <div
+                      id={wordingHelpRegionId}
+                      className="mt-2 rounded-2xl border border-teal/20 bg-teal/5 px-4 py-2.5 text-sm leading-relaxed text-stone-700"
+                    >
+                      <p className="font-semibold text-ink">
+                        What this is asking
+                      </p>
+                      <p className="mt-1">{wordingHelp}</p>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+              {!state.revealedHint ||
+              (secondHint && !state.revealedHint2) ? (
+                <button
+                  type="button"
+                  aria-expanded={state.revealedHint}
+                  aria-controls={clueRegionId}
+                  onClick={() =>
+                    setState(
+                      state.revealedHint
+                        ? {
+                            ...state,
+                            revealedHint: true,
+                            revealedHint2: true,
+                          }
+                        : { ...state, revealedHint: true },
+                    )
+                  }
+                  className="text-sm font-medium text-teal underline-offset-4 hover:underline"
+                >
+                  {state.revealedHint ? "Another clue" : "Need a hint?"}
+                </button>
+              ) : null}
               <button
                 type="button"
                 onClick={checkAnswer}
@@ -592,10 +686,22 @@ export function PracticeQuiz({
           ) : null}
 
           {state.revealedHint && !state.submitted ? (
-            <p className="mt-2 rounded-2xl bg-amber-50 px-4 py-2.5 text-sm leading-relaxed text-amber-950">
-              <span className="font-semibold">Hint: </span>
-              {question.hint}
-            </p>
+            <div
+              id={clueRegionId}
+              className="mt-2 space-y-2"
+              aria-live="polite"
+            >
+              <p className="rounded-2xl border border-stone-200 bg-amber-50 px-4 py-2.5 text-sm leading-relaxed text-amber-950">
+                <span className="font-semibold">Clue </span>
+                {question.hint}
+              </p>
+              {state.revealedHint2 && secondHint ? (
+                <p className="rounded-2xl border border-stone-200 bg-amber-50 px-4 py-2.5 text-sm leading-relaxed text-amber-950">
+                  <span className="font-semibold">Clue </span>
+                  {secondHint}
+                </p>
+              ) : null}
+            </div>
           ) : null}
 
           {state.submitted ? (
@@ -615,10 +721,15 @@ export function PracticeQuiz({
                   ? "Correct."
                   : "Not quite. Explorers miss things. Here is what this was asking."}
               </p>
+              {missContrast ? (
+                <p className="text-sm leading-snug text-ink">
+                  {missContrast}
+                </p>
+              ) : null}
               <p className="text-sm leading-snug text-stone-700">
                 {question.explanation}
               </p>
-              {!isCorrect ? (
+              {!isCorrect && !state.revealedHint ? (
                 <p className="text-sm leading-snug text-stone-600">
                   <span className="font-semibold text-ink">Hint: </span>
                   {question.hint}
@@ -629,7 +740,8 @@ export function PracticeQuiz({
                   attemptXp={state.xpAward.attemptXp}
                   sessionBonusXp={state.xpAward.sessionBonusXp}
                   isCorrect={isCorrect}
-                  hintUsed={state.revealedHint}
+                  hintUsed={hintUsed}
+                  quiet={!isCorrect}
                 />
               ) : null}
               {!state.saved ? (
@@ -679,6 +791,8 @@ type ResultsCardProps = {
   summary: PracticeSummary;
   followUp: PracticeFollowUp;
   revisitNote: string | null;
+  practiceMode: PracticeMode;
+  stillWeak: boolean;
   onTryAgain: () => void;
   sessionXp: number;
   streakDays: number;
@@ -695,6 +809,8 @@ function ResultsCard({
   summary,
   followUp,
   revisitNote,
+  practiceMode,
+  stillWeak,
   onTryAgain,
   sessionXp,
   streakDays,
@@ -800,19 +916,35 @@ function ResultsCard({
         <p className="mt-2 text-sm leading-relaxed text-parchment/85">
           {followUp.detail}
         </p>
-        {revisitNote ? (
+        {practiceMode === "weak" && !stillWeak ? (
+          <p className="mt-3 text-sm font-medium text-parchment">
+            Those topics look stronger now. Regular practice will keep them
+            fresh.
+          </p>
+        ) : revisitNote ? (
           <p className="mt-3 text-sm font-medium text-parchment">{revisitNote}</p>
         ) : null}
       </div>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-        <button
-          type="button"
-          onClick={onTryAgain}
-          className="rounded-full bg-teal-dark px-5 py-2.5 text-center text-sm font-semibold text-parchment hover:bg-teal"
-        >
-          Try this expedition again
-        </button>
+        {practiceMode === "weak" && !stillWeak ? (
+          <Link
+            href={`/events/${eventId}/practice`}
+            className="rounded-full bg-teal-dark px-5 py-2.5 text-center text-sm font-semibold text-parchment hover:bg-teal"
+          >
+            Start an expedition
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={onTryAgain}
+            className="rounded-full bg-teal-dark px-5 py-2.5 text-center text-sm font-semibold text-parchment hover:bg-teal"
+          >
+            {practiceMode === "weak"
+              ? "Keep practicing these topics"
+              : "Try this expedition again"}
+          </button>
+        )}
         <Link
           href={`/events/${eventId}`}
           className="rounded-full border border-stone-200 px-5 py-2.5 text-center text-sm font-semibold text-ink hover:bg-parchment"
@@ -820,7 +952,7 @@ function ResultsCard({
           Back to {eventName}
         </Link>
         <Link
-          href="/"
+          href="/camp"
           className="rounded-full border border-stone-200 px-5 py-2.5 text-center text-sm font-semibold text-ink hover:bg-parchment"
         >
           Base camp

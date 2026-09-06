@@ -72,6 +72,21 @@ export function completedSessionCountForEvent(
   return complete;
 }
 
+export function uniqueLiveQuestionsPracticed(
+  attempts: ExpeditionAttempt[],
+  questions: Question[],
+): number {
+  const byId = new Map(questions.map((question) => [question.id, question]));
+  const ids = new Set<string>();
+  for (const attempt of attempts) {
+    const question = byId.get(attempt.questionId);
+    if (question && isLivePracticeQuestion(question)) {
+      ids.add(attempt.questionId);
+    }
+  }
+  return ids.size;
+}
+
 export function uniqueQuestionsPracticed(
   eventId: string,
   attempts: ExpeditionAttempt[],

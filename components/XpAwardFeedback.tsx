@@ -5,6 +5,8 @@ type XpAwardFeedbackProps = {
   sessionBonusXp: number;
   isCorrect: boolean;
   hintUsed: boolean;
+  /** Quiet styling after a miss so the explanation stays the focus. */
+  quiet?: boolean;
 };
 
 /**
@@ -15,6 +17,7 @@ export function XpAwardFeedback({
   sessionBonusXp,
   isCorrect,
   hintUsed,
+  quiet = false,
 }: XpAwardFeedbackProps) {
   const lines = describeXpAward({
     attemptXp,
@@ -29,7 +32,11 @@ export function XpAwardFeedback({
 
   return (
     <div
-      className="rounded-xl border border-gold-dark/30 bg-gold/15 px-3 py-2"
+      className={
+        quiet
+          ? "px-1 py-0.5"
+          : "rounded-xl border border-gold-dark/30 bg-gold/15 px-3 py-2"
+      }
       aria-live="polite"
     >
       <ul className="space-y-1">
@@ -38,10 +45,22 @@ export function XpAwardFeedback({
             key={`${line.amount}-${line.reason}`}
             className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5"
           >
-            <span className="xp-float font-display text-lg font-semibold tabular-nums text-ink">
+            <span
+              className={
+                quiet
+                  ? "font-medium tabular-nums text-stone-600"
+                  : "xp-float font-display text-lg font-semibold tabular-nums text-ink"
+              }
+            >
               {formatXpGain(line.amount)}
             </span>
-            <span className="text-sm font-medium text-stone-700">
+            <span
+              className={
+                quiet
+                  ? "text-sm text-stone-500"
+                  : "text-sm font-medium text-stone-700"
+              }
+            >
               — {line.reason}
             </span>
           </li>

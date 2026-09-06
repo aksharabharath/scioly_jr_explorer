@@ -105,7 +105,7 @@ export async function setMySelectedEvents(
     }
   }
 
-  revalidatePath("/");
+  revalidatePath("/camp");
   revalidatePath("/profile/events");
   revalidatePath("/onboarding/events");
   return { ok: true, eventIds: normalized.eventIds };
@@ -124,7 +124,7 @@ export async function requireEventSelection(): Promise<string[]> {
 export async function requireSelectedEvent(eventId: string): Promise<string[]> {
   const ids = await requireEventSelection();
   if (!ids.includes(eventId)) {
-    redirect("/");
+    redirect("/camp");
   }
   return ids;
 }

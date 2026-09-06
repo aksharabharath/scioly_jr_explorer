@@ -212,7 +212,7 @@ export async function insertPracticeAttempt(
   // Refresh dashboard XP/streak and the event hub. Do not revalidate the
   // `/events` layout — that refetches the in-progress practice page and can
   // leave Next question disabled after Check answer.
-  revalidatePath("/");
+  revalidatePath("/camp");
   revalidatePath(`/events/${question.eventId}`);
   return { ok: true, ...awarded };
 }

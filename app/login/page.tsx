@@ -16,7 +16,7 @@ type LoginPageProps = {
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const user = await getCurrentUser();
   if (user) {
-    redirect("/");
+    redirect("/camp");
   }
   const { error } = await searchParams;
 

@@ -9,6 +9,7 @@ import {
   type AnatomyCognitiveDemand,
   type AnatomySourceType,
 } from "@/lib/mock/anatomy-physiology-questions";
+import { optionalSecondHintIsValid } from "@/lib/practice";
 
 const failures: string[] = [];
 
@@ -75,6 +76,10 @@ for (const question of questions) {
     question.explanation.trim().length > 0,
   );
   check(`${question.id} has a non-empty hint`, question.hint.trim().length > 0);
+  check(
+    `${question.id} optional hint2 differs from hint when present`,
+    optionalSecondHintIsValid(question),
+  );
   check(`${question.id} has exactly 4 choices`, question.choices.length === 4);
   check(`${question.id} is text-only`, question.imageRequired === false);
   check(

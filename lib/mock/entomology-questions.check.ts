@@ -15,6 +15,7 @@ import {
   type EntomologyQuestion,
 } from "@/lib/mock/entomology-questions";
 import { entomologyImageCredit } from "@/lib/mock/entomology-image-credits";
+import { optionalSecondHintIsValid } from "@/lib/practice";
 
 const IMAGE_ALT_SPOILERS = [
   "formicidae",
@@ -132,6 +133,10 @@ for (const question of questions) {
     question.explanation.trim().length > 0,
   );
   check(`${question.id} has a non-empty hint`, question.hint.trim().length > 0);
+  check(
+    `${question.id} optional hint2 differs from hint when present`,
+    optionalSecondHintIsValid(question),
+  );
   check(`${question.id} has exactly 4 choices`, question.choices.length === 4);
 
   const choiceIds = question.choices.map((choice) => choice.id);

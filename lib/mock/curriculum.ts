@@ -37,9 +37,7 @@ import {
   ecologyQuestionToPracticeQuestion,
 } from "@/lib/mock/ecology-questions";
 import { getEvent } from "@/lib/mock/events";
-import { MOCK_EXPLORER } from "@/lib/mock/explorer";
 import type {
-  ExplorerProfile,
   Question,
   ScienceEvent,
   Topic,
@@ -139,7 +137,6 @@ export async function getQuestionById(
 
 export type EventPageData = {
   event: ScienceEvent;
-  explorer: ExplorerProfile;
   overview: string;
   topics: Topic[];
   hasPractice: boolean;
@@ -159,7 +156,6 @@ export async function getEventPageData(
 
   return {
     event,
-    explorer: MOCK_EXPLORER,
     overview: OVERVIEW_BY_EVENT[eventId] ?? event.shortDescription,
     topics,
     hasPractice,

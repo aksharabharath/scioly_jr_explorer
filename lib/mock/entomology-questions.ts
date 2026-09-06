@@ -10,6 +10,7 @@
  * source notes, image briefs). `verificationStatus` is copied onto the generic
  * `Question` so live-practice filtering can see it; it is not shown to students.
  */
+import { optionalSecondHintFields } from "@/lib/practice";
 import type {
   DifficultyLevel,
   Question,
@@ -145,6 +146,7 @@ function ento(
     choiceTexts: [string, string, string, string];
     correctChoiceId: "a" | "b" | "c" | "d";
     hint: string;
+    hint2?: string;
     explanation: string;
     taxonomyTags: EntomologyTaxonId[];
     cognitiveDemand: EntomologyCognitiveDemand;
@@ -170,6 +172,7 @@ function ento(
     ],
     correctChoiceId: input.correctChoiceId,
     hint: input.hint,
+    ...optionalSecondHintFields(input.hint2),
     explanation: input.explanation,
     taxonomyTags: input.taxonomyTags,
     cognitiveDemand: input.cognitiveDemand,
@@ -330,7 +333,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Apidae — bees",
     ],
     correctChoiceId: "b",
-    hint: "Among listed Hymenoptera families, match the specimen to its official common name. Do not pick bees, gall wasps, or paper wasps.",
+    hint: "Among listed Hymenoptera families, match the specimen to its official common name.",
     explanation:
       "Ants are family Formicidae in Hymenoptera. Wasps, gall wasps, and bees are other listed hymenopteran families with different body plans.",
     taxonomyTags: ["Formicidae", "Hymenoptera"],
@@ -1683,6 +1686,7 @@ export function entomologyQuestionToPracticeQuestion(
     correctChoiceId: question.correctChoiceId,
     explanation: question.explanation,
     hint: question.hint,
+    ...optionalSecondHintFields(question.hint2),
     difficulty: question.difficulty,
     imageRequired: question.imageRequired,
     verificationStatus: question.verificationStatus,

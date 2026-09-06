@@ -28,7 +28,10 @@ import { MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS } from "@/lib/mock/anatomy-physiology
 import { MOCK_WATER_QUALITY_QUESTIONS } from "@/lib/mock/water-quality-questions";
 import { MOCK_CRIME_BUSTERS_QUESTIONS } from "@/lib/mock/crime-busters-questions";
 import { MOCK_ECOLOGY_OVERVIEW } from "@/lib/mock/ecology";
-import { MOCK_ECOLOGY_QUESTIONS } from "@/lib/mock/ecology-questions";
+import {
+  MOCK_ECOLOGY_QUESTIONS,
+  ecologyQuestionToPracticeQuestion,
+} from "@/lib/mock/ecology-questions";
 import {
   BUILD_EVENT_IDS,
   EVENTS_WITH_QUESTION_BANKS,
@@ -77,6 +80,51 @@ async function run() {
     MOCK_ENTOMOLOGY_QUESTIONS.length === 60,
   );
   check("Astronomy bank still loads 48 questions", astronomy.length === 48);
+  check(
+    "practice mapper keeps an authored hint2",
+    ecologyQuestionToPracticeQuestion({
+      ...MOCK_ECOLOGY_QUESTIONS[0],
+      hint2: "Apply the idea to this question.",
+    }).hint2 === "Apply the idea to this question.",
+  );
+  check(
+    "practice mapper omits a missing hint2",
+    ecologyQuestionToPracticeQuestion(MOCK_ECOLOGY_QUESTIONS[0]).hint2 ===
+      undefined,
+  );
+  const ecoQ21 = MOCK_ECOLOGY_QUESTIONS.find(
+    (question) => question.id === "eco-q21",
+  );
+  const mappedEcoQ21 = ecoQ21
+    ? ecologyQuestionToPracticeQuestion(ecoQ21)
+    : null;
+  check(
+    "practice mapper keeps promptTerms on eco-q21",
+    mappedEcoQ21?.promptTerms?.map((ref) => ref.glossaryId).join(",") ===
+      "temperate,biome",
+  );
+  check(
+    "practice mapper keeps wordingHelp on eco-q21",
+    mappedEcoQ21?.wordingHelp ===
+      "This question is asking what is most common in this type of environment.",
+  );
+  check(
+    "practice mapper omits missing promptTerms",
+    ecologyQuestionToPracticeQuestion(MOCK_ECOLOGY_QUESTIONS[0])
+      .promptTerms === undefined,
+  );
+  check(
+    "practice mapper omits missing wordingHelp",
+    ecologyQuestionToPracticeQuestion(MOCK_ECOLOGY_QUESTIONS[0])
+      .wordingHelp === undefined,
+  );
+  check(
+    "live banks do not require hint2",
+    allQuestions.every(
+      (question) =>
+        question.hint2 === undefined || question.hint2.trim().length > 0,
+    ),
+  );
   const fullAnatomy = allQuestions.filter(
     (question) => question.eventId === "anatomy-physiology",
   );

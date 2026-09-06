@@ -251,6 +251,75 @@ check(
   ]) === 2,
 );
 
+check(
+  "three later corrects on the same topic clear it for a new weak set",
+  (() => {
+    const cleared: LearningAttempt[] = [
+      attempt("astro-q3", false),
+      attempt("astro-q4", true),
+      attempt("astro-q20", true),
+      attempt("astro-q21", true),
+    ];
+    return (
+      !hasWeakTopics(cleared) &&
+      selectNextQuestion({
+        bank,
+        history: cleared,
+        askedQuestionIds: [],
+        sessionTopicSequence: [],
+        lastWasRevisitEvidence: false,
+        mode: "weak",
+      }) === null
+    );
+  })(),
+);
+
+check(
+  "quiz-shaped askedIds still continue a tricky set after the first answer",
+  (() => {
+    const prior = [attempt("astro-q3", false)];
+    const first = next(prior, [], [], "weak");
+    const afterFirst = [...prior, attempt(first.id, true)];
+    const second = selectNextQuestion({
+      bank,
+      history: afterFirst,
+      askedQuestionIds: [first.id],
+      sessionTopicSequence: [first.topicId],
+      lastWasRevisitEvidence: false,
+      mode: "weak",
+    });
+    return second != null && second.topicId === "the-moon";
+  })(),
+);
+
+check(
+  "an unanswered askedId does not freeze-away the weak topic",
+  (() => {
+    const prior = [attempt("astro-q3", false)];
+    const first = next(prior, [], [], "weak");
+    const extra = moonOnly.find(
+      (question) => question.id !== first.id && question.id !== "astro-q3",
+    );
+    if (!extra) {
+      return false;
+    }
+    const afterFirst = [...prior, attempt(first.id, true)];
+    const second = selectNextQuestion({
+      bank,
+      history: afterFirst,
+      askedQuestionIds: [first.id, extra.id],
+      sessionTopicSequence: [first.topicId],
+      lastWasRevisitEvidence: false,
+      mode: "weak",
+    });
+    return (
+      second != null &&
+      second.topicId === "the-moon" &&
+      second.id !== extra.id
+    );
+  })(),
+);
+
 if (failures.length > 0) {
   throw new Error(`Weak-point checks failed:\n- ${failures.join("\n- ")}`);
 }

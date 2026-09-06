@@ -17,7 +17,7 @@ export default async function OnboardingEventsPage() {
   ]);
 
   if (selectedIds.length > 0) {
-    redirect("/");
+    redirect("/camp");
   }
 
   return (

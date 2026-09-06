@@ -4,6 +4,7 @@ import { getSupabasePublicEnv } from "@/lib/supabase/env";
 
 function isPublicPath(pathname: string): boolean {
   return (
+    pathname === "/" ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/signup") ||
     pathname.startsWith("/auth")
@@ -70,7 +71,7 @@ export async function updateSession(request: NextRequest) {
     (pathname.startsWith("/login") || pathname.startsWith("/signup"))
   ) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/";
+    redirectUrl.pathname = "/camp";
     redirectUrl.search = "";
     const redirectResponse = NextResponse.redirect(redirectUrl);
     supabaseResponse.cookies.getAll().forEach((cookie) => {

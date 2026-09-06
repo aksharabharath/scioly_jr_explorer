@@ -58,6 +58,7 @@ export async function updateStudentProfile(
   }
 
   revalidatePath("/", "layout");
+  revalidatePath("/camp");
   revalidatePath("/profile");
   return { saved: true };
 }

@@ -1,8 +1,10 @@
 import { PracticeQuiz } from "@/components/PracticeQuiz";
+import { TrickyTopicsEmpty } from "@/components/TrickyTopicsEmpty";
 import {
   eligibleWeakQuestions,
   hasWeakTopics,
   parsePracticeMode,
+  parsePracticeTopicId,
   toLearningAttempts,
 } from "@/lib/learning/adaptive";
 import { getAllQuestions, getPracticePageData } from "@/lib/mock/curriculum";
@@ -18,12 +20,11 @@ import { dailyPracticeGoalFromUser } from "@/lib/student-preferences";
 import { requireUser } from "@/lib/auth/session";
 import type { Metadata } from "next";
 import { ExplorerTrail } from "@/components/ExplorerTrail";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 type PracticeRouteProps = {
   params: Promise<{ eventId: string }>;
-  searchParams: Promise<{ mode?: string | string[] }>;
+  searchParams: Promise<{ mode?: string | string[]; topic?: string | string[] }>;
 };
 
 export async function generateMetadata({
@@ -55,7 +56,9 @@ export default async function PracticePage({
   }
   await requireSelectedEvent(eventId);
   const user = await requireUser();
-  const mode = parsePracticeMode((await searchParams).mode);
+  const search = await searchParams;
+  const mode = parsePracticeMode(search.mode);
+  const topicId = parsePracticeTopicId(search.topic);
   const data = await getPracticePageData(eventId);
 
   if (!data) {
@@ -74,9 +77,12 @@ export default async function PracticePage({
     (question) => question.eventId === data.event.id,
   );
   const priorAttempts = toLearningAttempts(storedAttempts, eventQuestions);
+  const weakPool = eligibleWeakQuestions(data.questions, priorAttempts);
   const practiceQuestions =
     mode === "weak"
-      ? eligibleWeakQuestions(data.questions, priorAttempts)
+      ? topicId
+        ? weakPool.filter((question) => question.topicId === topicId)
+        : weakPool
       : data.questions;
   const noTrickyTopics = mode === "weak" && !hasWeakTopics(priorAttempts);
   const noTrickyQuestions = mode === "weak" && practiceQuestions.length === 0;
@@ -86,35 +92,19 @@ export default async function PracticePage({
       <div className="mx-auto w-full max-w-screen-xl px-4 py-3 sm:px-6">
         <ExplorerTrail
           crumbs={[
-            { href: "/", label: "Base camp" },
+            { href: "/camp", label: "Base camp" },
             { href: `/events/${data.event.id}`, label: data.event.name },
             { label: mode === "weak" ? "Tricky topics" : "Expedition" },
           ]}
         />
         {noTrickyTopics || noTrickyQuestions ? (
-          <section className="journal-panel mt-4 rounded-3xl p-5">
-            <h1 className="font-display text-2xl font-semibold tracking-tight text-ink">
-              No tricky topics yet
-            </h1>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-stone-600">
-              Keep exploring. We&apos;ll bring back anything that needs another
-              look.
-            </p>
-            <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href={`/events/${data.event.id}/practice`}
-                className="rounded-full bg-teal-dark px-5 py-2.5 text-center text-sm font-semibold text-parchment hover:bg-teal"
-              >
-                Start an expedition
-              </Link>
-              <Link
-                href={`/events/${data.event.id}`}
-                className="rounded-full border border-stone-200 px-5 py-2.5 text-center text-sm font-semibold text-ink hover:bg-parchment"
-              >
-                Back to {data.event.name}
-              </Link>
-            </div>
-          </section>
+          <div className="mt-4">
+            <TrickyTopicsEmpty
+              eventId={data.event.id}
+              eventName={data.event.name}
+              headingLevel="h1"
+            />
+          </div>
         ) : (
           <div className="mt-3">
             <PracticeQuiz

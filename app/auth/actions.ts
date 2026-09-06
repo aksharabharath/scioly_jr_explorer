@@ -76,7 +76,7 @@ export async function signUp(
     };
   }
 
-  redirect("/");
+  redirect("/camp");
 }
 
 export async function signIn(
@@ -104,7 +104,7 @@ export async function signIn(
     return { error: friendlyAuthError(error) };
   }
 
-  redirect("/");
+  redirect("/camp");
 }
 
 export async function signOut(): Promise<void> {

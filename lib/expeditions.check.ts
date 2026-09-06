@@ -9,6 +9,7 @@ import {
   expeditionLogEntries,
   hasCompletedExpeditionOnLocalDate,
   questionsPracticedOnLocalDate,
+  uniqueLiveQuestionsPracticed,
   uniqueQuestionsPracticed,
   type ExpeditionAttempt,
 } from "@/lib/expeditions";
@@ -124,6 +125,13 @@ const log = expeditionLogEntries(full, questions, {
 check("journal includes the completed expedition", log.length === 1);
 check("journal uses the event name", log[0]?.eventName === "Water Quality");
 check("journal XP includes attempt XP plus session bonus", log[0]?.derivedXp === 10 * 10 + 20);
+check(
+  "unique live questions count distinct ids across events",
+  uniqueLiveQuestionsPracticed(
+    [attempt("wq-q1"), attempt("wq-q1"), attempt("ento-q1")],
+    questions,
+  ) === 2,
+);
 
 if (failures.length > 0) {
   throw new Error(`Expedition checks failed:\n- ${failures.join("\n- ")}`);
