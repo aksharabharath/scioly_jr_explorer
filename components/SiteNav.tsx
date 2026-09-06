@@ -101,9 +101,9 @@ export function SiteNav() {
   return (
     <nav
       aria-label="Main"
-      className="min-w-0 flex-1"
+      className="min-w-0 flex-1 max-[479px]:basis-full"
     >
-      <ul className="flex min-w-0 flex-wrap items-center justify-end gap-0.5 sm:flex-nowrap sm:gap-1">
+      <ul className="flex min-w-0 flex-wrap items-center justify-end gap-0.5 sm:flex-nowrap sm:gap-1 max-[479px]:justify-between">
         {ITEMS.map((item) => {
           const active = item.match(pathname);
           return (
@@ -112,14 +112,16 @@ export function SiteNav() {
                 href={item.href}
                 aria-label={item.label}
                 aria-current={active ? "page" : undefined}
-                className={`inline-flex min-h-12 items-center gap-1.5 rounded-md px-2.5 py-2.5 text-[13px] font-medium outline-none transition-colors sm:min-h-11 sm:px-3 sm:py-2.5 sm:text-sm focus-visible:ring-2 focus-visible:ring-teal ${
+                className={`inline-flex min-h-12 items-center gap-1.5 rounded-md px-2.5 py-2.5 text-[13px] font-medium outline-none transition-colors max-[479px]:px-1.5 max-[479px]:text-[11px] sm:min-h-11 sm:px-3 sm:py-2.5 sm:text-sm focus-visible:ring-2 focus-visible:ring-teal ${
                   active
                     ? "bg-parchment font-semibold text-teal-dark shadow-[inset_0_-2px_0_0_var(--teal)]"
                     : "text-stone-600 hover:bg-parchment hover:text-ink"
                 }`}
               >
                 <NavIcon name={item.icon} />
-                <span className="hidden min-[480px]:inline">{item.label}</span>
+                <span className="hidden min-[480px]:inline max-[479px]:inline">
+                  {item.label}
+                </span>
               </Link>
             </li>
           );

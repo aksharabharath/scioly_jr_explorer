@@ -17,8 +17,8 @@ export function LoginForm({ confirmNotice = false }: LoginFormProps) {
     <form action={action} className="mt-6 space-y-4">
       {confirmNotice ? (
         <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-950">
-          Your account may already be confirmed. Log in to start exploring. If
-          login does not work, check your email or create the account again.
+          Try logging in first. If that does not work, check the confirmation
+          email or ask your grown-up for help.
         </p>
       ) : null}
       {state.error ? (

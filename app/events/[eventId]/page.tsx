@@ -22,6 +22,7 @@ import {
   getMyGamification,
   getMyPracticeAttempts,
   getMyRecentPracticeAttempts,
+  latestInProgressPracticeSessionForEvent,
 } from "@/lib/practice-attempts";
 import { calculateEventProgress } from "@/lib/progress";
 import { hasEventRules } from "@/lib/event-rules";
@@ -84,6 +85,12 @@ export default async function EventPage({ params }: EventRouteProps) {
     attempts,
     questions,
   );
+  const hasInProgressExpedition =
+    latestInProgressPracticeSessionForEvent(
+    event.id,
+    attempts,
+    questions,
+  ) !== null;
   const topicNames = new Map(topics.map((topic) => [topic.id, topic.name]));
   const learningHistory = toLearningAttempts(recentAttempts, eventQuestions);
   const trickyTopics =
@@ -201,7 +208,9 @@ export default async function EventPage({ params }: EventRouteProps) {
                     href={`/events/${event.id}/practice`}
                     className="inline-flex min-h-11 justify-center rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment hover:bg-teal"
                   >
-                    Start expedition
+                    {hasInProgressExpedition
+                      ? "Continue expedition"
+                      : "Start expedition"}
                   </Link>
                   {trickyTopics.length > 0 ? (
                     <Link

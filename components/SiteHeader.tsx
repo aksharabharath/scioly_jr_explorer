@@ -9,7 +9,7 @@ export async function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-surface/90 backdrop-blur-md">
-      <div className="mx-auto flex max-w-screen-xl items-center gap-2 px-4 py-3.5 sm:gap-3 sm:px-6 sm:py-4">
+      <div className="mx-auto flex max-w-screen-xl flex-wrap items-center gap-2 px-4 py-3.5 sm:gap-3 sm:px-6 sm:py-4">
         <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
           <SiteBrand highlightHome={Boolean(user)} />
           {user ? (

@@ -139,6 +139,16 @@ function beginSet(
     },
     [],
   );
+  const historyAlreadyIncludesSession =
+    resumedRecords.length > 0 &&
+    resumedRecords.every(
+      (record, index) =>
+        history[history.length - resumedRecords.length + index]?.questionId ===
+        record.questionId,
+    );
+  const sessionHistory = historyAlreadyIncludesSession
+    ? history
+    : [...history, ...resumedHistory];
   const askedIds = resumedRecords.map((record) => record.questionId);
   const sessionTopics = resumedRecords
     .map((record) => byId.get(record.questionId)?.topicId)
@@ -181,7 +191,7 @@ function beginSet(
     revealedHint: false,
     submitted: false,
     records: resumedRecords,
-    history: [...history, ...resumedHistory],
+    history: sessionHistory,
     saveError: null,
     saved: false,
     saving: false,

@@ -168,3 +168,8 @@ body {
 .progress-fill {
   transition: width 0.45s ease-out;
 }
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 3px;
+}

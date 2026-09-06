@@ -1,6 +1,5 @@
 import { PracticeQuiz } from "@/components/PracticeQuiz";
 import {
-  PRACTICE_SET_SIZE,
   eligibleWeakQuestions,
   hasWeakTopics,
   parsePracticeMode,
@@ -13,6 +12,7 @@ import {
   getMyPracticeAttemptCount,
   getMyPracticeAttempts,
   getMyRecentPracticeAttempts,
+  latestInProgressPracticeSessionForEvent,
 } from "@/lib/practice-attempts";
 import {
   calculateAttemptXp,
@@ -114,33 +114,21 @@ export default async function PracticePage({
       : data.questions;
   const noTrickyTopics = mode === "weak" && !hasWeakTopics(priorAttempts);
   const noTrickyQuestions = mode === "weak" && practiceQuestions.length === 0;
-  const eventQuestionIds = new Set(eventQuestions.map((question) => question.id));
-  const sessions = new Map<string, typeof allStoredAttempts>();
-  for (const attempt of allStoredAttempts) {
-    if (!attempt.sessionId || !eventQuestionIds.has(attempt.questionId)) {
-      continue;
-    }
-    const session = sessions.get(attempt.sessionId) ?? [];
-    session.push(attempt);
-    sessions.set(attempt.sessionId, session);
-  }
-  const resumeEntry = [...sessions.entries()]
-    .filter(([, attempts]) => attempts.length < PRACTICE_SET_SIZE)
-    .sort(([, left], [, right]) => {
-      const leftLast = left[left.length - 1]?.answeredAt ?? "";
-      const rightLast = right[right.length - 1]?.answeredAt ?? "";
-      return rightLast.localeCompare(leftLast);
-    })[0];
+  const resumeEntry = latestInProgressPracticeSessionForEvent(
+    data.event.id,
+    allStoredAttempts,
+    eventQuestions,
+  );
   const resumeSession = mode === "normal" && resumeEntry
     ? {
-        sessionId: resumeEntry[0],
-        attempts: resumeEntry[1].map((attempt) => ({
+        sessionId: resumeEntry.sessionId,
+        attempts: resumeEntry.attempts.map((attempt) => ({
           questionId: attempt.questionId,
           selectedChoiceId: attempt.selectedChoiceId,
           isCorrect: attempt.isCorrect,
           hintUsed: attempt.hintUsed,
         })),
-        sessionXp: sessionXpFromAttempts(resumeEntry[1]),
+        sessionXp: sessionXpFromAttempts(resumeEntry.attempts),
       }
     : undefined;
 

@@ -5,9 +5,13 @@ import {
   resolvePracticeDate,
   type GamificationState,
 } from "@/lib/gamification";
-import { WEAK_TOPIC_ATTEMPT_WINDOW } from "@/lib/learning/adaptive";
+import {
+  PRACTICE_SET_SIZE,
+  WEAK_TOPIC_ATTEMPT_WINDOW,
+} from "@/lib/learning/adaptive";
 import { getQuestionById } from "@/lib/mock/curriculum";
 import { createClient } from "@/lib/supabase/server";
+import type { Question } from "@/lib/types";
 
 export type StoredPracticeAttempt = {
   questionId: string;
@@ -56,6 +60,35 @@ export async function getMyPracticeAttempts(): Promise<StoredPracticeAttempt[]> 
   }
 
   return data.map(mapAttemptRow);
+}
+
+export function latestInProgressPracticeSessionForEvent(
+  eventId: string,
+  attempts: StoredPracticeAttempt[],
+  questions: Question[],
+): { sessionId: string; attempts: StoredPracticeAttempt[] } | null {
+  const byId = new Map(questions.map((question) => [question.id, question]));
+  const sessions = new Map<string, StoredPracticeAttempt[]>();
+  for (const attempt of attempts) {
+    if (!attempt.sessionId || byId.get(attempt.questionId)?.eventId !== eventId) {
+      continue;
+    }
+    const session = sessions.get(attempt.sessionId) ?? [];
+    session.push(attempt);
+    sessions.set(attempt.sessionId, session);
+  }
+
+  return (
+    [...sessions.entries()]
+      .filter(([, session]) => session.length < PRACTICE_SET_SIZE)
+      .sort(([, left], [, right]) => {
+        const leftLast = left[left.length - 1]?.answeredAt ?? "";
+        const rightLast = right[right.length - 1]?.answeredAt ?? "";
+        return rightLast.localeCompare(leftLast);
+      })
+      .map(([sessionId, session]) => ({ sessionId, attempts: session }))[0] ??
+    null
+  );
 }
 
 export async function getMyRecentPracticeAttempts(): Promise<
