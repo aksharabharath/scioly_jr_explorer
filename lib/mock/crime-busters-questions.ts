@@ -8,8 +8,10 @@
  * Registered in curriculum.ts. Unlocked for shared live practice.
  */
 import { optionalSecondHintFields } from "@/lib/practice";
+import { optionalQuestionHelpFields } from "@/lib/question-help";
 import type {
   DifficultyLevel,
+  PromptTermRef,
   Question,
   QuestionVerificationStatus,
 } from "@/lib/types";
@@ -78,6 +80,8 @@ function cb(
     correctChoiceId: "a" | "b" | "c" | "d";
     hint: string;
     hint2?: string;
+    promptTerms?: PromptTermRef[];
+    wordingHelp?: string;
     explanation: string;
     cognitiveDemand: CrimeBustersCognitiveDemand;
     sourceType: CrimeBustersSourceType;
@@ -110,6 +114,7 @@ function cb(
     correctChoiceId: input.correctChoiceId,
     hint: input.hint,
     ...optionalSecondHintFields(input.hint2),
+    ...optionalQuestionHelpFields(input),
     explanation: input.explanation,
     cognitiveDemand: input.cognitiveDemand,
     sourceType: input.sourceType,
@@ -277,7 +282,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Clavicle and scapula",
     ],
     correctChoiceId: "b",
-    hint: "The handbook derives the two loop names from bones, not from the lower leg or shoulder girdle.",
+    hint: "Use the handbook sentence that derives the two loop names. Match the bone pair printed there with the choices.",
     explanation:
       "The handbook states that the terms radial and ulnar are derived from the radius and ulna bones of the forearm.",
     cognitiveDemand: "recall",
@@ -299,6 +304,9 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Flow out the opposite side with a wave in the center",
     ],
     correctChoiceId: "c",
+    promptTerms: [{ glossaryId: "recurve" }],
+    wordingHelp:
+      "This question is asking what the ridges do next after they curve back.",
     hint: "Use the full NIST loop definition, including what happens after the ridges recurve.",
     explanation:
       "NIST defines a loop as ridges that enter upon one side, recurve, touch or pass an imaginary line between delta and core, and pass out upon the same side the ridges entered. Flowing out the other side with a wave describes a plain arch.",
@@ -343,7 +351,9 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Ulnar flow, radial flow, or a pocket",
     ],
     correctChoiceId: "b",
-    hint: "A tented arch can look like a loop but is missing one of three loop requirements, not a printing condition.",
+    wordingHelp:
+      "This question is asking which missing piece a tented arch can lack, from the three loop rules.",
+    hint: "Use the NIST fingerprint reference and find the paragraph on tented arches. Compare the features listed there with the four choices.",
     explanation:
       "NIST states that tented arches may be similar to a loop, except that they lack one of the three requirements (recurve, delta, or ridge count).",
     cognitiveDemand: "application",
@@ -365,7 +375,8 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "The line must pass through both cores",
     ],
     correctChoiceId: "b",
-    hint: "Use the NIST plain-whorl sentence about the imaginary line and the inner pattern area.",
+    promptTerms: [{ glossaryId: "delta" }],
+    hint: "Use the two marked points as your starting locations, then follow the reference's test for the ridge behavior between them.",
     explanation:
       "NIST: a plain whorl has two deltas, between which, when an imaginary line is drawn, at least one recurving ridge within the inner pattern area is cut or touched. The ‘no inner recurve touched’ wording is NIST’s central-pocket-loop definition and is not used as a family-classification item here.",
     cognitiveDemand: "distinction",
@@ -387,7 +398,8 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "The stratum corneum surface only",
     ],
     correctChoiceId: "c",
-    hint: "Think about where the stratum basale meets the dermis.",
+    promptTerms: [{ glossaryId: "stratum-basale" }],
+    hint: "Use the OpenStax fingerprint-formation description and compare the tissue boundary it identifies with each choice.",
     explanation:
       "OpenStax: fingerprints form where the cells of the stratum basale meet the papillae of the underlying dermal layer (papillary layer). The same chapter says the two main skin layers are epidermis and dermis.",
     cognitiveDemand: "application",
@@ -409,7 +421,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Human, dog, cat, bird, and fish",
     ],
     correctChoiceId: "a",
-    hint: "Use the five sources named in Hair/Fiber Analysis. Do not add unlisted animals.",
+    hint: "Check the Hair/Fiber Analysis list and compare every option against the complete set of permitted hair sources.",
     explanation:
       "The rules name human, dog, cat, squirrel, and mouse hair. Other mammals are not on that closed list.",
     cognitiveDemand: "recall",
@@ -431,7 +443,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Scale, pigment, and keratin only",
     ],
     correctChoiceId: "b",
-    hint: "The document compares the shaft to three layers from outside to center.",
+    hint: "Use the DOJ hair reference and compare the structures it identifies as parts of the shaft with the three-part choices.",
     explanation:
       "The DOJ document states that the shaft is made of three layers called the cuticle, cortex, and medulla.",
     cognitiveDemand: "recall",
@@ -453,7 +465,10 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Exactly one-half the shaft width with a ladder pattern in every hair",
     ],
     correctChoiceId: "c",
-    hint: "The table contrasts a human fraction of shaft width with a typical animal fraction.",
+    promptTerms: [{ glossaryId: "medulla" }],
+    wordingHelp:
+      "This question is asking how that inner core is usually described compared with the width of the hair.",
+    hint: "Use the DOJ comparison table and check the human row before comparing its description with the four choices.",
     explanation:
       "Table 1 describes the human medulla as less than one-third the width of the shaft with an amorphous irregular appearance. Animal hair is often greater than one-third with a defined structure. That does not identify dog versus cat versus squirrel versus mouse.",
     cognitiveDemand: "distinction",
@@ -475,7 +490,8 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Imbricate (no repeating pattern), flattened scales, relatively smooth along the shaft",
     ],
     correctChoiceId: "d",
-    hint: "Use the human row of the DOJ cuticle column, not the animal row.",
+    promptTerms: [{ glossaryId: "cuticle" }],
+    hint: "Use the DOJ cuticle comparison table. Start with the human row and compare its full description with each choice.",
     explanation:
       "Human cuticle: imbricate (no repeating pattern), flattened scales, similar along the length of the shaft and relatively smooth. Animal hair is described as having a wide range of scale patterns.",
     cognitiveDemand: "distinction",
@@ -497,7 +513,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Linen, silk, wool, cashmere, mohair, and alpaca",
     ],
     correctChoiceId: "b",
-    hint: "Use the six names printed under Hair/Fiber Analysis.",
+    hint: "Check the Hair/Fiber Analysis list and compare each option against the complete set of fibers students are expected to distinguish.",
     explanation:
       "The closed fiber-name list is cotton, linen, silk, nylon, rayon, and polyester.",
     cognitiveDemand: "recall",
@@ -519,7 +535,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Organic, inorganic, and blended",
     ],
     correctChoiceId: "a",
-    hint: "Use the three class words in the rules sentence about microscopic images, not FTC labeling terms.",
+    hint: "Return to the rules sentence about microscopic fiber identification and compare the categories stated there with the choices.",
     explanation:
       "The rules ask students to identify differences between animal, vegetable, and synthetic fibers. This item is list literacy only; it does not assign each named fiber to a class.",
     cognitiveDemand: "recall",
@@ -563,7 +579,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Cellulose",
     ],
     correctChoiceId: "d",
-    hint: "Think about cotton fibrils, not the names of storage sugars.",
+    hint: "Use the LibreTexts description of cotton and identify the carbohydrate named for its main structural material.",
     explanation:
       "The LibreTexts page states that cotton fibrils and filter paper are almost entirely cellulose (about 95%), and that cellulose is a fibrous carbohydrate found in all plants. This does not assign every official fiber to animal, vegetable, or synthetic.",
     cognitiveDemand: "application",
@@ -585,7 +601,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Topsoil, subsoil, parent material, peat, chalk, and humus",
     ],
     correctChoiceId: "a",
-    hint: "Use the six adjectives printed under Soil Analysis.",
+    hint: "Check the Soil Analysis list and compare each option against the complete set of soil names printed there.",
     explanation:
       "The closed list is Peaty, Loamy, Sandy, Clay, Chalky, and Silty. USDA taxonomy names and unofficial garden nicknames are not that list.",
     cognitiveDemand: "recall",
@@ -607,7 +623,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Compost",
     ],
     correctChoiceId: "b",
-    hint: "Match the exact adjective on the six-name list.",
+    hint: "Check the Soil Analysis list and compare the four choices with the name used for this soil type.",
     explanation:
       "The 2027 list prints Peaty. RHS describes peat soils as very high in organic matter and moisture. Muck, humus, and compost are not official list names.",
     cognitiveDemand: "recognition",
@@ -629,7 +645,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Always acidic and unable to hold any water",
     ],
     correctChoiceId: "c",
-    hint: "RHS contrasts clay with sandy soils on weight, wetness, and summer behavior.",
+    hint: "Use the RHS clay-soil paragraph. Compare it with the sandy-soil paragraph; do not mix the two.",
     explanation:
       "RHS: clay soils are heavy, high in nutrients, wet and cold in winter and baked dry in summer. Light, dry, and low in nutrients describes sandy soils on that page.",
     cognitiveDemand: "application",
@@ -651,7 +667,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Light, dry, warm, low in nutrients, and often acidic",
     ],
     correctChoiceId: "d",
-    hint: "RHS calls sandy soils light soils and notes they often drain and warm quickly.",
+    hint: "Use the RHS sandy-soil paragraph. Compare it with the clay-soil paragraph; do not mix the two.",
     explanation:
       "RHS: sandy soils are light, dry, warm, low in nutrients and often acidic. Heavy, sticky, rollable soil is the clay description on that page.",
     cognitiveDemand: "application",
@@ -673,7 +689,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Always the most alkaline garden soil",
     ],
     correctChoiceId: "a",
-    hint: "RHS emphasizes organic matter and water-holding, not lime.",
+    hint: "Use the RHS peat-soil paragraph. Do not reuse the chalky-soil chemistry from that page.",
     explanation:
       "RHS: peat soils are very high in organic matter and moisture. Alkaline, lime-rich language on that page belongs to chalky soils.",
     cognitiveDemand: "recognition",
@@ -695,7 +711,8 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Table salt as the main solid",
     ],
     correctChoiceId: "b",
-    hint: "RHS links chalky soils with lime-rich chemistry, not with table salt.",
+    promptTerms: [{ glossaryId: "alkaline" }],
+    hint: "Use the RHS description of chalky soils and compare the material associated with that soil type against the choices.",
     explanation:
       "RHS: chalky soils also contain calcium carbonate or lime and are very alkaline. That soil-type name is not the same contest item as the powder Calcium carbonate (Chalk).",
     cognitiveDemand: "application",
@@ -718,6 +735,8 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     ],
     correctChoiceId: "b",
     hint: "Check which competition heading each printed name sits under.",
+    wordingHelp:
+      "This question is asking whether those two printed names are the same contest item or two different ones.",
     explanation:
       "Chalky is a soil type. Calcium carbonate (Chalk) is a powder on the chemical list. The evidence matrix marks merging them as human review (HR4).",
     cognitiveDemand: "multi-step",
@@ -739,7 +758,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "NaCl",
     ],
     correctChoiceId: "d",
-    hint: "Use the molecular formula for sodium chloride / table salt.",
+    hint: "Match table salt to its chemical name, then choose that compound’s formula — not the formula of a different powder.",
     explanation:
       "PubChem: sodium chloride is an ionic compound with the formula NaCl and is also called table salt. NaHCO3 is sodium bicarbonate; CaCO3 is calcium carbonate; C12H22O11 is sucrose.",
     cognitiveDemand: "recall",
@@ -761,7 +780,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "NaClO",
     ],
     correctChoiceId: "a",
-    hint: "Use the molecular formula for sucrose.",
+    hint: "Match the chemical name in the stem to that compound's formula in the reference, not the formula of a different listed chemical.",
     explanation:
       "PubChem CID 5988: sucrose has formula C12H22O11 and lists Table sugar among synonyms. This item treats contest “Sugar” as sucrose only when named as table sugar/sucrose.",
     cognitiveDemand: "recall",
@@ -783,7 +802,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "H2O",
     ],
     correctChoiceId: "b",
-    hint: "Use the molecular formula for sodium bicarbonate.",
+    hint: "Match sodium bicarbonate to its formula, not the formula of a different listed powder.",
     explanation:
       "PubChem CID 516892 uses molecular formula NaHCO3 for sodium bicarbonate.",
     cognitiveDemand: "recall",
@@ -805,7 +824,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "C12H22O11",
     ],
     correctChoiceId: "c",
-    hint: "Use the molecular formula for calcium carbonate.",
+    hint: "Match calcium carbonate to its formula, not the formula of a different listed powder.",
     explanation:
       "PubChem: calcium carbonate has formula CaCO3 and is discussed as chalk. That powder name is separate from soil type Chalky.",
     cognitiveDemand: "recall",
@@ -827,7 +846,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "H2O2",
     ],
     correctChoiceId: "d",
-    hint: "The peroxide record is not the same formula as water.",
+    hint: "Match the chemical name in the stem to that compound’s formula in the reference, not the formula of a different listed chemical.",
     explanation:
       "PubChem CID 784 lists H2O2. The 2027 liquid name includes the qualifier (3%), which is a rules string, not a PubChem bottle assay.",
     cognitiveDemand: "recall",
@@ -849,7 +868,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "The formula for liquid bleach",
     ],
     correctChoiceId: "a",
-    hint: "PubChem describes everyday uses of sodium bicarbonate. That is not a contest reagent key or the formula of a different chemical.",
+    hint: "Check the PubChem entry for the named compound and compare its documented uses with the four choices.",
     explanation:
       "PubChem: sodium bicarbonate is used as a source of carbon dioxide and as an ingredient of baking powder (among other uses). That is not a complete contest “uses of every powder” table.",
     cognitiveDemand: "recognition",
@@ -871,7 +890,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "A pH-strip dye",
     ],
     correctChoiceId: "b",
-    hint: "Think about therapeutic uses of calcium carbonate, such as settling an upset stomach.",
+    hint: "Check the PubChem entry for the named compound and compare its documented non-industrial uses with the choices.",
     explanation:
       "PubChem: calcium carbonate is therapeutically used as a food additive, a dietary supplement, an antacid, and a phosphate binder.",
     cognitiveDemand: "recognition",
@@ -893,7 +912,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Immediate fizzing of carbon dioxide gas",
     ],
     correctChoiceId: "c",
-    hint: "The iodine test is a color change without boiling. Fizzing is a different reaction family.",
+    hint: "Identify the kind of result the named test reports, then see which choice describes that kind of result.",
     explanation:
       "LibreTexts: a bluish black color is a positive test for starch; a yellowish-brown color (no color change) is negative. That does not uniquely identify flour versus cornstarch, which can both contain starch.",
     cognitiveDemand: "application",
@@ -915,7 +934,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Carbon dioxide",
     ],
     correctChoiceId: "d",
-    hint: "Carbonates plus acid make a salt, water, and a gas.",
+    hint: "Use the reaction description in the reference and identify the gaseous product before comparing it with the choices.",
     explanation:
       "LibreTexts OpenStax remix: carbonates react with acids to form salts of the metal, gaseous carbon dioxide, and water. Example: CaCO3 + 2 HCl → CaCl2 + CO2 + H2O. Hydrogen carbonates also form CO2 with acids, so this test alone does not uniquely identify chalk versus baking soda.",
     cognitiveDemand: "application",
@@ -959,7 +978,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Liquid bleach",
     ],
     correctChoiceId: "b",
-    hint: "Think of the household name for about 70% isopropanol in water.",
+    hint: "Check the PubChem entry for the named substance and compare its common product names with the four choices.",
     explanation:
       "PubChem: sold in 70% aqueous solution as rubbing alcohol. The rules print Rubbing alcohol (isopropyl). The bottle is still a mixture (HR6); this item only matches the named product.",
     cognitiveDemand: "application",
@@ -981,7 +1000,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Lemon juice",
     ],
     correctChoiceId: "c",
-    hint: "Think of the household product that often contains sodium hypochlorite.",
+    hint: "Check the PubChem entry for the named substance and compare the household products associated with it against the choices.",
     explanation:
       "PubChem: sodium hypochlorite is commonly found in household bleach (formula NaClO on that record). Liquid bleach is still a commercial mixture (HR6).",
     cognitiveDemand: "application",
@@ -1124,6 +1143,7 @@ export function crimeBustersQuestionToPracticeQuestion(
     explanation: question.explanation,
     hint: question.hint,
     ...optionalSecondHintFields(question.hint2),
+    ...optionalQuestionHelpFields(question),
     difficulty: question.difficulty,
     imageRequired: question.imageRequired,
     verificationStatus: question.verificationStatus,

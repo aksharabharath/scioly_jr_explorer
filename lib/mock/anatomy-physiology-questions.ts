@@ -6,8 +6,10 @@
  * MVP QA pass: items are verified or needs-review (no draft).
  */
 import { optionalSecondHintFields } from "@/lib/practice";
+import { optionalQuestionHelpFields } from "@/lib/question-help";
 import type {
   DifficultyLevel,
+  PromptTermRef,
   Question,
   QuestionVerificationStatus,
 } from "@/lib/types";
@@ -64,6 +66,8 @@ function ap(input: {
   correctChoiceId: "a" | "b" | "c" | "d";
   hint: string;
   hint2?: string;
+  promptTerms?: PromptTermRef[];
+  wordingHelp?: string;
   explanation: string;
   cognitiveDemand: AnatomyCognitiveDemand;
   sourceType: AnatomySourceType;
@@ -86,6 +90,7 @@ function ap(input: {
     correctChoiceId: input.correctChoiceId,
     hint: input.hint,
     ...optionalSecondHintFields(input.hint2),
+    ...optionalQuestionHelpFields(input),
     explanation: input.explanation,
     cognitiveDemand: input.cognitiveDemand,
     sourceType: input.sourceType,
@@ -110,6 +115,9 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "The synovial joint cavity",
     ],
     correctChoiceId: "b",
+    promptTerms: [{ glossaryId: "keratin" }],
+    wordingHelp:
+      "This question is asking which layer also helps keep water in the body.",
     hint: "Stay with a skin layer, not marrow or a joint cavity.",
     explanation:
       "Keratin and glycolipids in the stratum corneum form a barrier against water loss. The same outer skin also helps defend against microbes and chemicals.",
@@ -176,6 +184,8 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "They fill with synovial fluid to cushion the skin",
     ],
     correctChoiceId: "b",
+    wordingHelp:
+      "This question is asking what those blood vessels do, and why they do it.",
     hint: "The body is already too warm. Do the dermal vessels open a path for heat to leave, or try to keep heat in?",
     explanation:
       "When the body is too warm, arterioles in the dermis dilate so excess heat can dissipate through the skin. Sweat evaporating from the skin surface also cools the body.",
@@ -198,7 +208,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Urate",
     ],
     correctChoiceId: "b",
-    hint: "This is a named chemical in sweat. Pigment and nerve-signal chemicals are different jobs.",
+    hint: "Compare the usual job of each listed chemical with the role sweat is playing in the stem.",
     explanation:
       "Sweat contains dermcidin, which has antibiotic properties that help deter microbes from over-colonizing the skin surface.",
     cognitiveDemand: "recall",
@@ -241,7 +251,8 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Stratum corneum",
     ],
     correctChoiceId: "c",
-    hint: "Thick skin has a fifth named layer that thin skin does not.",
+    promptTerms: [{ glossaryId: "epidermal-strata" }],
+    hint: "Find the thick-skin versus thin-skin comparison in the reference. See which listed layer name is added only in thick skin.",
     explanation:
       "Thin skin has four layers (basale, spinosum, granulosum, and corneum). Thick skin has a fifth layer, the stratum lucidum.",
     cognitiveDemand: "distinction",
@@ -285,6 +296,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Red marrow in spongy bone",
     ],
     correctChoiceId: "b",
+    promptTerms: [{ glossaryId: "thermoregulation" }],
     hint: "The stem already gives the job and the body map. Choose the matching gland type — not a touch receptor or marrow.",
     explanation:
       "Eccrine sweat glands produce hypotonic sweat for thermoregulation and are especially abundant on the palms, soles, and forehead.",
@@ -307,7 +319,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Apocrine glands are found only inside the synovial cavities of joints",
     ],
     correctChoiceId: "a",
-    hint: "Compare where each gland sits and what is in the sweat. Palms-and-soles cooling is the other gland.",
+    hint: "Compare where each choice says the glands sit, what is in the sweat, and what job the glands are doing.",
     explanation:
       "Apocrine sweat glands are usually associated with hair follicles in densely hairy areas such as armpits and genital regions. Their sweat includes organic compounds that bacteria can decompose, which can cause odor. Eccrine glands, not apocrine glands, are the main thermoregulatory glands on palms, soles, and forehead.",
     cognitiveDemand: "distinction",
@@ -329,6 +341,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Acetylcholine at the neuromuscular junction",
     ],
     correctChoiceId: "c",
+    promptTerms: [{ glossaryId: "dermis" }],
     hint: "OpenStax also says aging skin can have a thinner epidermis. This question is only about the wrinkling claim, which it locates in the dermis.",
     explanation:
       "Wrinkling of the skin occurs due to decreased collagen and elastin production in the dermis. Aging skin also has a thinner epidermis because mitosis in the stratum basale decreases.",
@@ -351,7 +364,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Ultraviolet radiation from sunlight or tanning beds",
     ],
     correctChoiceId: "d",
-    hint: "Focus on the specific kind of exposure being asked about.",
+    hint: "Use the skin-cancer prevention guidance in the reference. Compare each choice with the documented risk or prevention factors it describes.",
     explanation:
       "Exposure to ultraviolet (UV) radiation is a risk factor for skin cancer. Sunlamps and tanning beds also give off UV radiation.",
     cognitiveDemand: "recall",
@@ -373,7 +386,9 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Shingles can occur only if the person never had chickenpox",
     ],
     correctChoiceId: "c",
-    hint: "One virus can cause two illnesses at different times of life.",
+    wordingHelp:
+      "This question is asking what the second illness shows about the virus.",
+    hint: "For each choice, compare the kind of disease-history it proposes with the sequence of events already given in the stem.",
     explanation:
       "Chickenpox is caused by varicella-zoster virus (VZV). After recovery, VZV can remain dormant and later reactivate as shingles.",
     cognitiveDemand: "multi-step",
@@ -417,7 +432,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Stretching the sarcomere to 200% of resting length",
     ],
     correctChoiceId: "c",
-    hint: "Focus on the specific protection being asked about.",
+    hint: "Check the CDC cancer-prevention guidance for HPV. Compare each choice with the protection recommended in that guidance.",
     explanation:
       "HPV can cause cancers later in life, and HPV vaccination can protect against those cancers. CDC recommends 2 doses starting at ages 11–12 (and vaccination can start at age 9).",
     cognitiveDemand: "recall",
@@ -483,7 +498,10 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Formation of a synovial joint cavity",
     ],
     correctChoiceId: "a",
-    hint: "This process happens inside bone spaces, not at the skin surface or at a nerve-muscle meeting.",
+    promptTerms: [{ glossaryId: "spongy-bone" }],
+    wordingHelp:
+      "This question is asking what process happens in those marrow-filled spaces.",
+    hint: "Compare where each listed process actually occurs with the location already named in the stem.",
     explanation:
       "Spaces in some spongy bones contain red marrow, where hematopoiesis (blood-cell production) occurs. Bones also store calcium and phosphate.",
     cognitiveDemand: "recall",
@@ -548,7 +566,9 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "The cartilage is converted into epidermis by UV light",
     ],
     correctChoiceId: "b",
-    hint: "Think replace the model, not the model magically becomes mineral.",
+    hint: "Compare what each choice claims happens to the original cartilage once bone is present. Stay with cartilage–bone relationships, not a different organ system.",
+    wordingHelp:
+      "This question is asking how the cartilage and the bone that comes later are related.",
     explanation:
       "In endochondral ossification, bone develops by replacing hyaline cartilage. Cartilage does not become bone; it serves as a template that is completely replaced by new bone.",
     cognitiveDemand: "distinction",
@@ -570,7 +590,9 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "It is a motor end-plate that releases acetylcholine",
     ],
     correctChoiceId: "b",
-    hint: "This plate is why children can still get taller.",
+    hint: "Classify each choice by the body system or tissue process it describes. Then compare the choices that stay in the system named by the stem.",
+    wordingHelp:
+      "This question is asking two things: what that plate is, and what happens after its cartilage is fully replaced by bone.",
     explanation:
       "The epiphyseal plate is a layer of hyaline cartilage and is the area of growth in a long bone. When cartilage there is replaced by bone, longitudinal growth stops and an epiphyseal line remains.",
     cognitiveDemand: "recognition",
@@ -592,7 +614,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "A synovial joint is found only in the epidermis",
     ],
     correctChoiceId: "b",
-    hint: "Look for the lubricating space between the bones.",
+    hint: "Compare how each choice describes the way the two bones meet. Separate a mobility claim or a skin location from a structural claim.",
     explanation:
       "In a fibrous joint, adjacent bones are united by fibrous connective tissue. In a synovial joint, the bones meet inside a fluid-filled joint cavity rather than being directly connected that way. Cartilaginous joints are joined by hyaline cartilage or fibrocartilage.",
     cognitiveDemand: "distinction",
@@ -635,7 +657,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "The epiphyseal plate and the stratum corneum",
     ],
     correctChoiceId: "b",
-    hint: "Compare the hinge-like limb pairs with the two joints that can move in many directions.",
+    hint: "Ignore pairings that are not joints. For the two limb-joint pairs, compare how each pair usually moves, then match that pattern to the joint type named in the question.",
     explanation:
       "The hip joint and the glenohumeral (shoulder) joint are the only ball-and-socket joints of the body. Ball-and-socket joints also have the greatest range of motion among synovial types.",
     cognitiveDemand: "recall",
@@ -657,6 +679,8 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Synarthrosis; plane",
     ],
     correctChoiceId: "c",
+    wordingHelp:
+      "This question is asking for two names in one pair: the movement class, and the synovial shape with the most movement.",
     hint: "All synovial joints share one movement class. Separately, which synovial shape allows the most movement?",
     explanation:
       "All synovial joints are functionally classified as diarthroses (freely moveable). The joint with the greatest range of motion is the ball-and-socket joint.",
@@ -722,7 +746,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "It is noticed when varicella-zoster virus reactivates",
     ],
     correctChoiceId: "a",
-    hint: "Focus on the specific timing being asked about.",
+    hint: "Compare when each choice says a person would notice the change, then match that timing with the bone-density story in the stem.",
     explanation:
       "Osteoporosis develops when bone mineral density and bone mass decrease, which increases fracture risk. People typically do not have symptoms until they break a bone.",
     cognitiveDemand: "recall",
@@ -766,6 +790,9 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Through the epiphysis, physis, and metaphysis together",
     ],
     correctChoiceId: "a",
+    promptTerms: [{ glossaryId: "salter-harris" }],
+    wordingHelp:
+      "This question is asking which path a Type I break follows in that system.",
     hint: "Look at how many of the three regions Type I uses.",
     explanation:
       "Salter-Harris Type I (Slipped) goes through the physis. Type II also involves the metaphysis, Type III involves the epiphysis, and Type IV goes through epiphysis, physis, and metaphysis.",
@@ -788,7 +815,10 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Generating heat when ATP is used",
     ],
     correctChoiceId: "d",
-    hint: "Focus on the additional role being asked about.",
+    promptTerms: [{ glossaryId: "homeostasis" }],
+    wordingHelp:
+      "This question is asking how skeletal muscle also helps keep the body’s conditions steady.",
+    hint: "Find the skeletal-muscle functions listed in the reference. Compare the choices with the functions described beyond the movement and posture roles.",
     explanation:
       "Skeletal muscles produce movement, help maintain posture, and generate heat. Muscle contraction requires ATP, and breaking down ATP produces heat.",
     cognitiveDemand: "recall",
@@ -810,7 +840,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Epiphyseal line",
     ],
     correctChoiceId: "b",
-    hint: "The stem already places this unit in a muscle fiber. Stay with a muscle-fiber term, not a bone term.",
+    hint: "The stem already names the structure’s setting. Compare what anatomical level each choice belongs to, then match the functional-unit wording in the stem.",
     explanation:
       "The sarcomere is the functional unit of the muscle fiber, bordered by Z-discs. Thin filaments are actin; thick filaments are myosin.",
     cognitiveDemand: "recall",
@@ -832,6 +862,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Urate",
     ],
     correctChoiceId: "b",
+    promptTerms: [{ glossaryId: "neuromuscular-junction" }],
     hint: "The messenger crosses a tiny synaptic cleft to receptors on the motor end-plate.",
     explanation:
       "The neuromuscular junction is where a motor neuron’s terminal meets the muscle fiber. The axon terminal releases acetylcholine (ACh), which binds receptors on the motor end-plate.",
@@ -854,7 +885,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "The hair follicle must enter telogen; melanin is released from osteoclasts",
     ],
     correctChoiceId: "a",
-    hint: "Compare the choices by what process they actually describe.",
+    hint: "Stay with the coupling sequence named in the stem. Compare what each choice says happens in that sequence.",
     explanation:
       "For a skeletal muscle fiber to contract, its membrane must be excited—it must fire an action potential. That excitation is coupled to contraction by release of calcium ions (Ca++) from the sarcoplasmic reticulum (SR).",
     cognitiveDemand: "recognition",
@@ -876,7 +907,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Apocrine glands release organic sweat into the synaptic cleft",
     ],
     correctChoiceId: "b",
-    hint: "Focus on the specific next step being asked about.",
+    hint: "Follow the action potential from the T-tubules and compare what each choice says happens next.",
     explanation:
       "T-tubules carry the action potential into the fiber, triggering opening of calcium channels in the adjacent sarcoplasmic reticulum. Arrival of Ca++ in the sarcoplasm initiates contraction of the sarcomeres. That sequence is the heart of excitation-contraction coupling.",
     cognitiveDemand: "multi-step",
@@ -898,7 +929,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Red marrow",
     ],
     correctChoiceId: "a",
-    hint: "Focus on the role being asked about in that pairing.",
+    hint: "Use the two actions named in the stem. Decide what relationship the question is asking about between those paired muscles, then match that relationship to the choices.",
     explanation:
       "The biceps brachii flexes the forearm, and the triceps brachii extends it. A muscle with the opposite action of the prime mover (agonist) is called an antagonist.",
     cognitiveDemand: "distinction",
@@ -921,7 +952,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "To pump blood into the vessels of the circulatory system",
     ],
     correctChoiceId: "d",
-    hint: "Focus on the job of the coordinated contractions.",
+    hint: "Stay with the organ named in the stem and check the reference for the function associated with its coordinated contractions. Compare that description with the choices.",
     explanation:
       "Cardiac muscle tissue is found only in the heart. Highly coordinated contractions pump blood into the vessels of the circulatory system.",
     cognitiveDemand: "recall",
@@ -964,7 +995,8 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "Only attaching biceps brachii to the forearm bones",
     ],
     correctChoiceId: "b",
-    hint: "Involuntary muscle is not a biceps tendon and not an osteon. Compare skin versus the walls of internal passages.",
+    promptTerms: [{ glossaryId: "involuntary" }],
+    hint: "Compare the body regions named in each choice and ask which one is a realistic place for this muscle type.",
     explanation:
       "Smooth muscle is nonstriated and is not under voluntary control. It is present in the walls of hollow organs and in the walls of passageways such as arteries and veins.",
     cognitiveDemand: "distinction",
@@ -1009,7 +1041,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "On the medial side of the proximal tibia; it flexes the knee and flexes, abducts, and laterally rotates at the hip",
     ],
     correctChoiceId: "b",
-    hint: "Use the official insertion and action for the diaphragm. Do not reuse the sit-up or shrug rows.",
+    hint: "Find the official insertion and action for the named muscle, then compare that pair with each choice.",
     explanation:
       "The diaphragm inserts on the central tendon. It is the prime mover that changes thoracic volume for inhalation and exhalation.",
     cognitiveDemand: "multi-step",
@@ -1078,7 +1110,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
       "It protracts the scapula",
     ],
     correctChoiceId: "d",
-    hint: "Focus on the specific action being asked about.",
+    hint: "Find the official action for the named muscle in the reference, then compare that action with each choice.",
     explanation:
       "Serratus anterior inserts on the anterior surface of the vertebral border of the scapula and protracts the scapula. (This item does not use a single rib-number origin, because sources give a range.)",
     cognitiveDemand: "recognition",
@@ -1104,6 +1136,7 @@ export function anatomyPhysiologyQuestionToPracticeQuestion(
     explanation: question.explanation,
     hint: question.hint,
     ...optionalSecondHintFields(question.hint2),
+    ...optionalQuestionHelpFields(question),
     difficulty: question.difficulty,
     imageRequired: question.imageRequired,
     verificationStatus: question.verificationStatus,

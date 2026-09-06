@@ -114,7 +114,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Ecosystem",
     ],
     correctChoiceId: "d",
-    hint: "Use the printed arrow sequence. Skip levels that appear before Community and the last level in the list.",
+    hint: "Find Community in the printed arrow sequence, then read the next name.",
     explanation:
       "The printed order is Individual → Population → Community → Ecosystem → Biome → Biosphere, so Ecosystem follows Community. Population and Individual come earlier; Biosphere is last.",
     cognitiveDemand: "recall",
@@ -136,7 +136,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "The different species in an area and the interactions among them",
     ],
     correctChoiceId: "c",
-    hint: "Look for one species sharing a place and time, not every species in an area and not the whole planet.",
+    hint: "Match the named level to its definition. Check whether a choice describes a different organization level.",
     explanation:
       "A population is a group of interbreeding organisms that are members of the same species living in the same area at the same time. The other choices describe the biosphere, a biome, and a community.",
     cognitiveDemand: "recognition",
@@ -158,7 +158,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "A community is only the nonliving parts of an area; a population is only plants",
     ],
     correctChoiceId: "c",
-    hint: "Ask whether more than one species is included, and whether nonliving things are part of the definition.",
+    hint: "Compare what entities each choice includes at each named level. Then check whether that choice actually describes those two levels or a neighboring level.",
     explanation:
       "A biological community consists of the different species within an area and the interactions among them. A population is one species living in the same area at the same time. An ecosystem, not a community, adds abiotic components.",
     cognitiveDemand: "distinction",
@@ -180,7 +180,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "It includes the living organisms in an area and their interactions with nonliving parts of that area, such as air, water, and soil",
     ],
     correctChoiceId: "d",
-    hint: "Look for both living (biotic) and nonliving (abiotic) parts.",
+    hint: "Compare the scale and topic of each statement with the named ecological level, then see which statement belongs at that level.",
     explanation:
       "An ecosystem is composed of the biotic components in an area along with the abiotic components, including air, water, and soil. One interbreeding species is a population. Greenhouse gases are a climate topic, not the definition of an ecosystem.",
     cognitiveDemand: "application",
@@ -202,7 +202,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "How energy flows directionally through ecosystems",
     ],
     correctChoiceId: "d",
-    hint: "Think about what is passed from one feeding level to the next, and in which direction.",
+    hint: "Compare each choice by the ecological process it describes, then match that process to what food webs are used to show.",
     explanation:
       "Food webs illustrate how energy flows directionally through ecosystems. Gene flow, rain shadows, and acid rain are different processes.",
     cognitiveDemand: "recall",
@@ -224,7 +224,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Biomass pyramids can never be inverted",
     ],
     correctChoiceId: "c",
-    hint: "Compare energy pyramids with pyramids of numbers or biomass. Which shape is required by energy loss as heat?",
+    hint: "For each choice, note which pyramid type it names and whether the claim is about energy, numbers, or biomass. Then check whether that claim matches how that quantity changes from one trophic level to the next.",
     explanation:
       "Energy pyramids must always be upright because during energy transfer some energy is lost as heat, so less energy is available at each higher trophic level. Pyramids of numbers can be upright or inverted. Biomass pyramids can also be inverted in some ecosystems.",
     cognitiveDemand: "distinction",
@@ -246,7 +246,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "The recycling of inorganic matter between living organisms and their environment",
     ],
     correctChoiceId: "d",
-    hint: "The name combines biology with geology and chemistry. What is being recycled?",
+    hint: "Use the word parts in the name, then see which choice fits that kind of process.",
     explanation:
       "A biogeochemical cycle is the recycling of inorganic matter between living organisms and their environment. The other choices describe energy pyramids, carrying capacity, and the Coriolis effect.",
     cognitiveDemand: "recall",
@@ -290,7 +290,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Both species benefit from the interaction",
     ],
     correctChoiceId: "d",
-    hint: "Compare mutualism with parasitism and commensalism.",
+    hint: "For each choice, mark what happens to the first species and what happens to the second. Then see which of those patterns belongs with the interaction named in the question.",
     explanation:
       "Mutualism is a symbiotic relationship in which two species benefit from their interaction. Parasitism benefits the parasite and harms the host. Commensalism benefits one species and neither helps nor harms the other.",
     cognitiveDemand: "distinction",
@@ -314,8 +314,8 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
     correctChoiceId: "d",
     promptTerms: [{ glossaryId: "niche" }],
     wordingHelp:
-      "This question is asking what the rule says about two species sharing a living space.",
-    hint: "The principle is about the same niche and the same full set of resources, not about biomes or life-history labels.",
+      "This question is asking what the rule says two species cannot share in the same habitat.",
+    hint: "Treat each choice as a separate ecology claim. Ask what would have to be true for that claim to follow from two species using the same full set of resources.",
     explanation:
       "The competitive exclusion principle states that two species cannot occupy the same niche in a habitat: they cannot coexist if they compete for all the same resources. It does not require different biomes or forbid sharing a food web at different niches.",
     cognitiveDemand: "application",
@@ -337,7 +337,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "The number of species in a community",
     ],
     correctChoiceId: "c",
-    hint: "This quantity is an environmental limit on population size, not a count of species or food-web steps.",
+    hint: "Compare what kind of ecological quantity each choice is measuring, then match K to the kind of quantity it actually names.",
     explanation:
       "Carrying capacity, or K, is the maximum population size that a particular environment can support. It is not a count of trophic levels or species.",
     cognitiveDemand: "recall",
@@ -384,7 +384,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
     promptTerms: [{ glossaryId: "density-dependent" }],
     wordingHelp:
       "This question is asking which group of things matches that kind of population limit.",
-    hint: "Density-dependent examples here are living interactions and their by-products, not weather.",
+    hint: "Ask whether each set would get stronger as a population gets denser, or would hit the population the same way either way.",
     explanation:
       "Most density-dependent factors are biotic and include predation, inter- and intraspecific competition, accumulation of waste, and diseases. Weather, natural disasters, and pollution are typically density-independent.",
     cognitiveDemand: "recognition",
@@ -428,7 +428,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "They cannot live below carrying capacity",
     ],
     correctChoiceId: "c",
-    hint: "Compare early maturity and many unattended offspring with long life and few, well-cared-for offspring.",
+    hint: "Compare the full wording of each choice with the ecological strategy named in the question.",
     explanation:
       "r-selected species mature early, have short lifespans, and produce many offspring that receive no parental care. K-selected species live long, mature late, and provide long-term parental care to few offspring.",
     cognitiveDemand: "distinction",
@@ -496,7 +496,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Colonization of newly formed land",
     ],
     correctChoiceId: "a",
-    hint: "Gene flow is about alleles traveling with individuals that move, not about random sampling alone.",
+    hint: "Compare the four descriptions side by side. Identify what each process is doing, then match the named term to one of those processes.",
     explanation:
       "Gene flow is the movement of alleles across a species’ range, relatively free because individuals can move and then mate in a new location. Genetic drift is a chance change in allele frequencies.",
     cognitiveDemand: "recall",
@@ -518,6 +518,8 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Only toward the equator, never sideways",
     ],
     correctChoiceId: "c",
+    wordingHelp:
+      "This question is asking which way the moving air is pushed, compared with the way it was already going.",
     hint: "Northern and Southern Hemispheres deflect opposite ways.",
     explanation:
       "The Coriolis force causes moving objects, including air, to veer to the right in the Northern Hemisphere and to the left in the Southern Hemisphere. This item does not test Hadley-cell biome belts.",
@@ -540,7 +542,10 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Enhanced only at the equator, never on mountains",
     ],
     correctChoiceId: "c",
-    promptTerms: [{ glossaryId: "precipitation" }],
+    promptTerms: [
+      { glossaryId: "perpendicular" },
+      { glossaryId: "precipitation" },
+    ],
     wordingHelp:
       "This question is asking where rain increases and where it drops a lot when wind hits mountains.",
     hint: "Windward faces the incoming wind; leeward is the other side of the range.",
@@ -568,7 +573,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
     promptTerms: [{ glossaryId: "temperate" }, { glossaryId: "biome" }],
     wordingHelp:
       "This question is asking what is most common in this type of environment.",
-    hint: "Think of open plains rather than closed-canopy forest or ocean.",
+    hint: "Use the biome name already in the question, then match the vegetation.",
     explanation:
       "Temperate grasslands are found throughout central North America, where they are also known as prairies. Savannas and temperate grasslands are dominated by grasses.",
     cognitiveDemand: "recall",
@@ -590,7 +595,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "They are very dry; in some years evaporation exceeds precipitation",
     ],
     correctChoiceId: "d",
-    hint: "Deserts are defined here by dryness and water loss, not by polar location.",
+    hint: "Compare each choice’s climate and vegetation claims with the biome named in the question.",
     explanation:
       "Subtropical deserts are very dry; in some years evaporation exceeds precipitation. They are not Arctic, not rainforest-wet, and not grasslands with scattered trees.",
     cognitiveDemand: "recognition",
@@ -612,7 +617,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "They rely on rain shadows to stay wet",
     ],
     correctChoiceId: "b",
-    hint: "Less leaf surface means less water can evaporate from the plant.",
+    hint: "For each choice, look at the plant feature it names and ask how that feature would affect the process already named in the stem.",
     explanation:
       "To reduce water loss, many desert plants have tiny leaves or no leaves at all. Ocotillo leaves, for example, appear only after rainfall and then are shed.",
     cognitiveDemand: "application",
@@ -634,7 +639,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Only in the deep ocean",
     ],
     correctChoiceId: "b",
-    hint: "Use the north-of-boreal-forest location in the Arctic, not the equator or the ocean.",
+    hint: "Use the two biome names in the question to decide the geographic relationship.",
     explanation:
       "The Arctic tundra lies north of the subarctic boreal forest and is located throughout the Arctic regions of the northern hemisphere. This item does not treat taiga and boreal forest as two different biomes.",
     cognitiveDemand: "recall",
@@ -656,7 +661,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Only the carrying capacity of one population",
     ],
     correctChoiceId: "b",
-    hint: "Diversity is not only a species count; how common each species is also matters.",
+    hint: "Look up how biodiversity is described in the reference, then compare that description with the four choices.",
     explanation:
       "Biodiversity is a general term for the number of species present in the biosphere, taking into account both the number of species and their relative abundance to each other.",
     cognitiveDemand: "recall",
@@ -678,7 +683,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "The IUCN category Data Deficient",
     ],
     correctChoiceId: "b",
-    hint: "This is variation within a species that evolution can use, not a count of ecosystem types.",
+    hint: "Set aside choices that are not about biological variation at all. Then compare the remaining choices by the level of variation they describe.",
     explanation:
       "Genetic diversity, or genetic variation, defines the raw material for evolution and adaptation in a species. Ecosystem diversity is the number of different ecosystems on the planet or within a given geographic area.",
     cognitiveDemand: "distinction",
@@ -700,7 +705,8 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Provisioning, Regulating, Supporting, Cultural",
     ],
     correctChoiceId: "d",
-    hint: "Match the four service names, not succession types, energy types, or selection types.",
+    promptTerms: [{ glossaryId: "ecosystem-services" }],
+    hint: "Find the official ecosystem-service category names, then see which printed set matches those headings.",
     explanation:
       "The four printed ecosystem-service names are Provisioning, Regulating, Supporting, and Cultural. This item does not map examples such as pollination onto those four headings.",
     cognitiveDemand: "recall",
@@ -722,7 +728,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Particles of dry acid deposition that never include gases",
     ],
     correctChoiceId: "a",
-    hint: "Think about what happens to heat in the air when these gases are present.",
+    hint: "Find the EPA definition for the term in the question, then compare each choice with what that definition describes.",
     explanation:
       "Gases that trap heat in the atmosphere are called greenhouse gases. EPA’s main inventory gases include carbon dioxide, methane, nitrous oxide, and fluorinated gases. This item does not mix in OpenStax’s water-vapor list as a keyed catalog.",
     cognitiveDemand: "recall",
@@ -744,7 +750,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Carrying capacity of the ocean falls to zero",
     ],
     correctChoiceId: "a",
-    hint: "Follow carbon dioxide into seawater, then to hydrogen ions and carbonate.",
+    hint: "Follow carbon dioxide after it enters seawater. Ask whether the water becomes more acidic or more alkaline, and what that does to shell-building.",
     explanation:
       "When CO2 is absorbed by seawater, reactions increase hydrogen-ion concentration. Excess hydrogen bonds with carbonate ions, leaving fewer carbonate ions for calcifying organisms to build shells and skeletons. This item stays qualitative and does not require a pH-unit change.",
     cognitiveDemand: "application",
@@ -766,7 +772,11 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Solar, wind, and geothermal energy",
     ],
     correctChoiceId: "a",
-    hint: "These threats come from how people use land, harvest wild species, and move species to new places.",
+    promptTerms: [
+      { glossaryId: "proximate" },
+      { glossaryId: "biodiversity" },
+    ],
+    hint: "Find the sentence on the three greatest proximate threats to biodiversity, then see which printed trio matches that list.",
     explanation:
       "The three greatest proximate threats to biodiversity are habitat loss, overharvesting, and the introduction of exotic species. Anthropogenic climate change is named as a fourth major cause predicted to grow, not as one of those three.",
     cognitiveDemand: "recall",
@@ -788,7 +798,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Only plants with tiny leaves in subtropical deserts",
     ],
     correctChoiceId: "b",
-    hint: "Two parts matter: not native to the place, and a threat to that habitat’s balance.",
+    hint: "Compare each choice on origin, habitat story, and conservation-list status before you decide.",
     explanation:
       "Invasive species are nonnative organisms that, when introduced to an area out of their native range, threaten the ecosystem balance of that habitat. No official invasive-species list is used here.",
     cognitiveDemand: "recognition",
@@ -810,7 +820,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Public-awareness signs with no living agents",
     ],
     correctChoiceId: "a",
-    hint: "Match the control method to the kind of tool it uses: living agents, chemicals, machines, or human practices.",
+    hint: "Compare the choices by what kind of tool each one actually describes, not by whether that tool would work on an invasive species.",
     explanation:
       "Biological control is the intentional manipulation of natural enemies by humans to control pests or plants. Chemical control uses pesticides and similar products. Mechanical control uses tools or machines. Cultural control includes changing practices and human behavior. Physical/manual control is not treated as a fifth official method here.",
     cognitiveDemand: "distinction",
@@ -832,7 +842,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Only methane from biomass combustion",
     ],
     correctChoiceId: "a",
-    hint: "The mineral acids in acid rain come from two common air pollutants, not from an IUCN category.",
+    hint: "Find the acid-rain formation paragraph in the reference and match the emitted chemicals named there with the choices.",
     explanation:
       "Acid rain, or acid deposition, includes precipitation with acidic components such as sulfuric or nitric acid. Acid rain results when sulfur dioxide and nitrogen oxides are emitted, transported, and react with water, oxygen, and other chemicals.",
     cognitiveDemand: "recognition",
@@ -854,7 +864,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "The deflection of winds to the left in the Northern Hemisphere",
     ],
     correctChoiceId: "a",
-    hint: "Follow a persistent toxin from producers up to top predators.",
+    hint: "Use the word parts in biomagnification. Ask what is getting larger, and where.",
     explanation:
       "Biomagnification is the increasing concentration of persistent, toxic substances in organisms at each trophic level, from the primary producers to the apex consumers. Many such substances also bioaccumulate. A sharper bioaccumulation-only definition is not keyed.",
     cognitiveDemand: "recall",
@@ -876,7 +886,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Allopatric speciation begins on every farm",
     ],
     correctChoiceId: "a",
-    hint: "Connect extra nutrients to microbial blooms, then to oxygen and animals.",
+    hint: "Follow the runoff problem from extra nutrients to the water’s living conditions.",
     explanation:
       "Eutrophication is a process whereby nutrient runoff causes excess growth of microorganisms, depleting dissolved oxygen levels and killing ecosystem fauna. Nitrogen and phosphorus are major limiting nutrients in most aquatic environments. Eutrophication stages are not tested as a numbered ladder.",
     cognitiveDemand: "application",
@@ -898,7 +908,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Nuclear power is the same as biomass combustion",
     ],
     correctChoiceId: "b",
-    hint: "Separate what happens while a reactor runs from what happens to used fuel afterward.",
+    hint: "For each choice, note which stage of the nuclear-energy process it is talking about, then see which stage the source treats as the environmental concern.",
     explanation:
       "Nuclear reactors do not produce air pollution or carbon dioxide while operating. A major environmental concern is radioactive waste that can remain dangerous for thousands of years. The United States does not have a permanent disposal facility for high-level nuclear waste.",
     cognitiveDemand: "distinction",
@@ -920,6 +930,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Yes; they emit sulfur dioxide in order to create acid rain",
     ],
     correctChoiceId: "b",
+    promptTerms: [{ glossaryId: "greenhouse-gases" }],
     hint: "Separate the operating plant from the factories that make panels.",
     explanation:
       "Solar energy technologies and power plants do not produce air pollution or greenhouse gases when operating. Producing and disposing of solar technologies still have environmental effects, including land clearing that can affect habitats.",
@@ -942,7 +953,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Wind turbines always invert energy pyramids",
     ],
     correctChoiceId: "a",
-    hint: "Think about flying animals and moving blades, not smokestack gases.",
+    hint: "Compare the type of harm or effect each choice describes, then check which one the source actually reports for this technology.",
     explanation:
       "Wind turbines do not release emissions that pollute air or water in normal operation and do not require water for cooling. Birds and bats are at risk of injury or death if they fly into turbine blades.",
     cognitiveDemand: "recognition",
@@ -964,7 +975,10 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "They always increase ocean carbonate ions",
     ],
     correctChoiceId: "a",
-    hint: "Think about a river that is blocked and turned into a lake.",
+    promptTerms: [{ glossaryId: "hydropower" }],
+    wordingHelp:
+      "This question is asking what other problem can still happen even without air pollution.",
+    hint: "Sort each choice by the kind of environmental claim it makes, then see which kind can still apply when air pollutants are not the issue.",
     explanation:
       "Hydropower generators produce energy without directly emitting air pollutants, but dams and reservoirs can obstruct fish migration and change natural water temperatures, chemistry, river flow, and silt loads.",
     cognitiveDemand: "application",
@@ -986,7 +1000,8 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Provisioning, Regulating, and Supporting",
     ],
     correctChoiceId: "b",
-    hint: "Threatened status is the high-risk living categories, not Least Concern and not the four ecosystem-service names.",
+    promptTerms: [{ glossaryId: "iucn-red-list" }],
+    hint: "The question asks which three Red List categories count as threatened. Match that official trio, not a different three-name set.",
     explanation:
       "Species are classified into nine Red List categories. Vulnerable, Endangered, and Critically Endangered species are considered to be threatened with extinction. Criteria A–E thresholds are not tested.",
     cognitiveDemand: "distinction",
