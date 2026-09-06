@@ -8,10 +8,10 @@ import {
 import { WEAK_TOPIC_ATTEMPT_WINDOW } from "@/lib/learning/adaptive";
 import { getQuestionById } from "@/lib/mock/curriculum";
 import { createClient } from "@/lib/supabase/server";
-import { revalidatePath } from "next/cache";
 
 export type StoredPracticeAttempt = {
   questionId: string;
+  selectedChoiceId: string;
   isCorrect: boolean;
   hintUsed: boolean;
   sessionId: string | null;
@@ -20,6 +20,7 @@ export type StoredPracticeAttempt = {
 
 function mapAttemptRow(row: {
   question_id: unknown;
+  selected_option_id: unknown;
   is_correct: unknown;
   hint_used: unknown;
   session_id?: unknown;
@@ -27,6 +28,7 @@ function mapAttemptRow(row: {
 }): StoredPracticeAttempt {
   return {
     questionId: row.question_id as string,
+    selectedChoiceId: row.selected_option_id as string,
     isCorrect: Boolean(row.is_correct),
     hintUsed: Boolean(row.hint_used),
     sessionId: typeof row.session_id === "string" ? row.session_id : null,
@@ -43,7 +45,9 @@ export async function getMyPracticeAttempts(): Promise<StoredPracticeAttempt[]> 
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("practice_attempts")
-    .select("question_id, is_correct, hint_used, session_id, answered_at")
+    .select(
+      "question_id, selected_option_id, is_correct, hint_used, session_id, answered_at",
+    )
     .eq("student_id", user.id)
     .order("answered_at", { ascending: true });
 
@@ -65,7 +69,9 @@ export async function getMyRecentPracticeAttempts(): Promise<
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("practice_attempts")
-    .select("question_id, is_correct, hint_used, session_id, answered_at")
+    .select(
+      "question_id, selected_option_id, is_correct, hint_used, session_id, answered_at",
+    )
     .eq("student_id", user.id)
     .order("answered_at", { ascending: false })
     .limit(WEAK_TOPIC_ATTEMPT_WINDOW);
@@ -209,11 +215,9 @@ export async function insertPracticeAttempt(
   }
 
   const awarded = parseAwardResult(data);
-  // Refresh dashboard XP/streak and the event hub. Do not revalidate the
-  // `/events` layout — that refetches the in-progress practice page and can
-  // leave Next question disabled after Check answer.
-  revalidatePath("/");
-  revalidatePath(`/events/${question.eventId}`);
+  // Keep the in-progress PracticeQuiz mounted. Its client state owns the
+  // active question, review index, and session identity; refreshing the
+  // practice route here would reconstruct a new quiz after every save.
   return { ok: true, ...awarded };
 }
 

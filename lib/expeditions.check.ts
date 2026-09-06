@@ -125,7 +125,10 @@ const log = expeditionLogEntries(full, questions, {
 });
 check("journal includes the completed expedition", log.length === 1);
 check("journal uses the event name", log[0]?.eventName === "Water Quality");
-check("journal XP includes attempt XP plus session bonus", log[0]?.derivedXp === 10 * 10 + 20);
+check(
+  "journal XP includes streak attempt XP plus session bonus",
+  log[0]?.derivedXp === 10 * 8 + 12 + 15 + 20,
+);
 
 check("week of Saturday Sep 5 2026 starts Monday Aug 31", startOfLocalWeek("2026-09-05") === "2026-08-31");
 check("week of Sunday Aug 30 2026 starts Monday Aug 24", startOfLocalWeek("2026-08-30") === "2026-08-24");

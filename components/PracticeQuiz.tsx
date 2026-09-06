@@ -57,6 +57,16 @@ type PracticeQuizProps = {
   initialAttemptCount: number;
   initialXp?: number;
   initialStreakDays?: number;
+  resumeSession?: {
+    sessionId: string;
+    attempts: Array<{
+      questionId: string;
+      selectedChoiceId: string;
+      isCorrect: boolean;
+      hintUsed: boolean;
+    }>;
+    sessionXp: number;
+  };
   dailyPracticeGoal?: DailyPracticeGoal;
   mode?: PracticeMode;
 };
@@ -108,13 +118,41 @@ function beginSet(
   history: LearningAttempt[],
   attemptCount: number,
   mode: PracticeMode,
+  resumeSession?: PracticeQuizProps["resumeSession"],
 ): QuizState {
+  const resumedAttempts = resumeSession?.attempts ?? [];
+  const byId = new Map(questions.map((item) => [item.id, item]));
+  const resumedRecords: AnswerRecord[] = resumedAttempts
+    .filter((item) => byId.has(item.questionId))
+    .map((item) => ({
+      questionId: item.questionId,
+      selectedChoiceId: item.selectedChoiceId,
+      isCorrect: item.isCorrect,
+      hintUsed: item.hintUsed,
+    }));
+  const resumedHistory = resumedRecords.reduce<LearningAttempt[]>(
+    (items, record) => {
+      const question = byId.get(record.questionId);
+      return question
+        ? [...items, attemptFromQuestion(question, record.isCorrect, record.hintUsed)]
+        : items;
+    },
+    [],
+  );
+  const askedIds = resumedRecords.map((record) => record.questionId);
+  const sessionTopics = resumedRecords
+    .map((record) => byId.get(record.questionId)?.topicId)
+    .filter((topicId): topicId is string => Boolean(topicId));
   const question = selectNextQuestion({
     bank: questions,
     history,
-    askedQuestionIds: [],
-    sessionTopicSequence: [],
-    lastWasRevisitEvidence: false,
+    askedQuestionIds: askedIds,
+    sessionTopicSequence: sessionTopics,
+    lastWasRevisitEvidence:
+      resumedRecords.length > 0
+        ? !resumedRecords[resumedRecords.length - 1].isCorrect ||
+          resumedRecords[resumedRecords.length - 1].hintUsed
+        : false,
     mode,
   });
 
@@ -137,28 +175,28 @@ function beginSet(
   return {
     status: "active",
     question,
-    askedIds: [question.id],
-    sessionTopics: [question.topicId],
+    askedIds: [...askedIds, question.id],
+    sessionTopics: [...sessionTopics, question.topicId],
     selectedChoiceId: null,
     revealedHint: false,
     submitted: false,
-    records: [],
-    history,
+    records: resumedRecords,
+    history: [...history, ...resumedHistory],
     saveError: null,
     saved: false,
     saving: false,
     attemptCount,
     xpAward: null,
-    sessionXp: 0,
-    viewIndex: 0,
+    sessionXp: resumeSession?.sessionXp ?? 0,
+    viewIndex: resumedRecords.length,
   };
 }
 
 function consecutiveCorrectStreak(
   records: AnswerRecord[],
-  pendingCorrect: boolean | null,
+  pendingAnswer: Pick<AnswerRecord, "isCorrect" | "hintUsed"> | null,
 ): number {
-  if (pendingCorrect === false) {
+  if (pendingAnswer && !pendingAnswer.isCorrect) {
     return 0;
   }
   let streak = 0;
@@ -166,9 +204,12 @@ function consecutiveCorrectStreak(
     if (!records[i].isCorrect) {
       break;
     }
+    if (records[i].hintUsed) {
+      continue;
+    }
     streak += 1;
   }
-  if (pendingCorrect === true) {
+  if (pendingAnswer?.isCorrect && !pendingAnswer.hintUsed) {
     streak += 1;
   }
   return streak;
@@ -218,17 +259,26 @@ export function PracticeQuiz({
   initialAttemptCount,
   initialXp = 0,
   initialStreakDays = 0,
+  resumeSession,
   dailyPracticeGoal = DEFAULT_DAILY_PRACTICE_GOAL,
   mode = "normal",
 }: PracticeQuizProps) {
   const [state, setState] = useState<QuizState>(() =>
-    beginSet(questions, priorAttempts, initialAttemptCount, mode),
+    beginSet(
+      questions,
+      priorAttempts,
+      initialAttemptCount,
+      mode,
+      resumeSession,
+    ),
   );
   const feedbackRef = useRef<HTMLDivElement>(null);
   const savingRef = useRef(false);
-  const sessionIdRef = useRef(crypto.randomUUID());
+  const sessionIdRef = useRef(
+    resumeSession?.sessionId ?? crypto.randomUUID(),
+  );
   const attemptIdRef = useRef<string | null>(null);
-  const sessionXpRef = useRef(0);
+  const sessionXpRef = useRef(resumeSession?.sessionXp ?? 0);
   const streakDaysRef = useRef(0);
   const totalXpRef = useRef<number | null>(null);
   const badgeAttemptsRef = useRef(priorBadgeAttempts);
@@ -327,9 +377,7 @@ export function PracticeQuiz({
         revisitNote={revisitNote}
         onTryAgain={() => {
           startNewSession();
-          setState(
-            beginSet(questions, state.history, state.attemptCount, mode),
-          );
+          setState(beginSet(questions, state.history, state.attemptCount, mode));
         }}
         sessionXp={state.sessionXp}
         streakDays={state.streakDays}
@@ -562,8 +610,14 @@ export function PracticeQuiz({
         : state.viewIndex + 1;
   const progressPercent =
     plannedTotal === 0 ? 0 : Math.round((sessionNumber / plannedTotal) * 100);
-  const pendingCorrect = state.saved ? isCorrect : null;
-  const questionStreak = consecutiveCorrectStreak(state.records, pendingCorrect);
+  const pendingAnswer =
+    state.saved && viewingCurrent
+      ? { isCorrect, hintUsed: state.revealedHint }
+      : null;
+  const questionStreak = consecutiveCorrectStreak(
+    state.records,
+    pendingAnswer,
+  );
   const showFireCelebration =
     viewingCurrent && state.saved && isCorrect && questionStreak === 3;
 

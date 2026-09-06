@@ -1,5 +1,6 @@
 import { PracticeQuiz } from "@/components/PracticeQuiz";
 import {
+  PRACTICE_SET_SIZE,
   eligibleWeakQuestions,
   hasWeakTopics,
   parsePracticeMode,
@@ -13,6 +14,10 @@ import {
   getMyPracticeAttempts,
   getMyRecentPracticeAttempts,
 } from "@/lib/practice-attempts";
+import {
+  calculateAttemptXp,
+  calculateSessionCompletionXp,
+} from "@/lib/gamification";
 import { requireSelectedEvent } from "@/lib/student-events";
 import { dailyPracticeGoalFromUser } from "@/lib/student-preferences";
 import { requireUser } from "@/lib/auth/session";
@@ -20,6 +25,29 @@ import type { Metadata } from "next";
 import { ExplorerTrail } from "@/components/ExplorerTrail";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
+function sessionXpFromAttempts(
+  attempts: Array<{ isCorrect: boolean; hintUsed: boolean }>,
+): number {
+  let unhintedCorrectStreak = 0;
+  let xp = 0;
+  for (const attempt of attempts) {
+    if (attempt.isCorrect && !attempt.hintUsed) {
+      unhintedCorrectStreak += 1;
+    } else if (!attempt.isCorrect) {
+      unhintedCorrectStreak = 0;
+    }
+    xp += calculateAttemptXp({
+      isCorrect: attempt.isCorrect,
+      hintUsed: attempt.hintUsed,
+      unhintedCorrectStreak:
+        attempt.isCorrect && !attempt.hintUsed
+          ? unhintedCorrectStreak
+          : undefined,
+    });
+  }
+  return xp + calculateSessionCompletionXp(attempts.length);
+}
 
 type PracticeRouteProps = {
   params: Promise<{ eventId: string }>;
@@ -62,17 +90,23 @@ export default async function PracticePage({
     notFound();
   }
 
-  const [storedAttempts, priorBadgeAttempts, attemptCount, allQuestions, gamification] =
-    await Promise.all([
-      getMyRecentPracticeAttempts(),
-      getMyPracticeAttempts(),
-      getMyPracticeAttemptCount(),
-      getAllQuestions(),
-      getMyGamification(),
-    ]);
+  const [
+    storedAttempts,
+    allStoredAttempts,
+    attemptCount,
+    allQuestions,
+    gamification,
+  ] = await Promise.all([
+    getMyRecentPracticeAttempts(),
+    getMyPracticeAttempts(),
+    getMyPracticeAttemptCount(),
+    getAllQuestions(),
+    getMyGamification(),
+  ]);
   const eventQuestions = allQuestions.filter(
     (question) => question.eventId === data.event.id,
   );
+  const priorBadgeAttempts = allStoredAttempts;
   const priorAttempts = toLearningAttempts(storedAttempts, eventQuestions);
   const practiceQuestions =
     mode === "weak"
@@ -80,6 +114,35 @@ export default async function PracticePage({
       : data.questions;
   const noTrickyTopics = mode === "weak" && !hasWeakTopics(priorAttempts);
   const noTrickyQuestions = mode === "weak" && practiceQuestions.length === 0;
+  const eventQuestionIds = new Set(eventQuestions.map((question) => question.id));
+  const sessions = new Map<string, typeof allStoredAttempts>();
+  for (const attempt of allStoredAttempts) {
+    if (!attempt.sessionId || !eventQuestionIds.has(attempt.questionId)) {
+      continue;
+    }
+    const session = sessions.get(attempt.sessionId) ?? [];
+    session.push(attempt);
+    sessions.set(attempt.sessionId, session);
+  }
+  const resumeEntry = [...sessions.entries()]
+    .filter(([, attempts]) => attempts.length < PRACTICE_SET_SIZE)
+    .sort(([, left], [, right]) => {
+      const leftLast = left[left.length - 1]?.answeredAt ?? "";
+      const rightLast = right[right.length - 1]?.answeredAt ?? "";
+      return rightLast.localeCompare(leftLast);
+    })[0];
+  const resumeSession = mode === "normal" && resumeEntry
+    ? {
+        sessionId: resumeEntry[0],
+        attempts: resumeEntry[1].map((attempt) => ({
+          questionId: attempt.questionId,
+          selectedChoiceId: attempt.selectedChoiceId,
+          isCorrect: attempt.isCorrect,
+          hintUsed: attempt.hintUsed,
+        })),
+        sessionXp: sessionXpFromAttempts(resumeEntry[1]),
+      }
+    : undefined;
 
   return (
     <main className="flex flex-1 flex-col">
@@ -127,6 +190,7 @@ export default async function PracticePage({
               initialAttemptCount={attemptCount}
               initialXp={gamification.xp}
               initialStreakDays={gamification.streakDays}
+              resumeSession={resumeSession}
               dailyPracticeGoal={dailyPracticeGoalFromUser(user)}
               mode={mode}
             />

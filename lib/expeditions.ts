@@ -153,14 +153,24 @@ export function expeditionLogEntries(
     }
     let correctAnswers = 0;
     let derivedXp = 0;
+    let unhintedCorrectStreak = 0;
     let endedAt: string | null = null;
     for (const row of rows) {
       if (row.isCorrect) {
         correctAnswers += 1;
       }
+      if (row.isCorrect && !row.hintUsed) {
+        unhintedCorrectStreak += 1;
+      } else if (!row.isCorrect) {
+        unhintedCorrectStreak = 0;
+      }
       derivedXp += calculateAttemptXp({
         isCorrect: row.isCorrect,
         hintUsed: row.hintUsed,
+        unhintedCorrectStreak:
+          row.isCorrect && !row.hintUsed
+            ? unhintedCorrectStreak
+            : undefined,
       });
       if (
         row.answeredAt &&
