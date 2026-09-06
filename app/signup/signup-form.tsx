@@ -27,7 +27,7 @@ export function SignupForm() {
           </p>
           <p className="mt-2 text-sm leading-relaxed text-emerald-900/80">
             Can&apos;t find it? Check your spam or junk folder, or search your
-            inbox for &ldquo;Jr. Explorer&rdquo;.
+            inbox for &ldquo;Supabase&rdquo;.
           </p>
         </div>
       ) : null}
