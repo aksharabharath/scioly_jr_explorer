@@ -70,29 +70,31 @@ export function ExplorerProgress({
   return (
     <section
       aria-labelledby="explorer-progress-heading"
-      className="journal-panel rounded-3xl p-4 sm:p-5"
+      className="journal-panel rounded-2xl p-3 sm:p-4"
     >
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal">
         {rank}
       </p>
-      <h2
-        id="explorer-progress-heading"
-        className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink"
-      >
-        Explorer Level {progress.level}
-      </h2>
-      <p className="mt-1 font-display text-xl font-semibold tabular-nums text-ink">
-        {progress.totalXp} XP
-      </p>
+      <div className="mt-0.5 flex items-baseline justify-between gap-3">
+        <h2
+          id="explorer-progress-heading"
+          className="font-display text-xl font-semibold tracking-tight text-ink"
+        >
+          Explorer Level {progress.level}
+        </h2>
+        <p className="font-display text-lg font-semibold tabular-nums text-ink">
+          {progress.totalXp} XP
+        </p>
+      </div>
 
-      <div className="mt-4">
+      <div className="mt-2">
         {atMaxLevel ? (
           <p className="text-sm text-stone-600">
             You reached Explorer Level {MAX_EXPLORER_LEVEL}.
           </p>
         ) : (
           <>
-            <div className="mb-2 flex items-baseline justify-between gap-3">
+            <div className="mb-1.5 flex items-baseline justify-between gap-3">
               <span className="text-sm font-medium text-ink">
                 {progress.xpToNextLevel} XP to Level {progress.level + 1}
               </span>
@@ -108,24 +110,24 @@ export function ExplorerProgress({
           </>
         )}
         {streak ? (
-          <p className="mt-3 text-sm font-medium text-ink">{streak}</p>
+          <p className="mt-1.5 text-sm font-medium text-ink">{streak}</p>
         ) : (
-          <p className="mt-3 text-sm text-stone-500">
+          <p className="mt-1.5 text-sm text-stone-500">
             Practice today to start a streak. Missing a day does not take XP
             away.
           </p>
         )}
       </div>
 
-      <div className="mt-4 border-t border-stone-200/80 pt-3">
+      <div className="mt-2.5 border-t border-stone-200/80 pt-2">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal">
           How to earn XP
         </p>
-        <ul className="mt-2 space-y-0.5 text-sm text-stone-600">
-          <li>Correct answer: +{XP_CORRECT} XP</li>
-          <li>Correct with a hint: +{XP_CORRECT_WITH_HINT} XP</li>
-          <li>Incorrect answer: +{XP_INCORRECT} XP</li>
-          <li>Complete an expedition: +{XP_SESSION_COMPLETION} XP</li>
+        <ul className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-sm text-stone-600">
+          <li>Correct: +{XP_CORRECT} XP</li>
+          <li>Hint: +{XP_CORRECT_WITH_HINT} XP</li>
+          <li>Incorrect: +{XP_INCORRECT} XP</li>
+          <li>Expedition: +{XP_SESSION_COMPLETION} XP</li>
         </ul>
       </div>
     </section>

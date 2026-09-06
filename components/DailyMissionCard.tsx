@@ -31,23 +31,25 @@ export function DailyMissionCard({
   return (
     <section
       aria-labelledby="daily-mission-heading"
-      className="rounded-3xl border border-gold-dark/25 bg-gold/12 p-4 sm:p-5"
+      className="rounded-2xl border border-gold-dark/25 bg-gold/12 p-3 sm:p-4"
     >
       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal">
         Today
       </p>
-      <h2
-        id="daily-mission-heading"
-        className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink"
-      >
-        Today&apos;s goal
-      </h2>
-      <p className="mt-2 text-sm text-stone-600">
+      <div className="mt-0.5 flex items-baseline justify-between gap-3">
+        <h2
+          id="daily-mission-heading"
+          className="font-display text-xl font-semibold tracking-tight text-ink"
+        >
+          Today&apos;s goal
+        </h2>
+        <p className="font-display text-lg font-semibold tabular-nums text-ink">
+          {practiceDate == null ? "—" : `${shown} / ${dailyPracticeGoal}`}
+        </p>
+      </div>
+      <p className="mt-1 text-sm text-stone-600">
         Answer {dailyPracticeGoal} questions today. Any playable event counts.
         Missing a day does not take XP away.
-      </p>
-      <p className="mt-4 font-display text-xl font-semibold tabular-nums text-ink">
-        {practiceDate == null ? "—" : `${shown} / ${dailyPracticeGoal}`}
       </p>
       <div className="mt-2">
         <ProgressBar
@@ -56,7 +58,7 @@ export function DailyMissionCard({
           fillClassName="bg-gold-dark"
         />
       </div>
-      <p className="mt-2 text-sm font-medium text-ink">
+      <p className="mt-1.5 text-sm font-medium text-ink">
         {practiceDate == null
           ? "Checking today's goal…"
           : complete

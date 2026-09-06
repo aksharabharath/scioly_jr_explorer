@@ -56,7 +56,7 @@ export default async function Home() {
 
   return (
     <main className="flex flex-1 flex-col">
-      <div className="mx-auto w-full max-w-screen-xl flex-1 px-4 py-5 sm:px-6 sm:py-6">
+      <div className="mx-auto w-full max-w-screen-xl flex-1 px-4 py-4 sm:px-6 sm:py-5">
         <header className="max-w-3xl">
           <p className="text-sm font-semibold text-teal">Base camp</p>
           <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
@@ -67,7 +67,7 @@ export default async function Home() {
           </p>
         </header>
 
-        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
           <DailyMissionCard
             attempts={attempts}
             dailyPracticeGoal={dailyPracticeGoalFromUser(user)}
@@ -78,7 +78,7 @@ export default async function Home() {
         {continueEvent ? (
           <section
             aria-labelledby="continue-heading"
-            className="journal-panel mt-5 rounded-2xl p-4 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-5"
+            className="journal-panel mt-4 rounded-2xl p-3 sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-4"
           >
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal">
@@ -105,7 +105,7 @@ export default async function Home() {
           </section>
         ) : null}
 
-        <section aria-labelledby="events-heading" className="mt-6">
+        <section aria-labelledby="events-heading" className="mt-4">
           <h2
             id="events-heading"
             className="font-display text-2xl font-semibold tracking-tight text-ink"
