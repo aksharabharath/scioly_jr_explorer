@@ -5,6 +5,7 @@
 import {
   BADGE_DEFINITIONS,
   definitionsForIds,
+  getBadgeProgress,
   getEarnedBadgeIds,
   getNewlyEarnedBadges,
   type BadgeId,
@@ -272,6 +273,98 @@ check(
     questions,
     streakDays: 30,
   }).includes("dedicated-explorer"),
+);
+
+function progressFor(
+  attempts: BadgeProgressAttempt[],
+  streakDays = 0,
+) {
+  return new Map(
+    getBadgeProgress({ attempts, questions, streakDays }).map((row) => [
+      row.id,
+      row,
+    ]),
+  );
+}
+
+const emptyProgress = progressFor([]);
+check(
+  "progress covers every preset badge",
+  getBadgeProgress({ attempts: [], questions }).length ===
+    BADGE_DEFINITIONS.length,
+);
+check(
+  "new student Curious Mind is 0 / 100 questions",
+  emptyProgress.get("curious-mind")?.current === 0 &&
+    emptyProgress.get("curious-mind")?.required === 100 &&
+    emptyProgress.get("curious-mind")?.noun === "question",
+);
+check(
+  "new student First Expedition is 0 / 1 expedition",
+  emptyProgress.get("first-discovery")?.current === 0 &&
+    emptyProgress.get("first-discovery")?.required === 1,
+);
+
+const fiftyProgress = progressFor(fiftyUngrouped);
+check(
+  "50 attempts show Question Crusher complete and capped",
+  fiftyProgress.get("question-crusher")?.current === 50 &&
+    fiftyProgress.get("question-crusher")?.required === 50,
+);
+check(
+  "50 attempts show Curious Mind as 50 / 100",
+  fiftyProgress.get("curious-mind")?.current === 50 &&
+    fiftyProgress.get("curious-mind")?.required === 100,
+);
+
+const hundredProgress = progressFor(hundred);
+check(
+  "100 attempts cap Curious Mind at 100 / 100",
+  hundredProgress.get("curious-mind")?.current === 100 &&
+    hundredProgress.get("curious-mind")?.required === 100,
+);
+check(
+  "100 attempts keep Question Crusher capped at 50",
+  hundredProgress.get("question-crusher")?.current === 50,
+);
+
+const oneEventProgress = progressFor([attempt("ento-q1")]);
+check(
+  "one event is 1 / 2 toward Event Explorer",
+  oneEventProgress.get("event-explorer")?.current === 1 &&
+    oneEventProgress.get("event-explorer")?.required === 2,
+);
+
+const fiveWqProgress = progressFor(fiveWq);
+check(
+  "five Water Quality expeditions show Water Watcher 5 / 5",
+  fiveWqProgress.get("water-watcher")?.current === 5 &&
+    fiveWqProgress.get("water-watcher")?.required === 5,
+);
+check(
+  "five Water Quality expeditions leave Entomologist at 0 / 5",
+  fiveWqProgress.get("entomologist")?.current === 0 &&
+    fiveWqProgress.get("entomologist")?.required === 5,
+);
+
+const sixDayProgress = progressFor([attempt("ento-q1")], 6);
+check(
+  "a 6-day streak is 6 / 7 toward Consistent Explorer",
+  sixDayProgress.get("consistent-explorer")?.current === 6 &&
+    sixDayProgress.get("consistent-explorer")?.required === 7,
+);
+check(
+  "a 6-day streak is 6 / 30 toward Dedicated Explorer",
+  sixDayProgress.get("dedicated-explorer")?.current === 6 &&
+    sixDayProgress.get("dedicated-explorer")?.required === 30,
+);
+
+const earnedFromFiveWq = new Set(earned(fiveWq));
+check(
+  "progress current matches earned state for Water Watcher",
+  fiveWqProgress.get("water-watcher")?.current ===
+    fiveWqProgress.get("water-watcher")?.required &&
+    earnedFromFiveWq.has("water-watcher"),
 );
 
 if (failures.length > 0) {

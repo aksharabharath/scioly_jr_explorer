@@ -225,6 +225,72 @@ function tamedATrickyTopic(
   return false;
 }
 
+export type BadgeProgressNoun =
+  | "question"
+  | "expedition"
+  | "event"
+  | "topic"
+  | "day";
+
+export type BadgeProgress = {
+  id: BadgeId;
+  current: number;
+  required: number;
+  noun: BadgeProgressNoun;
+};
+
+function cappedProgress(
+  id: BadgeId,
+  current: number,
+  required: number,
+  noun: BadgeProgressNoun,
+): BadgeProgress {
+  const safeRequired = Math.max(1, required);
+  const safeCurrent = Math.max(0, Math.min(current, safeRequired));
+  return { id, current: safeCurrent, required: safeRequired, noun };
+}
+
+/**
+ * Display progress toward each badge. Thresholds match `getEarnedBadgeIds`.
+ * Displayed current is capped at the requirement.
+ */
+export function getBadgeProgress(input: BadgeInput): BadgeProgress[] {
+  const { attempts, questions } = input;
+  const streakDays = Math.max(0, Math.floor(input.streakDays ?? 0));
+  const finishedSets = completedSessionCount(attempts);
+  const eventsTried = distinctEventCount(attempts, questions);
+  const tamedTopic = tamedATrickyTopic(attempts, questions) ? 1 : 0;
+
+  const progress: BadgeProgress[] = [
+    cappedProgress("first-try", attempts.length, 1, "question"),
+    cappedProgress("first-discovery", finishedSets, 1, "expedition"),
+    cappedProgress("event-explorer", eventsTried, 2, "event"),
+    cappedProgress("three-event-explorer", eventsTried, 3, "event"),
+    cappedProgress("tricky-topic-tamer", tamedTopic, 1, "topic"),
+    cappedProgress("practice-regular", finishedSets, 5, "expedition"),
+    cappedProgress("question-crusher", attempts.length, 50, "question"),
+    cappedProgress("curious-mind", attempts.length, 100, "question"),
+  ];
+
+  for (const spec of EVENT_SET_BADGES) {
+    progress.push(
+      cappedProgress(
+        spec.id,
+        completedSessionCountForEvent(spec.eventId, attempts, questions),
+        spec.sets,
+        "expedition",
+      ),
+    );
+  }
+
+  progress.push(
+    cappedProgress("consistent-explorer", streakDays, 7, "day"),
+    cappedProgress("dedicated-explorer", streakDays, 30, "day"),
+  );
+
+  return progress;
+}
+
 export function getEarnedBadgeIds(input: BadgeInput): BadgeId[] {
   const { attempts, questions } = input;
   const streakDays = Math.max(0, Math.floor(input.streakDays ?? 0));
