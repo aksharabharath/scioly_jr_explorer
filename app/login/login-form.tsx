@@ -7,18 +7,18 @@ import { useActionState } from "react";
 const INITIAL_STATE: AuthFormState = {};
 
 type LoginFormProps = {
-  confirmError?: boolean;
+  confirmNotice?: boolean;
 };
 
-export function LoginForm({ confirmError = false }: LoginFormProps) {
+export function LoginForm({ confirmNotice = false }: LoginFormProps) {
   const [state, action, pending] = useActionState(signIn, INITIAL_STATE);
 
   return (
     <form action={action} className="mt-6 space-y-4">
-      {confirmError ? (
-        <p className="rounded-2xl bg-amber-50 px-4 py-3 text-sm text-amber-950">
-          We could not finish confirming that account. Try logging in, or create
-          the account again.
+      {confirmNotice ? (
+        <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-950">
+          Your account may already be confirmed. Log in to start exploring. If
+          login does not work, check your email or create the account again.
         </p>
       ) : null}
       {state.error ? (
