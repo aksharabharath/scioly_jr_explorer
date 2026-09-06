@@ -13,7 +13,10 @@ import {
   selectNextQuestion,
   targetDifficulty,
   toLearningAttempts,
+  parsePracticeTopicId,
+  topicLearningState,
   topicRevisitScore,
+  topicsGroupedByLearningState,
   topicsNeedingRevisit,
   type LearningAttempt,
 } from "@/lib/learning/adaptive";
@@ -419,6 +422,59 @@ check(
   "existing attempts without hint_used continue as hint_used = false",
   legacyRow[0]?.hintUsed === false &&
     !isTopicWeak(legacyRow, "sun-and-stars"),
+);
+
+check(
+  "a miss with no later corrects is Needs Practice",
+  topicLearningState(
+    [attempt("astro-q1", false)],
+    "sun-and-stars",
+  ) === "needs-practice",
+);
+check(
+  "a miss with some later corrects is Improving",
+  topicLearningState(
+    [
+      attempt("astro-q1", false),
+      attempt("astro-q1", true),
+    ],
+    "sun-and-stars",
+  ) === "improving",
+);
+check(
+  "three later corrects after a miss is Strong",
+  topicLearningState(
+    [
+      attempt("astro-q1", false),
+      attempt("astro-q1", true),
+      attempt("astro-q1", true),
+      attempt("astro-q1", true),
+    ],
+    "sun-and-stars",
+  ) === "strong",
+);
+check(
+  "corrects with no miss are not classified as Strong",
+  topicLearningState([attempt("astro-q1", true)], "sun-and-stars") === null,
+);
+check(
+  "grouped states keep Needs Practice separate from Improving",
+  topicsGroupedByLearningState([
+    attempt("astro-q1", false),
+    attempt("astro-q3", false),
+    attempt("astro-q3", true),
+  ]).needsPractice.includes("sun-and-stars") &&
+    topicsGroupedByLearningState([
+      attempt("astro-q1", false),
+      attempt("astro-q3", false),
+      attempt("astro-q3", true),
+    ]).improving.includes("the-moon"),
+);
+check(
+  "practice topic ids reject empty and unsafe values",
+  parsePracticeTopicId("seismic-waves") === "seismic-waves" &&
+    parsePracticeTopicId("") === null &&
+    parsePracticeTopicId("foo/bar") === null,
 );
 
 if (failures.length > 0) {

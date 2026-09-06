@@ -50,6 +50,20 @@ export function parsePracticeMode(
   return raw === "weak" ? "weak" : "normal";
 }
 
+/** Optional topic id for Tricky Topics practice (`?mode=weak&topic=`). */
+export function parsePracticeTopicId(
+  value: string | string[] | undefined,
+): string | null {
+  const raw = Array.isArray(value) ? value[0] : value;
+  if (!raw || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(raw)) {
+    return null;
+  }
+  return raw;
+}
+
+/** Student-facing learning labels from existing weak-topic recovery counts. */
+export type TopicLearningState = "needs-practice" | "improving" | "strong";
+
 export function hasWeakTopics(history: LearningAttempt[]): boolean {
   return topicsNeedingRevisit(history).length > 0;
 }
@@ -139,6 +153,66 @@ export function topicsNeedingRevisit(history: LearningAttempt[]): string[] {
       const recencyDiff = lastMissIndex(window, b) - lastMissIndex(window, a);
       return recencyDiff !== 0 ? recencyDiff : a.localeCompare(b);
     });
+}
+
+/**
+ * Maps existing revisit scores onto D-002 labels. Does not add new thresholds.
+ * - Needs Practice: unrecovered miss (no later corrects yet)
+ * - Improving: unrecovered miss with some later corrects
+ * - Strong: miss in the window that was cleared (3 later corrects)
+ * Returns null when there is not enough evidence (e.g. never missed).
+ */
+export function topicLearningState(
+  history: LearningAttempt[],
+  topicId: string,
+): TopicLearningState | null {
+  const remaining = remainingCorrectsToClear(history, topicId);
+  if (remaining >= CORRECTS_TO_CLEAR_WEAK_TOPIC) {
+    return "needs-practice";
+  }
+  if (remaining > 0) {
+    return "improving";
+  }
+  const window = windowedHistory(history);
+  if (lastMissIndex(window, topicId) === -1) {
+    return null;
+  }
+  return "strong";
+}
+
+export function topicsGroupedByLearningState(history: LearningAttempt[]): {
+  needsPractice: string[];
+  improving: string[];
+  strong: string[];
+} {
+  const window = windowedHistory(history);
+  const topicIds = [...new Set(window.map((attempt) => attempt.topicId))];
+  const needsPractice: string[] = [];
+  const improving: string[] = [];
+  const strong: string[] = [];
+
+  for (const topicId of topicIds) {
+    const state = topicLearningState(history, topicId);
+    if (state === "needs-practice") {
+      needsPractice.push(topicId);
+    } else if (state === "improving") {
+      improving.push(topicId);
+    } else if (state === "strong") {
+      strong.push(topicId);
+    }
+  }
+
+  const recency = (topicId: string) => lastMissIndex(window, topicId);
+  const byRecency = (a: string, b: string) => {
+    const recencyDiff = recency(b) - recency(a);
+    return recencyDiff !== 0 ? recencyDiff : a.localeCompare(b);
+  };
+
+  return {
+    needsPractice: needsPractice.sort(byRecency),
+    improving: improving.sort(byRecency),
+    strong: strong.sort(byRecency),
+  };
 }
 
 export function targetDifficulty(history: LearningAttempt[]): DifficultyLevel {
@@ -244,6 +318,12 @@ function remainingCorrectsToClear(
   return Math.max(0, CORRECTS_TO_CLEAR_WEAK_TOPIC - laterCorrect);
 }
 
+/**
+ * Weak-topic membership is frozen from history before this session.
+ * `askedQuestionIds` may include the current unanswered question (not yet
+ * in `history`). Only trailing answers that are actually in history count
+ * as this session, so an extra unanswered ID cannot wipe the freeze window.
+ */
 function historyBeforeThisSession(
   history: LearningAttempt[],
   askedQuestionIds: string[],
@@ -251,11 +331,18 @@ function historyBeforeThisSession(
   if (askedQuestionIds.length === 0) {
     return history;
   }
-  const sessionStart = history.length - askedQuestionIds.length;
-  if (sessionStart <= 0) {
-    return [];
+  const asked = new Set(askedQuestionIds);
+  let sessionAnswers = 0;
+  for (let index = history.length - 1; index >= 0; index -= 1) {
+    if (!asked.has(history[index].questionId)) {
+      break;
+    }
+    sessionAnswers += 1;
   }
-  return history.slice(0, sessionStart);
+  if (sessionAnswers === 0) {
+    return history;
+  }
+  return history.slice(0, history.length - sessionAnswers);
 }
 
 function availableQuestions(input: SelectNextQuestionInput): Question[] {
