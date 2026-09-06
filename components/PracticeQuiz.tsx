@@ -80,6 +80,8 @@ type ActiveQuizState = {
     attemptXp: number;
     sessionBonusXp: number;
   } | null;
+  /** Running total of XP the server has awarded in this expedition. */
+  sessionXp: number;
   /** Which expedition question is on screen. Past answers are review-only. */
   viewIndex: number;
 };
@@ -147,8 +149,46 @@ function beginSet(
     saving: false,
     attemptCount,
     xpAward: null,
+    sessionXp: 0,
     viewIndex: 0,
   };
+}
+
+function consecutiveCorrectStreak(
+  records: AnswerRecord[],
+  pendingCorrect: boolean | null,
+): number {
+  if (pendingCorrect === false) {
+    return 0;
+  }
+  let streak = 0;
+  for (let i = records.length - 1; i >= 0; i -= 1) {
+    if (!records[i].isCorrect) {
+      break;
+    }
+    streak += 1;
+  }
+  if (pendingCorrect === true) {
+    streak += 1;
+  }
+  return streak;
+}
+
+function formatExpeditionXp(sessionXp: number): string {
+  return `+ ${Math.max(0, sessionXp)} XP Earned`;
+}
+
+function formatQuestionStreak(streak: number): string {
+  if (streak <= 0) {
+    return "No streak yet";
+  }
+  if (streak === 1) {
+    return "1 in a row";
+  }
+  if (streak === 2) {
+    return "2 Question Streak";
+  }
+  return `${streak} Question Streak!!!!!`;
 }
 
 function newlyEarnedForSession(
@@ -381,6 +421,10 @@ export function PracticeQuiz({
                   attemptXp: result.attemptXp,
                   sessionBonusXp: result.sessionBonusXp,
                 },
+                sessionXp:
+                  earned > 0
+                    ? current.sessionXp + earned
+                    : current.sessionXp,
                 attemptCount:
                   earned > 0
                     ? current.attemptCount + 1
@@ -466,6 +510,7 @@ export function PracticeQuiz({
       saving: false,
       attemptCount: state.attemptCount,
       xpAward: null,
+      sessionXp: state.sessionXp,
       viewIndex: nextRecords.length,
     });
   }
@@ -517,15 +562,33 @@ export function PracticeQuiz({
         : state.viewIndex + 1;
   const progressPercent =
     plannedTotal === 0 ? 0 : Math.round((sessionNumber / plannedTotal) * 100);
+  const pendingCorrect = state.saved ? isCorrect : null;
+  const questionStreak = consecutiveCorrectStreak(state.records, pendingCorrect);
+  const showFireCelebration =
+    viewingCurrent && state.saved && isCorrect && questionStreak === 3;
 
   const hasImage = Boolean(viewedQuestion.imageSrc);
 
   return (
     <section className="journal-panel rounded-3xl p-4 sm:p-5">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="font-medium text-stone-700">
-          Question {sessionNumber} of {plannedTotal}
-        </p>
+      <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
+        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+          <p className="font-medium text-stone-700">
+            Question {sessionNumber} of {plannedTotal}
+          </p>
+          <p className="font-medium tabular-nums text-ink">
+            {formatExpeditionXp(state.sessionXp)}
+          </p>
+          <p
+            className={
+              questionStreak >= 3
+                ? "font-semibold text-teal-dark"
+                : "font-medium text-stone-600"
+            }
+          >
+            {formatQuestionStreak(questionStreak)}
+          </p>
+        </div>
         <span className="rounded-full bg-parchment px-2.5 py-1 text-xs font-semibold text-ink">
           {DIFFICULTY_LEVEL_LABEL[viewedQuestion.difficulty]}
         </span>
@@ -672,6 +735,14 @@ export function PracticeQuiz({
                   ? "Correct."
                   : "Not quite. Explorers miss things. Here is what this was asking."}
               </p>
+              {showFireCelebration ? (
+                <p
+                  className="rounded-xl border border-gold-dark/30 bg-gold/15 px-3 py-2 text-sm font-semibold text-ink"
+                  aria-live="polite"
+                >
+                  🔥 3 right in a row! You&apos;re on fire!!!
+                </p>
+              ) : null}
               <p className="text-sm leading-snug text-stone-700">
                 {viewedQuestion.explanation}
               </p>
