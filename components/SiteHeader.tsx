@@ -9,14 +9,14 @@ export async function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-surface/90 backdrop-blur-md">
-      <div className="mx-auto flex max-w-screen-xl items-center gap-2 px-4 py-1.5 sm:gap-3 sm:px-6">
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+      <div className="mx-auto flex max-w-screen-xl items-center gap-2 px-4 py-3.5 sm:gap-3 sm:px-6 sm:py-4">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
           <SiteBrand highlightHome={Boolean(user)} />
           {user ? (
             <form action={signOut}>
               <button
                 type="submit"
-                className="rounded-md px-2 py-1.5 text-[13px] font-medium text-stone-600 outline-none transition-colors hover:bg-parchment hover:text-ink focus-visible:ring-2 focus-visible:ring-teal sm:px-2.5 sm:text-sm"
+                className="rounded-md px-2.5 py-2 text-[13px] font-medium text-stone-600 outline-none transition-colors hover:bg-parchment hover:text-ink focus-visible:ring-2 focus-visible:ring-teal sm:px-3 sm:text-sm"
               >
                 Log out
               </button>

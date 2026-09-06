@@ -112,7 +112,7 @@ export function SiteNav() {
                 href={item.href}
                 aria-label={item.label}
                 aria-current={active ? "page" : undefined}
-                className={`inline-flex min-h-11 items-center gap-1.5 rounded-md px-2 py-2 text-[13px] font-medium outline-none transition-colors sm:min-h-0 sm:px-2.5 sm:py-1.5 sm:text-sm focus-visible:ring-2 focus-visible:ring-teal ${
+                className={`inline-flex min-h-12 items-center gap-1.5 rounded-md px-2.5 py-2.5 text-[13px] font-medium outline-none transition-colors sm:min-h-11 sm:px-3 sm:py-2.5 sm:text-sm focus-visible:ring-2 focus-visible:ring-teal ${
                   active
                     ? "bg-parchment font-semibold text-teal-dark shadow-[inset_0_-2px_0_0_var(--teal)]"
                     : "text-stone-600 hover:bg-parchment hover:text-ink"

@@ -78,6 +78,8 @@ type ActiveQuizState = {
     attemptXp: number;
     sessionBonusXp: number;
   } | null;
+  /** Which expedition question is on screen. Past answers are review-only. */
+  viewIndex: number;
 };
 
 type CompleteQuizState = {
@@ -143,6 +145,7 @@ function beginSet(
     saving: false,
     attemptCount,
     xpAward: null,
+    viewIndex: 0,
   };
 }
 
@@ -461,14 +464,53 @@ export function PracticeQuiz({
       saving: false,
       attemptCount: state.attemptCount,
       xpAward: null,
+      viewIndex: nextRecords.length,
     });
   }
 
-  const sessionNumber = state.records.length + 1;
+  function goToPrevious() {
+    if (state.status !== "active" || state.viewIndex <= 0) {
+      return;
+    }
+    setState({ ...state, viewIndex: state.viewIndex - 1 });
+  }
+
+  function goToNext() {
+    if (state.status !== "active") {
+      return;
+    }
+    if (state.viewIndex < state.records.length) {
+      setState({ ...state, viewIndex: state.viewIndex + 1 });
+      return;
+    }
+    continueToNext();
+  }
+
+  const viewingCurrent = state.viewIndex === state.records.length;
+  const reviewedRecord = viewingCurrent
+    ? null
+    : state.records[state.viewIndex] ?? null;
+  const viewedQuestion = viewingCurrent
+    ? question
+    : (questions.find((item) => item.id === reviewedRecord?.questionId) ??
+      question);
+  const viewedSelectedChoiceId = viewingCurrent
+    ? state.selectedChoiceId
+    : (reviewedRecord?.selectedChoiceId ?? null);
+  const viewedSubmitted = viewingCurrent ? state.submitted : true;
+  const canGoPrevious = state.viewIndex > 0;
+  const canGoNext = viewingCurrent
+    ? Boolean(
+        state.submitted && state.saved && !isLast && state.selectedChoiceId,
+      )
+    : true;
+  const viewedIsCorrect =
+    viewedSelectedChoiceId === viewedQuestion.correctChoiceId;
+  const sessionNumber = state.viewIndex + 1;
   const progressPercent =
     plannedTotal === 0 ? 0 : Math.round((sessionNumber / plannedTotal) * 100);
 
-  const hasImage = Boolean(question.imageSrc);
+  const hasImage = Boolean(viewedQuestion.imageSrc);
 
   return (
     <section className="journal-panel rounded-3xl p-4 sm:p-5">
@@ -477,7 +519,7 @@ export function PracticeQuiz({
           Question {sessionNumber} of {plannedTotal}
         </p>
         <span className="rounded-full bg-parchment px-2.5 py-1 text-xs font-semibold text-ink">
-          {DIFFICULTY_LEVEL_LABEL[question.difficulty]}
+          {DIFFICULTY_LEVEL_LABEL[viewedQuestion.difficulty]}
         </span>
       </div>
       <div
@@ -503,20 +545,20 @@ export function PracticeQuiz({
       >
         <div>
           <h2 className="font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
-            {question.prompt}
+            {viewedQuestion.prompt}
           </h2>
-          {question.imageSrc ? (
+          {viewedQuestion.imageSrc ? (
             <figure className="mt-3 overflow-hidden rounded-2xl border border-stone-200/80 bg-parchment">
               {/* Local public JPEGs (and any other static imageSrc); next/image is not required. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={question.imageSrc}
-                alt={question.imageAlt ?? ""}
+                src={viewedQuestion.imageSrc}
+                alt={viewedQuestion.imageAlt ?? ""}
                 className="mx-auto max-h-[min(36vh,280px)] w-full object-contain p-2"
               />
-              {question.imageCredit ? (
+              {viewedQuestion.imageCredit ? (
                 <figcaption className="px-3 pb-2 text-center text-xs leading-snug text-stone-500">
-                  {question.imageCredit}
+                  {viewedQuestion.imageCredit}
                 </figcaption>
               ) : null}
             </figure>
@@ -525,22 +567,22 @@ export function PracticeQuiz({
 
         <div>
           <div
-            className={state.submitted ? "space-y-1.5" : "space-y-2"}
+            className={viewedSubmitted ? "space-y-1.5" : "space-y-2"}
             role="group"
             aria-label="Answer choices"
           >
-            {question.choices.map((choice) => {
-              const selected = state.selectedChoiceId === choice.id;
-              const correctChoice = choice.id === question.correctChoiceId;
+            {viewedQuestion.choices.map((choice) => {
+              const selected = viewedSelectedChoiceId === choice.id;
+              const correctChoice = choice.id === viewedQuestion.correctChoiceId;
               let choiceClass =
                 "border-stone-200 bg-parchment/50 hover:border-teal/40 hover:bg-parchment";
 
-              if (state.submitted && correctChoice) {
+              if (viewedSubmitted && correctChoice) {
                 choiceClass =
                   "choice-pulse border-teal bg-teal/10 text-teal-dark";
-              } else if (state.submitted && selected && !correctChoice) {
+              } else if (viewedSubmitted && selected && !correctChoice) {
                 choiceClass = "border-stone-400 bg-stone-100 text-ink";
-              } else if (!state.submitted && selected) {
+              } else if (!viewedSubmitted && selected) {
                 choiceClass = "border-teal bg-teal/10 text-teal-dark";
               }
 
@@ -548,17 +590,17 @@ export function PracticeQuiz({
                 <button
                   key={choice.id}
                   type="button"
-                  disabled={state.submitted}
+                  disabled={viewedSubmitted}
                   onClick={() => selectChoice(choice.id)}
                   className={`flex w-full items-start text-left transition disabled:cursor-default ${
-                    state.submitted
+                    viewedSubmitted
                       ? "gap-2 rounded-xl border px-3 py-1.5 text-sm"
                       : "min-h-11 gap-3 rounded-2xl border px-4 py-2.5 text-base"
                   } ${choiceClass}`}
                 >
                   <span
                     className={`mt-0.5 flex shrink-0 items-center justify-center rounded-full bg-white font-semibold text-stone-600 ${
-                      state.submitted
+                      viewedSubmitted
                         ? "h-6 w-6 text-xs"
                         : "h-7 w-7 text-sm"
                     }`}
@@ -571,12 +613,12 @@ export function PracticeQuiz({
             })}
           </div>
 
-          {!state.submitted ? (
+          {viewingCurrent && !state.submitted ? (
             <div className="mt-3 space-y-2">
               <button
                 type="button"
                 onClick={() => setState({ ...state, revealedHint: true })}
-                className="text-sm font-medium text-teal underline-offset-4 hover:underline"
+                className="inline-flex min-h-11 items-center justify-center rounded-full border border-teal/40 bg-teal/10 px-5 py-2.5 text-sm font-semibold text-teal-dark transition hover:bg-teal/15"
               >
                 {state.revealedHint ? "Hint is showing" : "Need a hint?"}
               </button>
@@ -591,40 +633,40 @@ export function PracticeQuiz({
             </div>
           ) : null}
 
-          {state.revealedHint && !state.submitted ? (
+          {viewingCurrent && state.revealedHint && !state.submitted ? (
             <p className="mt-2 rounded-2xl bg-amber-50 px-4 py-2.5 text-sm leading-relaxed text-amber-950">
               <span className="font-semibold">Hint: </span>
-              {question.hint}
+              {viewedQuestion.hint}
             </p>
           ) : null}
 
-          {state.submitted ? (
+          {viewedSubmitted ? (
             <div
-              ref={feedbackRef}
+              ref={viewingCurrent ? feedbackRef : undefined}
               className="mt-3 space-y-2 rounded-2xl border border-stone-200/80 bg-parchment/50 p-3"
-              aria-live="polite"
+              aria-live={viewingCurrent ? "polite" : undefined}
             >
               <p
                 className={`rounded-xl px-3 py-2 text-sm font-semibold ${
-                  isCorrect
+                  viewedIsCorrect
                     ? "border border-teal/30 bg-teal/10 text-teal-dark"
                     : "border border-stone-200 bg-surface text-ink"
                 }`}
               >
-                {isCorrect
+                {viewedIsCorrect
                   ? "Correct."
                   : "Not quite. Explorers miss things. Here is what this was asking."}
               </p>
               <p className="text-sm leading-snug text-stone-700">
-                {question.explanation}
+                {viewedQuestion.explanation}
               </p>
-              {!isCorrect ? (
+              {!viewedIsCorrect ? (
                 <p className="text-sm leading-snug text-stone-600">
                   <span className="font-semibold text-ink">Hint: </span>
-                  {question.hint}
+                  {viewedQuestion.hint}
                 </p>
               ) : null}
-              {state.saved && state.xpAward ? (
+              {viewingCurrent && state.saved && state.xpAward ? (
                 <XpAwardFeedback
                   attemptXp={state.xpAward.attemptXp}
                   sessionBonusXp={state.xpAward.sessionBonusXp}
@@ -632,7 +674,7 @@ export function PracticeQuiz({
                   hintUsed={state.revealedHint}
                 />
               ) : null}
-              {!state.saved ? (
+              {viewingCurrent && !state.saved ? (
                 <div className="space-y-2">
                   {state.saveError ? (
                     <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-950">
@@ -657,17 +699,45 @@ export function PracticeQuiz({
                   ) : null}
                 </div>
               ) : null}
-              <button
-                type="button"
-                onClick={continueToNext}
-                disabled={!state.saved}
-                className="min-h-11 w-full rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment transition enabled:hover:bg-teal disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {isLast ? "See results" : "Next question →"}
-              </button>
+              {viewingCurrent ? (
+                <button
+                  type="button"
+                  onClick={continueToNext}
+                  disabled={!state.saved}
+                  className="min-h-11 w-full rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment transition enabled:hover:bg-teal disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isLast ? "See results" : "Next question →"}
+                </button>
+              ) : null}
             </div>
           ) : null}
         </div>
+      </div>
+
+      <div className="mt-5 flex items-center justify-between gap-3 border-t border-stone-200/80 pt-4">
+        <button
+          type="button"
+          onClick={goToPrevious}
+          disabled={!canGoPrevious}
+          className="inline-flex min-h-11 min-w-[7.5rem] items-center justify-center rounded-full border border-stone-200 px-5 py-2.5 text-sm font-semibold text-ink transition enabled:hover:bg-parchment disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Previous
+        </button>
+        <p className="text-center text-xs text-stone-500">
+          {viewingCurrent && !state.submitted
+            ? "Check your answer to continue."
+            : viewingCurrent && isLast && state.submitted
+              ? "This is the last question."
+              : null}
+        </p>
+        <button
+          type="button"
+          onClick={goToNext}
+          disabled={!canGoNext}
+          className="inline-flex min-h-11 min-w-[7.5rem] items-center justify-center rounded-full border border-stone-200 px-5 py-2.5 text-sm font-semibold text-ink transition enabled:hover:bg-parchment disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Next
+        </button>
       </div>
     </section>
   );

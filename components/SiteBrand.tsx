@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 function CompassMark() {
   return (
-    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-teal text-parchment shadow-sm">
+    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal text-parchment shadow-sm">
       <svg
         viewBox="0 0 24 24"
         className="h-4 w-4"
@@ -38,12 +38,12 @@ export function SiteBrand({ highlightHome = false }: SiteBrandProps) {
       href="/"
       aria-current={atHome ? "page" : undefined}
       aria-label="Jr. Explorer"
-      className={`flex shrink-0 items-center gap-2.5 rounded-lg px-1 py-0.5 outline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-teal ${
+      className={`flex shrink-0 items-center gap-2.5 rounded-lg px-1.5 py-1.5 outline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-teal ${
         atHome ? "bg-parchment/80" : "hover:bg-parchment/70"
       }`}
     >
       <CompassMark />
-      <span className="font-display text-base font-semibold tracking-tight text-ink sm:text-lg">
+      <span className="font-display text-lg font-semibold tracking-tight text-ink sm:text-xl">
         Jr. Explorer
       </span>
     </Link>

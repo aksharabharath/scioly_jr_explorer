@@ -2,6 +2,10 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { explorerRankLabel } from "@/lib/explorer-ranks";
 import {
   MAX_EXPLORER_LEVEL,
+  XP_CORRECT,
+  XP_CORRECT_WITH_HINT,
+  XP_INCORRECT,
+  XP_SESSION_COMPLETION,
   calculateXpProgress,
   streakLabel,
   xpBarPercent,
@@ -111,6 +115,18 @@ export function ExplorerProgress({
             away.
           </p>
         )}
+      </div>
+
+      <div className="mt-4 border-t border-stone-200/80 pt-3">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal">
+          How to earn XP
+        </p>
+        <ul className="mt-2 space-y-0.5 text-sm text-stone-600">
+          <li>Correct answer: +{XP_CORRECT} XP</li>
+          <li>Correct with a hint: +{XP_CORRECT_WITH_HINT} XP</li>
+          <li>Incorrect answer: +{XP_INCORRECT} XP</li>
+          <li>Complete an expedition: +{XP_SESSION_COMPLETION} XP</li>
+        </ul>
       </div>
     </section>
   );
