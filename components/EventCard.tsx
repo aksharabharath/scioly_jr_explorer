@@ -10,9 +10,17 @@ type EventCardProps = {
   cta?: string;
   /** Short activity line, e.g. unique questions and expeditions. */
   progressLine?: string;
+  /** When false, omit the bottom CTA (display-only marketing cards). */
+  showCta?: boolean;
 };
 
-export function EventCard({ event, href, cta, progressLine }: EventCardProps) {
+export function EventCard({
+  event,
+  href,
+  cta,
+  progressLine,
+  showCta = true,
+}: EventCardProps) {
   const tint = fieldSiteTint(event.id);
   const site = fieldSiteSubtitle(event.id);
   const locked = !event.unlocked;
@@ -54,15 +62,17 @@ export function EventCard({ event, href, cta, progressLine }: EventCardProps) {
         </div>
       </div>
 
-      {locked || !playable ? (
-        <p className="mt-5 rounded-2xl bg-stone-100 px-3 py-2 text-sm font-medium text-stone-600">
-          Coming later
-        </p>
-      ) : (
-        <p className="mt-auto pt-4 text-sm font-semibold text-teal-dark">
-          {label}
-        </p>
-      )}
+      {showCta ? (
+        locked || !playable ? (
+          <p className="mt-5 rounded-2xl bg-stone-100 px-3 py-2 text-sm font-medium text-stone-600">
+            Coming later
+          </p>
+        ) : (
+          <p className="mt-auto pt-4 text-sm font-semibold text-teal-dark">
+            {label}
+          </p>
+        )
+      ) : null}
     </article>
   );
 

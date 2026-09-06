@@ -4,6 +4,7 @@ import { getSupabasePublicEnv } from "@/lib/supabase/env";
 
 function isPublicPath(pathname: string): boolean {
   return (
+    pathname === "/" ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/signup") ||
     pathname.startsWith("/auth")

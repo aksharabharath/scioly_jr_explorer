@@ -9,7 +9,7 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-surface/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-screen-xl items-center gap-2 px-4 py-1.5 sm:gap-3 sm:px-6">
-        <SiteBrand />
+        <SiteBrand showBaseCampLabel={Boolean(user)} />
         {user ? (
           <SiteNav />
         ) : (
@@ -27,7 +27,7 @@ export async function SiteHeader() {
               href="/signup"
               className="rounded-lg bg-teal-dark px-3 py-1.5 text-parchment outline-none hover:bg-teal focus-visible:ring-2 focus-visible:ring-teal"
             >
-              Create account
+              Start exploring
             </Link>
           </nav>
         )}

@@ -25,9 +25,14 @@ function CompassMark() {
   );
 }
 
-export function SiteBrand() {
+type SiteBrandProps = {
+  /** Logged-in home is Base camp. Logged-out `/` is the public landing page. */
+  showBaseCampLabel?: boolean;
+};
+
+export function SiteBrand({ showBaseCampLabel = false }: SiteBrandProps) {
   const pathname = usePathname() ?? "";
-  const atBaseCamp = pathname === "/";
+  const atBaseCamp = Boolean(showBaseCampLabel) && pathname === "/";
 
   return (
     <Link

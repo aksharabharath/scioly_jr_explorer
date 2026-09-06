@@ -1,9 +1,10 @@
 import { DailyMissionCard } from "@/components/DailyMissionCard";
 import { EventCard } from "@/components/EventCard";
 import { ExplorerProgress } from "@/components/ExplorerProgress";
+import { LandingPage } from "@/components/LandingPage";
 import { OverallProgressCard } from "@/components/OverallProgressCard";
 import { RecentAchievements } from "@/components/RecentAchievements";
-import { displayNameFromUser, requireUser } from "@/lib/auth/session";
+import { displayNameFromUser, getCurrentUser } from "@/lib/auth/session";
 import {
   completedSessionCountForEvent,
   uniqueQuestionsPracticed,
@@ -12,7 +13,7 @@ import { fieldSiteSubtitle, mostRecentPracticedEventId } from "@/lib/field-sites
 import { explorerProfileFromGamification } from "@/lib/gamification";
 import { getAllQuestions } from "@/lib/mock/curriculum";
 import { getDashboardData } from "@/lib/mock/explorer";
-import { isPlayablePracticeEvent } from "@/lib/mock/events";
+import { getEvents, isPlayablePracticeEvent } from "@/lib/mock/events";
 import {
   getMyGamification,
   getMyPracticeAttempts,
@@ -28,7 +29,12 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const user = await requireUser();
+  const user = await getCurrentUser();
+  if (!user) {
+    const events = (await getEvents()).filter(isPlayablePracticeEvent);
+    return <LandingPage events={events} />;
+  }
+
   const selectedEventIds = await requireEventSelection();
   const [{ events }, attempts, questions, gamification] = await Promise.all([
     getDashboardData(),

@@ -100,12 +100,44 @@
   animation: pin-fill 0.35s ease-out;
 }
 
+@keyframes landing-settle {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing-settle {
+  animation: landing-settle 0.45s ease-out both;
+}
+
+@keyframes landing-stamp {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.landing-stamp {
+  animation: landing-stamp 0.4s ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .badge-pop,
   .xp-float,
   .level-burst,
   .choice-pulse,
-  .pin-explored {
+  .pin-explored,
+  .landing-settle,
+  .landing-stamp {
     animation: none;
   }
 
