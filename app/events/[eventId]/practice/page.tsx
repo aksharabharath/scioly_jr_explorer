@@ -5,6 +5,7 @@ import {
   parsePracticeMode,
   toLearningAttempts,
 } from "@/lib/learning/adaptive";
+import { completedSessionCountForEvent } from "@/lib/expeditions";
 import { getAllQuestions, getPracticePageData } from "@/lib/mock/curriculum";
 import { isStudentCatalogEventId } from "@/lib/mock/events";
 import {
@@ -90,6 +91,7 @@ export default async function PracticePage({
     notFound();
   }
 
+<<<<<<< ours
   const [
     storedAttempts,
     allStoredAttempts,
@@ -103,11 +105,52 @@ export default async function PracticePage({
     getAllQuestions(),
     getMyGamification(),
   ]);
+||||||| base
+  const [storedAttempts, priorBadgeAttempts, attemptCount, allQuestions, gamification] =
+    await Promise.all([
+      getMyRecentPracticeAttempts(),
+      getMyPracticeAttempts(),
+      getMyPracticeAttemptCount(),
+      getAllQuestions(),
+      getMyGamification(),
+    ]);
+=======
+  const [
+    recentStoredAttempts,
+    allStoredAttempts,
+    attemptCount,
+    allQuestions,
+    gamification,
+  ] =
+    await Promise.all([
+      getMyRecentPracticeAttempts(),
+      getMyPracticeAttempts(),
+      getMyPracticeAttemptCount(),
+      getAllQuestions(),
+      getMyGamification(),
+    ]);
+>>>>>>> theirs
   const eventQuestions = allQuestions.filter(
     (question) => question.eventId === data.event.id,
   );
+<<<<<<< ours
   const priorBadgeAttempts = allStoredAttempts;
   const priorAttempts = toLearningAttempts(storedAttempts, eventQuestions);
+||||||| base
+  const priorAttempts = toLearningAttempts(storedAttempts, eventQuestions);
+=======
+  const priorAttempts = toLearningAttempts(recentStoredAttempts, eventQuestions);
+  const previouslyAnsweredQuestionIds = allStoredAttempts
+    .filter((attempt) =>
+      eventQuestions.some((question) => question.id === attempt.questionId),
+    )
+    .map((attempt) => attempt.questionId);
+  const completedExpeditions = completedSessionCountForEvent(
+    data.event.id,
+    allStoredAttempts,
+    allQuestions,
+  );
+>>>>>>> theirs
   const practiceQuestions =
     mode === "weak"
       ? eligibleWeakQuestions(data.questions, priorAttempts)
@@ -173,7 +216,9 @@ export default async function PracticePage({
               eventName={data.event.name}
               questions={practiceQuestions}
               priorAttempts={priorAttempts}
-              priorBadgeAttempts={priorBadgeAttempts}
+              priorBadgeAttempts={allStoredAttempts}
+              previouslyAnsweredQuestionIds={previouslyAnsweredQuestionIds}
+              completedExpeditions={completedExpeditions}
               allQuestions={allQuestions}
               initialAttemptCount={attemptCount}
               initialXp={gamification.xp}

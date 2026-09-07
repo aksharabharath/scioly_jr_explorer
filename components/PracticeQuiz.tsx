@@ -7,6 +7,7 @@ import {
   PRACTICE_SET_SIZE,
   attemptFromQuestion,
   friendlyRevisitNote,
+  hasWeakTopics,
   selectNextQuestion,
   type LearningAttempt,
   type PracticeMode,
@@ -69,6 +70,8 @@ type PracticeQuizProps = {
   };
   dailyPracticeGoal?: DailyPracticeGoal;
   mode?: PracticeMode;
+  previouslyAnsweredQuestionIds?: string[];
+  completedExpeditions?: number;
 };
 
 type ActiveQuizState = {
@@ -119,7 +122,14 @@ function beginSet(
   history: LearningAttempt[],
   attemptCount: number,
   mode: PracticeMode,
+<<<<<<< ours
   resumeSession?: PracticeQuizProps["resumeSession"],
+||||||| base
+=======
+  eventId: string,
+  expeditionNumber: number,
+  previouslyAnsweredQuestionIds: string[],
+>>>>>>> theirs
 ): QuizState {
   const resumedAttempts = resumeSession?.attempts ?? [];
   const byId = new Map(questions.map((item) => [item.id, item]));
@@ -157,6 +167,7 @@ function beginSet(
   const question = selectNextQuestion({
     bank: questions,
     history,
+<<<<<<< ours
     askedQuestionIds: askedIds,
     sessionTopicSequence: sessionTopics,
     lastWasRevisitEvidence:
@@ -164,7 +175,19 @@ function beginSet(
         ? !resumedRecords[resumedRecords.length - 1].isCorrect ||
           resumedRecords[resumedRecords.length - 1].hintUsed
         : false,
+||||||| base
+    askedQuestionIds: [],
+    sessionTopicSequence: [],
+    lastWasRevisitEvidence: false,
+=======
+    askedQuestionIds: [],
+    previouslyAnsweredQuestionIds,
+    sessionTopicSequence: [],
+    lastWasRevisitEvidence: false,
+>>>>>>> theirs
     mode,
+    eventId,
+    expeditionNumber,
   });
 
   if (!question) {
@@ -274,8 +297,16 @@ export function PracticeQuiz({
   resumeSession,
   dailyPracticeGoal = DEFAULT_DAILY_PRACTICE_GOAL,
   mode = "normal",
+  previouslyAnsweredQuestionIds = [],
+  completedExpeditions = 0,
 }: PracticeQuizProps) {
+  const expeditionNumberRef = useRef(completedExpeditions + 1);
+  const sessionModeRef = useRef(mode);
+  const previouslyAnsweredQuestionIdsRef = useRef([
+    ...previouslyAnsweredQuestionIds,
+  ]);
   const [state, setState] = useState<QuizState>(() =>
+<<<<<<< ours
     beginSet(
       questions,
       priorAttempts,
@@ -283,6 +314,19 @@ export function PracticeQuiz({
       mode,
       resumeSession,
     ),
+||||||| base
+    beginSet(questions, priorAttempts, initialAttemptCount, mode),
+=======
+    beginSet(
+      questions,
+      priorAttempts,
+      initialAttemptCount,
+      mode,
+      eventId,
+      completedExpeditions + 1,
+      previouslyAnsweredQuestionIds,
+    ),
+>>>>>>> theirs
   );
   const feedbackRef = useRef<HTMLDivElement>(null);
   const savingRef = useRef(false);
@@ -309,7 +353,8 @@ export function PracticeQuiz({
     });
   }, [showFeedback]);
 
-  function startNewSession() {
+  function startNewSession(nextMode: PracticeMode = "normal") {
+    sessionModeRef.current = nextMode;
     if (totalXpRef.current != null) {
       baselineXpRef.current = totalXpRef.current;
     }
@@ -389,9 +434,46 @@ export function PracticeQuiz({
         summary={summary}
         followUp={followUp}
         revisitNote={revisitNote}
+<<<<<<< ours
         onTryAgain={() => {
           startNewSession();
           setState(beginSet(questions, state.history, state.attemptCount, mode));
+||||||| base
+        onTryAgain={() => {
+          startNewSession();
+          setState(
+            beginSet(questions, state.history, state.attemptCount, mode),
+          );
+=======
+        hasRemediation={hasWeakTopics(state.history)}
+        onMoveOn={() => {
+          startNewSession("normal");
+          setState(
+            beginSet(
+              questions,
+              state.history,
+              state.attemptCount,
+              "normal",
+              eventId,
+              ++expeditionNumberRef.current,
+              previouslyAnsweredQuestionIdsRef.current,
+            ),
+          );
+        }}
+        onRemediate={() => {
+          startNewSession("weak");
+          setState(
+            beginSet(
+              questions,
+              state.history,
+              state.attemptCount,
+              "weak",
+              eventId,
+              ++expeditionNumberRef.current,
+              previouslyAnsweredQuestionIdsRef.current,
+            ),
+          );
+>>>>>>> theirs
         }}
         sessionXp={state.sessionXp}
         sessionBonusXp={state.sessionBonusXp}
@@ -537,6 +619,11 @@ export function PracticeQuiz({
     const attempt = attemptFromQuestion(question, record.isCorrect, hintUsed);
     const nextHistory = [...state.history, attempt];
     const nextRecords = [...state.records, record];
+    if (
+      !previouslyAnsweredQuestionIdsRef.current.includes(record.questionId)
+    ) {
+      previouslyAnsweredQuestionIdsRef.current.push(record.questionId);
+    }
     attemptIdRef.current = null;
 
     if (isLast) {
@@ -555,9 +642,13 @@ export function PracticeQuiz({
       bank: questions,
       history: nextHistory,
       askedQuestionIds: state.askedIds,
+      previouslyAnsweredQuestionIds:
+        previouslyAnsweredQuestionIdsRef.current,
       sessionTopicSequence: state.sessionTopics,
       lastWasRevisitEvidence: !record.isCorrect || hintUsed,
-      mode,
+      mode: sessionModeRef.current,
+      eventId,
+      expeditionNumber: expeditionNumberRef.current,
     });
 
     if (!nextQuestion) {
@@ -918,7 +1009,6 @@ type ResultsCardProps = {
   summary: PracticeSummary;
   followUp: PracticeFollowUp;
   revisitNote: string | null;
-  onTryAgain: () => void;
   sessionXp: number;
   sessionBonusXp: number;
   streakDays: number;
@@ -927,6 +1017,9 @@ type ResultsCardProps = {
   leveledUpTo: number | null;
   streakMilestone: StreakMilestone | null;
   dailyMissionComplete: boolean;
+  hasRemediation: boolean;
+  onMoveOn: () => void;
+  onRemediate: () => void;
 };
 
 function ResultsCard({
@@ -935,7 +1028,6 @@ function ResultsCard({
   summary,
   followUp,
   revisitNote,
-  onTryAgain,
   sessionXp,
   sessionBonusXp,
   streakDays,
@@ -944,6 +1036,9 @@ function ResultsCard({
   leveledUpTo,
   streakMilestone,
   dailyMissionComplete,
+  hasRemediation,
+  onMoveOn,
+  onRemediate,
 }: ResultsCardProps) {
   const explorerLevel =
     totalXp == null ? null : calculateLevelFromXp(totalXp);
@@ -1056,11 +1151,20 @@ function ResultsCard({
       <div className="mt-6 flex flex-col gap-3 sm:flex-row">
         <button
           type="button"
-          onClick={onTryAgain}
+          onClick={onMoveOn}
           className="rounded-full bg-teal-dark px-5 py-2.5 text-center text-sm font-semibold text-parchment hover:bg-teal"
         >
-          Try this expedition again
+          Move on to next expedition
         </button>
+        {hasRemediation ? (
+          <button
+            type="button"
+            onClick={onRemediate}
+            className="rounded-full border border-stone-200 px-5 py-2.5 text-center text-sm font-semibold text-ink hover:bg-parchment"
+          >
+            Try this expedition again — Work on tricky topics
+          </button>
+        ) : null}
         <Link
           href={`/events/${eventId}`}
           className="rounded-full border border-stone-200 px-5 py-2.5 text-center text-sm font-semibold text-ink hover:bg-parchment"
