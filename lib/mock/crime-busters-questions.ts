@@ -150,7 +150,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Ulnar, Radial, and Accidental",
     ],
     correctChoiceId: "b",
-    hint: "Use the three family headings in the Fingerprint Analysis section, not the subtype lists.",
+    hint: "Find the broad family headings in the official fingerprint section, then compare them with each set.",
     explanation:
       "The rules name Loops, Whorls, and Arches as the fundamental patterns. Ulnar and Radial are loop subtypes; Accidental is a whorl subtype.",
     cognitiveDemand: "recall",
@@ -172,7 +172,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Left slant and right slant only",
     ],
     correctChoiceId: "a",
-    hint: "Read the parenthetical list printed beside Loops, not beside Whorls or Arches.",
+    hint: "Locate the Loops entry in the official rules, then compare its listed subtypes with the choices.",
     explanation:
       "The rules print Loops (Ulnar, Radial, Central Pocket). Plain, Accidental, and Double Loop are listed under Whorls. Plain and Tented are listed under Arches.",
     cognitiveDemand: "recall",
@@ -238,7 +238,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Radial, ulnar, and tented",
     ],
     correctChoiceId: "b",
-    hint: "The three broad types come first, then subclasses inside each.",
+    hint: "Use the NIST classification section, then compare its broad pattern groups with the choices.",
     explanation:
       "NIST states that patterns are divided into three types: arches, loops, and whorls. That matches the three 2027 family names.",
     cognitiveDemand: "recognition",
@@ -282,7 +282,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Clavicle and scapula",
     ],
     correctChoiceId: "b",
-    hint: "Use the handbook sentence that derives the two loop names. Match the bone pair printed there with the choices.",
+    hint: "Find the handbook passage explaining these names, then compare the bones it mentions with the choices.",
     explanation:
       "The handbook states that the terms radial and ulnar are derived from the radius and ulna bones of the forearm.",
     cognitiveDemand: "recall",
@@ -353,7 +353,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     correctChoiceId: "b",
     wordingHelp:
       "This question is asking which missing piece a tented arch can lack, from the three loop rules.",
-    hint: "Use the NIST fingerprint reference and find the paragraph on tented arches. Compare the features listed there with the four choices.",
+    hint: "Find the NIST paragraph for this pattern, then compare the listed requirements with each choice.",
     explanation:
       "NIST states that tented arches may be similar to a loop, except that they lack one of the three requirements (recurve, delta, or ridge count).",
     cognitiveDemand: "application",
@@ -421,7 +421,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Human, dog, cat, bird, and fish",
     ],
     correctChoiceId: "a",
-    hint: "Check the Hair/Fiber Analysis list and compare every option against the complete set of permitted hair sources.",
+    hint: "Use the Hair/Fiber Analysis list, then compare every proposed set with the complete list.",
     explanation:
       "The rules name human, dog, cat, squirrel, and mouse hair. Other mammals are not on that closed list.",
     cognitiveDemand: "recall",
@@ -443,7 +443,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Scale, pigment, and keratin only",
     ],
     correctChoiceId: "b",
-    hint: "Use the DOJ hair reference and compare the structures it identifies as parts of the shaft with the three-part choices.",
+    hint: "Use the DOJ hair reference, then compare its shaft structures with each three-part choice.",
     explanation:
       "The DOJ document states that the shaft is made of three layers called the cuticle, cortex, and medulla.",
     cognitiveDemand: "recall",
@@ -491,7 +491,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     ],
     correctChoiceId: "d",
     promptTerms: [{ glossaryId: "cuticle" }],
-    hint: "Use the DOJ cuticle comparison table. Start with the human row and compare its full description with each choice.",
+    hint: "Use the DOJ comparison table, then compare the human-row description with all four choices.",
     explanation:
       "Human cuticle: imbricate (no repeating pattern), flattened scales, similar along the length of the shaft and relatively smooth. Animal hair is described as having a wide range of scale patterns.",
     cognitiveDemand: "distinction",
@@ -513,7 +513,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Linen, silk, wool, cashmere, mohair, and alpaca",
     ],
     correctChoiceId: "b",
-    hint: "Check the Hair/Fiber Analysis list and compare each option against the complete set of fibers students are expected to distinguish.",
+    hint: "Use the Hair/Fiber Analysis list, then compare every proposed set with the complete fiber list.",
     explanation:
       "The closed fiber-name list is cotton, linen, silk, nylon, rayon, and polyester.",
     cognitiveDemand: "recall",
@@ -535,7 +535,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Organic, inorganic, and blended",
     ],
     correctChoiceId: "a",
-    hint: "Return to the rules sentence about microscopic fiber identification and compare the categories stated there with the choices.",
+    hint: "Find the rules sentence on fiber identification, then compare its categories with the choices.",
     explanation:
       "The rules ask students to identify differences between animal, vegetable, and synthetic fibers. This item is list literacy only; it does not assign each named fiber to a class.",
     cognitiveDemand: "recall",
@@ -601,7 +601,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Topsoil, subsoil, parent material, peat, chalk, and humus",
     ],
     correctChoiceId: "a",
-    hint: "Check the Soil Analysis list and compare each option against the complete set of soil names printed there.",
+    hint: "Use the Soil Analysis list, then compare every proposed set with the complete printed list.",
     explanation:
       "The closed list is Peaty, Loamy, Sandy, Clay, Chalky, and Silty. USDA taxonomy names and unofficial garden nicknames are not that list.",
     cognitiveDemand: "recall",
@@ -623,7 +623,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Compost",
     ],
     correctChoiceId: "b",
-    hint: "Check the Soil Analysis list and compare the four choices with the name used for this soil type.",
+    hint: "Find the relevant name on the Soil Analysis list, then compare it with the four choices.",
     explanation:
       "The 2027 list prints Peaty. RHS describes peat soils as very high in organic matter and moisture. Muck, humus, and compost are not official list names.",
     cognitiveDemand: "recognition",
@@ -758,7 +758,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "NaCl",
     ],
     correctChoiceId: "d",
-    hint: "Match table salt to its chemical name, then choose that compound’s formula — not the formula of a different powder.",
+    hint: "Use the formula entry for the named compound, then compare it with all four formulas.",
     explanation:
       "PubChem: sodium chloride is an ionic compound with the formula NaCl and is also called table salt. NaHCO3 is sodium bicarbonate; CaCO3 is calcium carbonate; C12H22O11 is sucrose.",
     cognitiveDemand: "recall",
@@ -780,7 +780,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "NaClO",
     ],
     correctChoiceId: "a",
-    hint: "Match the chemical name in the stem to that compound's formula in the reference, not the formula of a different listed chemical.",
+    hint: "Use the relevant formula entry for the named compound, then compare it with all four formulas.",
     explanation:
       "PubChem CID 5988: sucrose has formula C12H22O11 and lists Table sugar among synonyms. This item treats contest “Sugar” as sucrose only when named as table sugar/sucrose.",
     cognitiveDemand: "recall",
@@ -802,7 +802,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "H2O",
     ],
     correctChoiceId: "b",
-    hint: "Match sodium bicarbonate to its formula, not the formula of a different listed powder.",
+    hint: "Use the formula entry for the named compound, then compare it with all four formulas.",
     explanation:
       "PubChem CID 516892 uses molecular formula NaHCO3 for sodium bicarbonate.",
     cognitiveDemand: "recall",
@@ -824,7 +824,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "C12H22O11",
     ],
     correctChoiceId: "c",
-    hint: "Match calcium carbonate to its formula, not the formula of a different listed powder.",
+    hint: "Use the formula entry for the named compound, then compare it with all four formulas.",
     explanation:
       "PubChem: calcium carbonate has formula CaCO3 and is discussed as chalk. That powder name is separate from soil type Chalky.",
     cognitiveDemand: "recall",

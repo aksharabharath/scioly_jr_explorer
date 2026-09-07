@@ -207,7 +207,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Coleoptera",
     ],
     correctChoiceId: "b",
-    hint: "Look at the official common names printed next to that order.",
+    hint: "Use the official taxonomy list to find each named common group, then compare the order printed beside it.",
     explanation:
       "The 2027 list gives Order Blattodea the common names cockroaches/termites. Mantodea is mantids; Orthoptera is printed as grasshoppers & crickets; Coleoptera is printed as beetles.",
     taxonomyTags: ["Blattodea"],
@@ -230,7 +230,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "springtails, snow fleas",
     ],
     correctChoiceId: "d",
-    hint: "Collembola is a subclass under Class Entognatha, not an insect order.",
+    hint: "Find the named subclass in the official list, then compare its printed common names with the choices.",
     explanation:
       "The list prints Collembola as springtails, snow fleas. Diplurans are Order Diplura; silverfish and firebrats are Zygentoma; thrips are Thysanoptera.",
     taxonomyTags: ["Collembola", "Entognatha"],
@@ -253,7 +253,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "As a non-insect arthropod family",
     ],
     correctChoiceId: "d",
-    hint: "Count the walking legs and find the list heading that is separate from Class Insecta.",
+    hint: "Inspect the specimen’s overall form, then compare its observable classification clues with the listed groups.",
     explanation:
       "Ixodidae is listed under Non-Insect Arthropods with the common name hardback ticks. It is not an insect order or a beetle or true-bug family. Eight walking legs and a fused body are visible in the photo; those characters are not printed on the 2027 list.",
     taxonomyTags: ["Ixodidae"],
@@ -281,7 +281,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Trichoptera",
     ],
     correctChoiceId: "c",
-    hint: "Dragon/damselflies, stoneflies, and caddisflies are different listed orders.",
+    hint: "Locate the named common group in the official list, then compare the order printed beside it.",
     explanation:
       "Ephemeroptera is printed as mayflies. Odonata is dragon/damselflies; Plecoptera is stoneflies; Trichoptera is caddisflies.",
     taxonomyTags: ["Ephemeroptera"],
@@ -304,7 +304,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Vespidae — paper wasps, hornets, yellowjackets",
     ],
     correctChoiceId: "c",
-    hint: "Among listed Hymenoptera families, match the specimen to its official common name. Do not pick bee flies.",
+    hint: "Inspect the specimen’s overall form, then compare its visible features with every listed family.",
     explanation:
       "Apidae is printed as bees under Hymenoptera. Bee flies (Bombyliidae) are a listed Diptera family. Ants are Formicidae; paper wasps, hornets, and yellowjackets are Vespidae.",
     taxonomyTags: ["Apidae", "Hymenoptera"],
@@ -333,7 +333,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Apidae — bees",
     ],
     correctChoiceId: "b",
-    hint: "Among listed Hymenoptera families, match the specimen to its official common name.",
+    hint: "Inspect the specimen and compare its visible structures with each listed family’s common name.",
     explanation:
       "Ants are family Formicidae in Hymenoptera. Wasps, gall wasps, and bees are other listed hymenopteran families with different body plans.",
     taxonomyTags: ["Formicidae", "Hymenoptera"],
@@ -362,7 +362,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "No listed moth or butterfly family has hindwing tails",
     ],
     correctChoiceId: "c",
-    hint: "Among the three listed Lepidoptera families, match the specimen to its official common name. Do not pick Giant Silkworm moths.",
+    hint: "Inspect the specimen’s visible structures, then compare them with each listed family name.",
     explanation:
       "Papilionidae (swallowtails) often have tail-like projections on the hindwings. Saturniidae are Giant Silkworm moths; Nymphalidae are brush-footed butterflies. Tails are a useful clue among the three listed lepidopteran families, not a proof for every swallowtail species.",
     taxonomyTags: ["Papilionidae", "Lepidoptera"],
@@ -391,7 +391,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Hydrophilidae — water scavenger",
     ],
     correctChoiceId: "a",
-    hint: "Match the swimming pose in the photo to a listed aquatic family. Do not pick beetle families if the specimen is a true bug.",
+    hint: "Compare the specimen’s body form and appendages with the evidence represented by each listed family.",
     explanation:
       "Notonectidae is printed as backswimmers. Orientation in the photo is not a list fact. Corixidae is printed as water boatmen. Dytiscidae and Hydrophilidae (water scavenger) are Coleoptera families, not Hemiptera.",
     taxonomyTags: ["Notonectidae", "Hemiptera"],
@@ -420,7 +420,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Curculionidae — weevils",
     ],
     correctChoiceId: "d",
-    hint: "Among listed beetle families, match the specimen to its official common name. Do not pick lady-bird beetles or dung beetles.",
+    hint: "Inspect the specimen’s visible structures, then compare them with every listed family name.",
     explanation:
       "Curculionidae is printed as weevils. The snout diagnostic is not on the 2027 list. Tenebrionidae, Scarabaeidae, and Coccinellidae (lady-bird beetles(ladybugs)) are other listed beetle families.",
     taxonomyTags: ["Curculionidae", "Coleoptera"],
@@ -478,7 +478,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Backswimmers belong to Coleoptera; water boatmen belong to Odonata.",
     ],
     correctChoiceId: "b",
-    hint: "Use the official common name “backswimmers” as a clue.",
+    hint: "Inspect the specimen’s visible features, then compare them with the meanings of the candidate common names.",
     explanation:
       "Both families are Hemiptera (true bugs) with six legs. The usual field split is orientation: Notonectidae often swim ventral-side up; Corixidae usually keep the back upward. Neither is a beetle or a dragonfly.",
     taxonomyTags: ["Corixidae", "Notonectidae", "Hemiptera"],
@@ -530,7 +530,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "A and B are both blow flies (Calliphoridae).",
     ],
     correctChoiceId: "c",
-    hint: "Crane flies are often mistaken for mosquitoes but are a different listed family.",
+    hint: "Inspect both photos side by side, then compare their visible structures with each paired-family choice.",
     explanation:
       "Tipulidae are crane flies; Culicidae are mosquitoes. Adult crane flies do not have the scaled wings and piercing proboscis of mosquitoes. Bee flies and blow flies are other listed Diptera families with different shapes.",
     taxonomyTags: ["Tipulidae", "Culicidae", "Diptera"],
@@ -559,7 +559,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Proboscis, elytra, and cerci",
     ],
     correctChoiceId: "a",
-    hint: "Ticks (Ixodidae) are built differently; think of a bee or a beetle.",
+    hint: "Use the standard insect body plan, then compare each three-part set with that organization.",
     explanation:
       "Insects have three main body regions: head, thorax, and abdomen. Proboscis, elytra, and cerci are parts, not those three regions. Family Ixodidae is listed under Non-Insect Arthropods, so do not treat ticks as if they used this insect body plan.",
     taxonomyTags: ["Insecta", "Ixodidae"],
@@ -581,7 +581,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "It stores pollen in every insect family",
     ],
     correctChoiceId: "c",
-    hint: "Think of armor that is also a skeleton on the outside.",
+    hint: "Compare the job assigned to the outer body covering in each choice.",
     explanation:
       "The exoskeleton (cuticle) supports the body, protects internal parts, and is the attachment surface for muscles. It is not a heart, and pollen baskets are not universal.",
     taxonomyTags: ["Insecta"],
@@ -604,7 +604,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "One pair on the head, thorax, and abdomen",
     ],
     correctChoiceId: "a",
-    hint: "Walking legs attach on the middle body region, not on the head or abdomen.",
+    hint: "Use the standard three-region body plan, then compare each proposed leg location.",
     explanation:
       "Adult insects have three pairs of walking legs attached on the thorax. Those walking pairs are not described as attaching to the head or abdomen.",
     taxonomyTags: ["Insecta"],
@@ -627,7 +627,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Inside the compound eyes",
     ],
     correctChoiceId: "c",
-    hint: "Look at the circled pair of structures. Do not pick antennae or eyes.",
+    hint: "Inspect the circled structures and compare their body-region location with each listed term.",
     explanation:
       "Cerci arise at the posterior end of the abdomen. They are not parts of the antennae, tarsi, or eyes.",
     taxonomyTags: ["Insecta"],
@@ -679,7 +679,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Membracidae",
     ],
     correctChoiceId: "c",
-    hint: "Start at couplet 1 using the official common-name string, not a look-alike Hemiptera family.",
+    hint: "Start at the first couplet, test both branches against the official name, and follow the supported branch.",
     explanation:
       "Couplet 1a matches the official common name short-horned grasshoppers → Acrididae. Couplet 2 is only for the other listed Orthoptera families. Membracidae are treehoppers (Hemiptera), so they are not in this key.",
     taxonomyTags: ["Acrididae", "Tettigoniidae", "Gryllidae", "Orthoptera"],
@@ -702,7 +702,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Is a tick versus is an insect",
     ],
     correctChoiceId: "a",
-    hint: "Look at the official common names: two mention diving or water; two are grasshoppers or crickets.",
+    hint: "For each proposed split, ask whether it separates all four groups using evidence available for those groups.",
     explanation:
       "Dytiscidae is printed as predaceous diving beetles; Hydrophilidae is printed as water scavenger. Acrididae is printed as short-horned grasshoppers; Gryllidae is printed as crickets/tree crickets. Grouping by those official-name clues splits the four taxa evenly. All four are insects; none are Ixodidae. Glow belongs to Lampyridae, which is not in this set.",
     taxonomyTags: ["Dytiscidae", "Hydrophilidae", "Acrididae", "Gryllidae"],
@@ -725,7 +725,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "In freshwater habitats such as streams and ponds",
     ],
     correctChoiceId: "d",
-    hint: "Caddisflies are often grouped with other aquatic insect orders on study lists.",
+    hint: "Use the larval habitat information for the named order, then compare it with each habitat choice.",
     explanation:
       "Caddisfly larvae are aquatic in freshwater. They are not listed as mammal parasites or as exclusively marine plankton.",
     taxonomyTags: ["Trichoptera"],
@@ -747,7 +747,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Inside stored grain as the main pest",
     ],
     correctChoiceId: "b",
-    hint: "Adult mayflies stay near the water where they emerged.",
+    hint: "Focus on the immature stage named in the stem, then compare the habitat requirements in each choice.",
     explanation:
       "This item treats mayfly immatures as aquatic in freshwater. That habitat is not printed on the 2027 taxon list.",
     taxonomyTags: ["Ephemeroptera"],
@@ -770,7 +770,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Odonata (dragon/damselflies)",
     ],
     correctChoiceId: "a",
-    hint: "Butterflies and moths have a resting pupal/chrysalis stage; true bugs and grasshoppers do not.",
+    hint: "Compare the developmental stages associated with each listed group, then match the complete life-cycle pattern.",
     explanation:
       "Lepidoptera are holometabolous: egg, larva, pupa, adult. Hemiptera, Orthoptera, and Odonata have incomplete development (naiad/nymph to adult) without a pupa.",
     taxonomyTags: ["Lepidoptera", "Papilionidae", "Hemiptera", "Orthoptera", "Odonata"],
@@ -891,7 +891,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Silk cocoons identical to Saturniidae moths",
     ],
     correctChoiceId: "c",
-    hint: "Do not pick mushrooms, honey, or moth cocoons.",
+    hint: "Use the plant response described in the reference, then compare each choice’s proposed outcome.",
     explanation:
       "Cynipidae is printed as gall wasps. RULES_2027.md includes relationships with plants. What a gall is, and silk cocoons in Saturniidae, are not printed on the taxon list.",
     taxonomyTags: ["Cynipidae", "Hymenoptera"],

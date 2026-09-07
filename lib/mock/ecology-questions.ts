@@ -106,7 +106,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
     topicId: "organization-and-energy",
     difficulty: 1,
     prompt:
-      "Levels of ecological organization are listed as Individual → Population → Community → Ecosystem → Biome → Biosphere. Which level comes immediately after Community?",
+      "Levels of ecological organization are listed as Individual → Population → Community → ______ → Biome → Biosphere. Which level comes immediately after Community?",
     choiceTexts: [
       "Population",
       "Individual",
@@ -180,7 +180,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "It includes the living organisms in an area and their interactions with nonliving parts of that area, such as air, water, and soil",
     ],
     correctChoiceId: "d",
-    hint: "Compare the scale and topic of each statement with the named ecological level, then see which statement belongs at that level.",
+    hint: "Compare the scale and topic of each statement with the named ecological level.",
     explanation:
       "An ecosystem is composed of the biotic components in an area along with the abiotic components, including air, water, and soil. One interbreeding species is a population. Greenhouse gases are a climate topic, not the definition of an ecosystem.",
     cognitiveDemand: "application",
@@ -202,7 +202,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "How energy flows directionally through ecosystems",
     ],
     correctChoiceId: "d",
-    hint: "Compare each choice by the ecological process it describes, then match that process to what food webs are used to show.",
+    hint: "Compare each choice by process, then match that process with what food webs are used to show.",
     explanation:
       "Food webs illustrate how energy flows directionally through ecosystems. Gene flow, rain shadows, and acid rain are different processes.",
     cognitiveDemand: "recall",
@@ -224,7 +224,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Biomass pyramids can never be inverted",
     ],
     correctChoiceId: "c",
-    hint: "For each choice, note which pyramid type it names and whether the claim is about energy, numbers, or biomass. Then check whether that claim matches how that quantity changes from one trophic level to the next.",
+    hint: "Separate energy, numbers, and biomass claims, then compare each with transfer between trophic levels.",
     explanation:
       "Energy pyramids must always be upright because during energy transfer some energy is lost as heat, so less energy is available at each higher trophic level. Pyramids of numbers can be upright or inverted. Biomass pyramids can also be inverted in some ecosystems.",
     cognitiveDemand: "distinction",
@@ -268,7 +268,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "When a community stays unchanged until the next fire or storm",
     ],
     correctChoiceId: "c",
-    hint: "Compare brand-new ground with a place that still has leftover community.",
+    hint: "Compare what remains after disturbance in each scenario with the starting conditions described.",
     explanation:
       "In primary succession, newly exposed or newly formed land is colonized by living things. Secondary succession is when part of an ecosystem is disturbed and remnants of the previous community remain. Competitive exclusion and climax are different ideas.",
     cognitiveDemand: "recognition",
@@ -290,7 +290,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Both species benefit from the interaction",
     ],
     correctChoiceId: "d",
-    hint: "For each choice, mark what happens to the first species and what happens to the second. Then see which of those patterns belongs with the interaction named in the question.",
+    hint: "Record the effect on each species for every option, then compare the resulting interaction patterns.",
     explanation:
       "Mutualism is a symbiotic relationship in which two species benefit from their interaction. Parasitism benefits the parasite and harms the host. Commensalism benefits one species and neither helps nor harms the other.",
     cognitiveDemand: "distinction",
@@ -315,7 +315,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
     promptTerms: [{ glossaryId: "niche" }],
     wordingHelp:
       "This question is asking what the rule says two species cannot share in the same habitat.",
-    hint: "Treat each choice as a separate ecology claim. Ask what would have to be true for that claim to follow from two species using the same full set of resources.",
+    hint: "Translate the resource statement into a claim about niche overlap, then test each choice against it.",
     explanation:
       "The competitive exclusion principle states that two species cannot occupy the same niche in a habitat: they cannot coexist if they compete for all the same resources. It does not require different biomes or forbid sharing a food web at different niches.",
     cognitiveDemand: "application",
@@ -337,7 +337,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "The number of species in a community",
     ],
     correctChoiceId: "c",
-    hint: "Compare what kind of ecological quantity each choice is measuring, then match K to the kind of quantity it actually names.",
+    hint: "Compare the quantity each option measures with the kind of quantity represented by K.",
     explanation:
       "Carrying capacity, or K, is the maximum population size that a particular environment can support. It is not a count of trophic levels or species.",
     cognitiveDemand: "recall",
@@ -359,7 +359,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Exponential growth is the same as a Type I survivorship curve",
     ],
     correctChoiceId: "c",
-    hint: "Ask whether resources stay unlimited, and whether population size can level off.",
+    hint: "Compare the resource assumptions and long-term population pattern in each choice.",
     explanation:
       "Exponential growth is possible only when infinite natural resources are available, which is not the case in the real world. With limited resources, growth can slow and plateau at carrying capacity (logistic growth). This item does not use a doubling-time formula.",
     cognitiveDemand: "distinction",
@@ -384,7 +384,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
     promptTerms: [{ glossaryId: "density-dependent" }],
     wordingHelp:
       "This question is asking which group of things matches that kind of population limit.",
-    hint: "Ask whether each set would get stronger as a population gets denser, or would hit the population the same way either way.",
+    hint: "For each group, ask whether its effect changes as population density changes.",
     explanation:
       "Most density-dependent factors are biotic and include predation, inter- and intraspecific competition, accumulation of waste, and diseases. Weather, natural disasters, and pollution are typically density-independent.",
     cognitiveDemand: "recognition",
@@ -452,7 +452,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
     correctChoiceId: "d",
     promptTerms: [{ glossaryId: "phenotype" }],
     wordingHelp: "This question is asking which kind of trait is favored.",
-    hint: "Which part of the trait range is favored, and what happens to the extremes?",
+    hint: "Mark the middle and extreme parts of each trait range, then compare the selection pattern.",
     explanation:
       "If natural selection favors an average phenotype, selecting against extreme variation, the population undergoes stabilizing selection. Directional selection favors one end of the range. Diversifying/disruptive selection is not used as a keyed definition here.",
     cognitiveDemand: "recall",
@@ -496,7 +496,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Colonization of newly formed land",
     ],
     correctChoiceId: "a",
-    hint: "Compare the four descriptions side by side. Identify what each process is doing, then match the named term to one of those processes.",
+    hint: "Compare what moves and how it moves in each process before matching the named term.",
     explanation:
       "Gene flow is the movement of alleles across a species’ range, relatively free because individuals can move and then mate in a new location. Genetic drift is a chance change in allele frequencies.",
     cognitiveDemand: "recall",
@@ -520,7 +520,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
     correctChoiceId: "c",
     wordingHelp:
       "This question is asking which way the moving air is pushed, compared with the way it was already going.",
-    hint: "Northern and Southern Hemispheres deflect opposite ways.",
+    hint: "Recall the hemisphere rule, then apply it to the directional choices.",
     explanation:
       "The Coriolis force causes moving objects, including air, to veer to the right in the Northern Hemisphere and to the left in the Southern Hemisphere. This item does not test Hadley-cell biome belts.",
     cognitiveDemand: "recall",
@@ -573,7 +573,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
     promptTerms: [{ glossaryId: "temperate" }, { glossaryId: "biome" }],
     wordingHelp:
       "This question is asking what is most common in this type of environment.",
-    hint: "Use the biome name already in the question, then match the vegetation.",
+    hint: "Compare the named biome with each choice’s climate and vegetation features.",
     explanation:
       "Temperate grasslands are found throughout central North America, where they are also known as prairies. Savannas and temperate grasslands are dominated by grasses.",
     cognitiveDemand: "recall",
@@ -617,7 +617,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "They rely on rain shadows to stay wet",
     ],
     correctChoiceId: "b",
-    hint: "For each choice, look at the plant feature it names and ask how that feature would affect the process already named in the stem.",
+    hint: "For each plant feature, trace how it affects the process named in the stem.",
     explanation:
       "To reduce water loss, many desert plants have tiny leaves or no leaves at all. Ocotillo leaves, for example, appear only after rainfall and then are shed.",
     cognitiveDemand: "application",
@@ -639,7 +639,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Only in the deep ocean",
     ],
     correctChoiceId: "b",
-    hint: "Use the two biome names in the question to decide the geographic relationship.",
+    hint: "Compare the two biome names by latitude and climate before deciding how they relate.",
     explanation:
       "The Arctic tundra lies north of the subarctic boreal forest and is located throughout the Arctic regions of the northern hemisphere. This item does not treat taiga and boreal forest as two different biomes.",
     cognitiveDemand: "recall",
@@ -661,7 +661,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Only the carrying capacity of one population",
     ],
     correctChoiceId: "b",
-    hint: "Look up how biodiversity is described in the reference, then compare that description with the four choices.",
+    hint: "Look up the reference description of biodiversity, then compare it with all four choices.",
     explanation:
       "Biodiversity is a general term for the number of species present in the biosphere, taking into account both the number of species and their relative abundance to each other.",
     cognitiveDemand: "recall",
@@ -728,7 +728,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Particles of dry acid deposition that never include gases",
     ],
     correctChoiceId: "a",
-    hint: "Find the EPA definition for the term in the question, then compare each choice with what that definition describes.",
+    hint: "Find the EPA description for the term, then compare each choice with that source.",
     explanation:
       "Gases that trap heat in the atmosphere are called greenhouse gases. EPA’s main inventory gases include carbon dioxide, methane, nitrous oxide, and fluorinated gases. This item does not mix in OpenStax’s water-vapor list as a keyed catalog.",
     cognitiveDemand: "recall",
@@ -798,7 +798,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
       "Only plants with tiny leaves in subtropical deserts",
     ],
     correctChoiceId: "b",
-    hint: "Compare each choice on origin, habitat story, and conservation-list status before you decide.",
+    hint: "Check each choice’s origin, ecological effect, and listing language before deciding.",
     explanation:
       "Invasive species are nonnative organisms that, when introduced to an area out of their native range, threaten the ecosystem balance of that habitat. No official invasive-species list is used here.",
     cognitiveDemand: "recognition",

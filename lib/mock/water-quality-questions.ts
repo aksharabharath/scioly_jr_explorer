@@ -99,7 +99,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Class 1 - Pollution Tolerant",
     ],
     correctChoiceId: "b",
-    hint: "Match the Class 1 heading printed on the 2027 table. Do not reuse a Class 4 or Class 5 title.",
+    hint: "Find the relevant table entry or heading in the official reference, then compare its wording with all four choices.",
     explanation:
       "The table heading is Class 1 - Pollution Sensitive. Moderately Tolerant is Class 3; Pollution Tolerant is Class 4; Air Breathing is Class 5.",
     cognitiveDemand: "recall",
@@ -121,7 +121,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Class 5 - Air Breathing",
     ],
     correctChoiceId: "d",
-    hint: "Read the fifth column header. It is not the Class 1 or Class 4 wording.",
+    hint: "Use the official table to locate the relevant heading, then compare its printed wording with the choices.",
     explanation:
       "Class 5 is printed as Air Breathing. Pollution Sensitive is Class 1; Moderately Sensitive is Class 2; Pollution Tolerant is Class 4.",
     cognitiveDemand: "recognition",
@@ -143,7 +143,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Class 3 - Moderately Sensitive",
     ],
     correctChoiceId: "a",
-    hint: "Class 3 sits between Moderately Sensitive and Pollution Tolerant on the printed table.",
+    hint: "Find the relevant table heading in the official reference, then compare that wording with all four choices.",
     explanation:
       "Class 3 - Moderately Tolerant is the official heading. Moderately Sensitive is Class 2; Pollution Sensitive is Class 1; Air Breathing is Class 5.",
     cognitiveDemand: "recall",
@@ -165,7 +165,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Class 2 - Air Breathing",
     ],
     correctChoiceId: "c",
-    hint: "Class 2 is the second column. Compare it with Class 1 and Class 4 titles.",
+    hint: "Use the official table’s printed headings, then compare the relevant heading with every choice.",
     explanation:
       "Class 2 - Moderately Sensitive is official. Pollution Sensitive is Class 1; Pollution Tolerant is Class 4; Air Breathing is Class 5.",
     cognitiveDemand: "distinction",
@@ -209,7 +209,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Mosquito",
     ],
     correctChoiceId: "d",
-    hint: "Find which of these four names is not in the Class 1 column.",
+    hint: "Find each name in the official table, then compare its listed classification with the class named in the question.",
     explanation:
       "Mayfly, Caddisfly, and Stonefly are Class 1. Mosquito is printed under Class 5 - Air Breathing.",
     cognitiveDemand: "distinction",
@@ -253,7 +253,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Class 2 - Moderately Sensitive",
     ],
     correctChoiceId: "c",
-    hint: "Match the printed cell, not the Class 5 column title.",
+    hint: "Locate the named organism in the official table, then compare its printed classification with the choices.",
     explanation:
       "Air Breathing Snail is a Class 4 - Pollution Tolerant name. Class 5 - Air Breathing is a different column (Whirligig Beetle, Mosquito, Giant Water Bug, Backswimmer, Water Boatman, Predacious Diving Beetle).",
     cognitiveDemand: "distinction",
@@ -297,7 +297,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Potable water treatment; Waste water treatment; Harmful species",
     ],
     correctChoiceId: "a",
-    hint: "The three headings are listed in order in THE COMPETITION. Treatment phrases are ecology examples, not the three topic titles.",
+    hint: "Find the official topic headings in the rules, then compare the complete sets of words with the choices.",
     explanation:
       "The rules name Freshwater Ecology, Freshwater Macroinvertebrates, and Water Monitoring and Analysis as the three topics the test will cover. Marine Ecology and Entomology List are not those headings. Potable water treatment, waste water treatment, and harmful species are ecology “areas such as” example phrases, not the three topic titles.",
     cognitiveDemand: "distinction",
@@ -342,7 +342,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Whirligig Beetle",
     ],
     correctChoiceId: "b",
-    hint: "Class 2 is the second column (four names). Do not pick a Class 1, Class 4, or Class 5 name.",
+    hint: "Locate each printed name in the official table, then compare the classification shown beside it with the question.",
     explanation:
       "Aquatic Sowbug is Class 2. Dobsonfly is Class 1; Tubifex is Class 4; Whirligig Beetle is Class 5.",
     cognitiveDemand: "distinction",
@@ -474,7 +474,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Water Penny",
     ],
     correctChoiceId: "c",
-    hint: "One slash-name sits in the Class 4 column of the macro table. Another slash-name is on the nuisance-animal list, not that column.",
+    hint: "Find each slash-form string in the official references, then compare its list or table heading with the choices.",
     explanation:
       "Deer/Horse Fly is the Class 4 table cell. Crayfish/Crawdads is a nuisance-animal string, not a Class 4 table name. Mosquito is Class 5; Water Penny is Class 1.",
     cognitiveDemand: "distinction",
@@ -496,7 +496,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Asian Carp",
     ],
     correctChoiceId: "b",
-    hint: "Find each name on the 2027 lists and read the heading above it. Class 3 is a macro table column; do not mix it with the Aquatic Nuisance Animals sentence.",
+    hint: "Locate each printed name in the relevant official lists, then compare the headings shown with the named class.",
     explanation:
       "Blackfly is Class 3. Water Penny is Class 1; Giant Water Bug is Class 5; Asian Carp is an Aquatic Nuisance Animals string, not a Class 3 table cell.",
     cognitiveDemand: "distinction",
@@ -540,7 +540,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Caddisfly",
     ],
     correctChoiceId: "a",
-    hint: "Use the printed Aquatic Nuisance Plants sentence. Do not pick a nuisance-animal string or a name from the adult-macroinvertebrate table.",
+    hint: "Find each name on the official closed lists, then compare the list heading associated with it.",
     explanation:
       "Purple Loosestrife is an Aquatic Nuisance Plants name. Zebra Mussel is an Aquatic Nuisance Animals string. Mayfly and Caddisfly are adult-macroinvertebrate table names.",
     cognitiveDemand: "recognition",
@@ -562,7 +562,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Asian Carp",
     ],
     correctChoiceId: "c",
-    hint: "Compare the Aquatic Nuisance Plants list with the Aquatic Nuisance Animals list.",
+    hint: "Check each choice against the two official nuisance-species lists, then compare the list placement.",
     explanation:
       "Water Hyacinth is a nuisance plant. Zebra Mussel, Spiny Water Flea, and Asian Carp are nuisance-animal strings.",
     cognitiveDemand: "distinction",
@@ -584,7 +584,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "The eight monitoring-parameter names",
     ],
     correctChoiceId: "b",
-    hint: "It is grouped with Spiny Water Flea, Asian Tiger Mosquito, Asian Carp, and Crayfish/Crawdads.",
+    hint: "Find the named organism on the official closed lists, then compare the heading printed with it.",
     explanation:
       "Zebra Mussel is an Aquatic Nuisance Animals string. It is not a Class 1 table name, not a nuisance plant, and not a monitoring parameter.",
     cognitiveDemand: "recognition",
@@ -782,7 +782,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Mayfly",
     ],
     correctChoiceId: "d",
-    hint: "The eight names are salinity, pH, phosphates, turbidity, dissolved oxygen, temperature, nitrates, and biochemical oxygen demand.",
+    hint: "Check each choice against the official monitoring-parameter list, then compare list membership.",
     explanation:
       "Mayfly is a Class 1 table name, not a monitoring parameter. Dissolved oxygen, temperature, and nitrates are on the eight-name list.",
     cognitiveDemand: "distinction",
