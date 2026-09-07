@@ -38,9 +38,12 @@ export type SelectNextQuestionInput = {
   bank: Question[];
   history: LearningAttempt[];
   askedQuestionIds: string[];
+  previouslyAnsweredQuestionIds?: string[];
   sessionTopicSequence: string[];
   lastWasRevisitEvidence: boolean;
   mode?: PracticeMode;
+  eventId?: string;
+  expeditionNumber?: number;
 };
 
 export function parsePracticeMode(
@@ -249,10 +252,33 @@ export function selectNextQuestion(
     return null;
   }
 
+  const difficulty = targetDifficultyForSession(input);
+  const boundedAvailable = available.filter(
+    (question) => question.difficulty <= difficulty,
+  );
+  const boundedFallback = input.bank.filter(
+    (question) =>
+      !input.askedQuestionIds.includes(question.id) &&
+      question.difficulty <= difficulty &&
+      (input.mode !== "weak" ||
+        topicsNeedingRevisit(
+          historyBeforeThisSession(input.history, input.askedQuestionIds),
+        ).includes(question.topicId)),
+  );
+  const progressionPool =
+    boundedAvailable.length > 0
+      ? boundedAvailable
+      : boundedFallback.length > 0
+        ? boundedFallback
+        : difficulty === 3
+          ? available
+          : [];
+  if (progressionPool.length === 0) {
+    return null;
+  }
   const lastTopicId = input.sessionTopicSequence.at(-1) ?? null;
-  const rotated = rotateAwayFromLastTopic(available, lastTopicId);
-  const pool = rotated.length > 0 ? rotated : available;
-  const difficulty = targetDifficulty(input.history);
+  const rotated = rotateAwayFromLastTopic(progressionPool, lastTopicId);
+  const pool = rotated.length > 0 ? rotated : progressionPool;
   const dueTopicId = pickDueTopic(
     input.history,
     pool,
@@ -270,7 +296,12 @@ export function selectNextQuestion(
     input.askedQuestionIds,
   );
 
-  return pickQuestion(candidates, difficulty, avoidQuestionIds);
+  return pickQuestion(
+    candidates,
+    difficulty,
+    avoidQuestionIds,
+    input.previouslyAnsweredQuestionIds ?? [],
+  );
 }
 
 export function friendlyRevisitNote(history: LearningAttempt[]): string | null {
@@ -349,33 +380,47 @@ function availableQuestions(input: SelectNextQuestionInput): Question[] {
   const unused = input.bank.filter(
     (question) => !input.askedQuestionIds.includes(question.id),
   );
-  if (unused.length === 0 || (input.mode ?? "normal") !== "weak") {
-    return unused;
-  }
-
-  const weakTopicIds = topicsNeedingRevisit(
-    historyBeforeThisSession(input.history, input.askedQuestionIds),
-  );
-  if (weakTopicIds.length === 0) {
+  if (unused.length === 0) {
     return [];
   }
 
-  const unusedWeak = unused.filter((question) =>
-    weakTopicIds.includes(question.topicId),
-  );
-  if (unusedWeak.length === 0) {
-    return [];
+  if ((input.mode ?? "normal") === "weak") {
+    const weakTopicIds = topicsNeedingRevisit(
+      historyBeforeThisSession(input.history, input.askedQuestionIds),
+    );
+    if (weakTopicIds.length === 0) {
+      return [];
+    }
+    const weakUnused = unused.filter((question) =>
+      weakTopicIds.includes(question.topicId),
+    );
+    const previouslyAnswered = new Set(
+      input.previouslyAnsweredQuestionIds ?? [],
+    );
+    const unseenWeak = weakUnused.filter(
+      (question) => !previouslyAnswered.has(question.id),
+    );
+    const crossSessionPool =
+      unseenWeak.length > 0 ? unseenWeak : weakUnused;
+    if (crossSessionPool.length === 0) {
+      return [];
+    }
+    const lastTopicId = input.sessionTopicSequence.at(-1) ?? null;
+    if (!lastTopicId) {
+      return crossSessionPool;
+    }
+    const rotatedWeak = crossSessionPool.filter(
+      (question) => question.topicId !== lastTopicId,
+    );
+    return rotatedWeak.length > 0 ? rotatedWeak : crossSessionPool;
   }
 
-  const lastTopicId = input.sessionTopicSequence.at(-1) ?? null;
-  if (!lastTopicId) {
-    return unusedWeak;
-  }
-
-  const rotatedWeak = unusedWeak.filter(
-    (question) => question.topicId !== lastTopicId,
+  const previouslyAnswered = new Set(
+    input.previouslyAnsweredQuestionIds ?? [],
   );
-  return rotatedWeak.length > 0 ? rotatedWeak : unusedWeak;
+  const unseen = unused.filter((question) => !previouslyAnswered.has(question.id));
+  const crossSessionPool = unseen.length > 0 ? unseen : unused;
+  return crossSessionPool;
 }
 
 function recentQuestionIds(
@@ -474,6 +519,7 @@ function pickQuestion(
   candidates: Question[],
   difficulty: DifficultyLevel,
   avoidQuestionIds: Set<string>,
+  previouslyAnsweredQuestionIds: string[],
 ): Question {
   const preferred = candidates.filter(
     (question) => !avoidQuestionIds.has(question.id),
@@ -486,10 +532,57 @@ function pickQuestion(
     if (difficultyDelta !== 0) {
       return difficultyDelta;
     }
+    const aLastSeen = previouslyAnsweredQuestionIds.lastIndexOf(a.id);
+    const bLastSeen = previouslyAnsweredQuestionIds.lastIndexOf(b.id);
+    if (aLastSeen !== bLastSeen) {
+      return aLastSeen - bLastSeen;
+    }
     return a.id.localeCompare(b.id);
   });
 
   return ranked[0];
+}
+
+export function targetDifficultyForSession(
+  input: SelectNextQuestionInput,
+): DifficultyLevel {
+  const sessionHistory = input.history.slice(-input.askedQuestionIds.length);
+  if (sessionHistory.length === 0) {
+    return 1;
+  }
+
+  const adaptiveTarget = targetDifficulty(sessionHistory);
+  const easySuccesses = trailingCount(
+    sessionHistory,
+    (attempt) => attempt.difficulty === 1 && attempt.isCorrect,
+  );
+  const mediumSuccesses = trailingCount(
+    sessionHistory,
+    (attempt) => attempt.difficulty === 2 && attempt.isCorrect,
+  );
+  const mediumFailures = trailingCount(
+    sessionHistory,
+    (attempt) => attempt.difficulty === 2 && !attempt.isCorrect,
+  );
+  const hasMediumAttempt = sessionHistory.some(
+    (attempt) => attempt.difficulty === 2,
+  );
+  const easySuccessesNeeded =
+    input.eventId === "anatomy-physiology" &&
+    (input.expeditionNumber ?? 1) <= 2
+      ? 6
+      : 5;
+
+  if (mediumFailures >= 2) {
+    return 1;
+  }
+  if (mediumSuccesses >= 4) {
+    return 3;
+  }
+  if (easySuccesses >= easySuccessesNeeded || hasMediumAttempt) {
+    return Math.min(adaptiveTarget, 2) as DifficultyLevel;
+  }
+  return 1;
 }
 
 function trailingCount(

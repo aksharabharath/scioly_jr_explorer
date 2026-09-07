@@ -12,6 +12,7 @@ import {
   isTopicWeak,
   selectNextQuestion,
   targetDifficulty,
+  targetDifficultyForSession,
   toLearningAttempts,
   parsePracticeTopicId,
   topicLearningState,
@@ -347,6 +348,297 @@ check(
 
 const first = next([], [], [], false);
 check("new student starts on an easy question", first.difficulty === 1);
+
+function sessionAttempt(
+  index: number,
+  difficulty: 1 | 2 | 3,
+  isCorrect: boolean,
+): LearningAttempt {
+  return {
+    questionId: `session-${index}`,
+    topicId: "session-topic",
+    difficulty,
+    isCorrect,
+    hintUsed: false,
+  };
+}
+
+function sessionTarget(
+  history: LearningAttempt[],
+  eventId = "ecology",
+  expeditionNumber = 1,
+): number {
+  return targetDifficultyForSession({
+    bank,
+    history,
+    askedQuestionIds: history.map((item) => item.questionId),
+    sessionTopicSequence: history.map((item) => item.topicId),
+    lastWasRevisitEvidence: false,
+    eventId,
+    expeditionNumber,
+  });
+}
+
+check(
+  "session starts easy and stays easy before demonstrated success",
+  sessionTarget([]) === 1 &&
+    sessionTarget([
+      sessionAttempt(1, 1, true),
+      sessionAttempt(2, 1, true),
+      sessionAttempt(3, 1, true),
+      sessionAttempt(4, 1, true),
+    ]) === 1,
+);
+check(
+  "five recent Easy successes unlock Medium",
+  sessionTarget([
+    sessionAttempt(1, 1, true),
+    sessionAttempt(2, 1, true),
+    sessionAttempt(3, 1, true),
+    sessionAttempt(4, 1, true),
+    sessionAttempt(5, 1, true),
+  ]) === 2,
+);
+check(
+  "one Medium success does not unlock Hard",
+  sessionTarget([
+    sessionAttempt(1, 1, true),
+    sessionAttempt(2, 1, true),
+    sessionAttempt(3, 1, true),
+    sessionAttempt(4, 1, true),
+    sessionAttempt(5, 1, true),
+    sessionAttempt(6, 2, true),
+  ]) === 2,
+);
+check(
+  "two recent Medium failures step back to Easy",
+  sessionTarget([
+    sessionAttempt(1, 1, true),
+    sessionAttempt(2, 1, true),
+    sessionAttempt(3, 1, true),
+    sessionAttempt(4, 1, true),
+    sessionAttempt(5, 1, true),
+    sessionAttempt(6, 2, false),
+    sessionAttempt(7, 2, false),
+  ]) === 1,
+);
+check(
+  "four consecutive Medium successes unlock Hard",
+  sessionTarget([
+    sessionAttempt(1, 1, true),
+    sessionAttempt(2, 1, true),
+    sessionAttempt(3, 1, true),
+    sessionAttempt(4, 1, true),
+    sessionAttempt(5, 1, true),
+    sessionAttempt(6, 2, true),
+    sessionAttempt(7, 2, true),
+    sessionAttempt(8, 2, true),
+    sessionAttempt(9, 2, true),
+  ]) === 3,
+);
+check(
+  "A&P onboarding waits for six Easy successes",
+  sessionTarget(
+    [
+      sessionAttempt(1, 1, true),
+      sessionAttempt(2, 1, true),
+      sessionAttempt(3, 1, true),
+      sessionAttempt(4, 1, true),
+      sessionAttempt(5, 1, true),
+    ],
+    "anatomy-physiology",
+    1,
+  ) === 1 &&
+    sessionTarget(
+      [
+        sessionAttempt(1, 1, true),
+        sessionAttempt(2, 1, true),
+        sessionAttempt(3, 1, true),
+        sessionAttempt(4, 1, true),
+        sessionAttempt(5, 1, true),
+        sessionAttempt(6, 1, true),
+      ],
+      "anatomy-physiology",
+      2,
+    ) === 2,
+);
+
+const selectionBank = Array.from({ length: 30 }, (_, index) => ({
+  ...bank[0]!,
+  id: `selection-${index}`,
+  difficulty: (index < 10 ? 1 : index < 20 ? 2 : 3) as 1 | 2 | 3,
+}));
+
+const wrongEasyGuardrailBank = [
+  { ...bank[0]!, id: "guard-easy", topicId: "topic-c", difficulty: 1 as const },
+  { ...bank[0]!, id: "guard-medium", topicId: "topic-d", difficulty: 2 as const },
+];
+const nextAfterThreeEasyMisses = selectNextQuestion({
+  bank: wrongEasyGuardrailBank,
+  history: [
+    sessionAttempt(1, 1, false),
+    { ...sessionAttempt(2, 1, false), topicId: "topic-b" },
+    { ...sessionAttempt(3, 1, false), topicId: "topic-c" },
+  ],
+  askedQuestionIds: ["guard-1", "guard-2", "guard-3"],
+  sessionTopicSequence: ["topic-a", "topic-b", "topic-c"],
+  lastWasRevisitEvidence: true,
+  eventId: "ecology",
+  expeditionNumber: 1,
+});
+check(
+  "three Easy misses cannot cause a Medium question",
+  nextAfterThreeEasyMisses?.difficulty === 1,
+);
+
+const mediumCeilingFallbackBank = [
+  {
+    ...bank[0]!,
+    id: "fallback-seen-easy",
+    difficulty: 1 as const,
+  },
+  {
+    ...bank[0]!,
+    id: "fallback-unseen-hard",
+    difficulty: 3 as const,
+  },
+];
+const mediumTargetFallback = selectNextQuestion({
+  bank: mediumCeilingFallbackBank,
+  history: [sessionAttempt(1, 2, true)],
+  askedQuestionIds: ["session-1"],
+  previouslyAnsweredQuestionIds: ["fallback-seen-easy"],
+  sessionTopicSequence: ["session-topic"],
+  lastWasRevisitEvidence: false,
+  eventId: "ecology",
+  expeditionNumber: 3,
+});
+check(
+  "Medium target reuses eligible lower difficulty before unseen Hard",
+  targetDifficultyForSession({
+    bank: mediumCeilingFallbackBank,
+    history: [sessionAttempt(1, 2, true)],
+    askedQuestionIds: ["session-1"],
+    sessionTopicSequence: ["session-topic"],
+    lastWasRevisitEvidence: false,
+    eventId: "ecology",
+    expeditionNumber: 3,
+  }) === 2 &&
+    mediumTargetFallback !== null &&
+    mediumTargetFallback.difficulty <= 2 &&
+    mediumTargetFallback.id === "fallback-seen-easy",
+);
+
+const hardOnlyFallback = selectNextQuestion({
+  bank: [
+    {
+      ...bank[0]!,
+      id: "locked-hard-only",
+      difficulty: 3 as const,
+    },
+  ],
+  history: [sessionAttempt(1, 2, true)],
+  askedQuestionIds: ["session-1"],
+  sessionTopicSequence: ["session-topic"],
+  lastWasRevisitEvidence: false,
+  eventId: "ecology",
+  expeditionNumber: 3,
+});
+check(
+  "Hard is not selected before four Medium successes",
+  hardOnlyFallback === null,
+);
+
+const unlockedHard = selectNextQuestion({
+  bank: [
+    {
+      ...bank[0]!,
+      id: "unlocked-hard",
+      difficulty: 3 as const,
+    },
+  ],
+  history: [
+    sessionAttempt(1, 2, true),
+    sessionAttempt(2, 2, true),
+    sessionAttempt(3, 2, true),
+    sessionAttempt(4, 2, true),
+  ],
+  askedQuestionIds: ["session-1", "session-2", "session-3", "session-4"],
+  sessionTopicSequence: [
+    "session-topic",
+    "session-topic",
+    "session-topic",
+    "session-topic",
+  ],
+  lastWasRevisitEvidence: false,
+  eventId: "ecology",
+  expeditionNumber: 3,
+});
+check(
+  "Hard remains selectable after four Medium successes",
+  unlockedHard?.id === "unlocked-hard",
+);
+
+function selectSyntheticSession(previouslyAnsweredQuestionIds: string[]) {
+  const ids: string[] = [];
+  let history: LearningAttempt[] = [];
+  for (let index = 0; index < PRACTICE_SET_SIZE; index += 1) {
+    const question = selectNextQuestion({
+      bank: selectionBank,
+      history,
+      askedQuestionIds: ids,
+      previouslyAnsweredQuestionIds,
+      sessionTopicSequence: history.map((item) => item.topicId),
+      lastWasRevisitEvidence: false,
+      eventId: "ecology",
+      expeditionNumber: 1,
+    });
+    if (!question) {
+      break;
+    }
+    ids.push(question.id);
+    history = [
+      ...history,
+      {
+        questionId: question.id,
+        topicId: question.topicId,
+        difficulty: question.difficulty,
+        isCorrect: true,
+        hintUsed: false,
+      },
+    ];
+  }
+  return ids;
+}
+
+const syntheticSessionOne = selectSyntheticSession([]);
+const syntheticSessionTwo = selectSyntheticSession(syntheticSessionOne);
+const syntheticSessionThree = selectSyntheticSession([
+  ...syntheticSessionOne,
+  ...syntheticSessionTwo,
+]);
+const syntheticSessionFour = selectSyntheticSession([
+  ...syntheticSessionOne,
+  ...syntheticSessionTwo,
+  ...syntheticSessionThree,
+]);
+check(
+  "Medium becomes selectable after five Easy successes",
+  syntheticSessionOne.slice(5).some((id) =>
+    id === "selection-10" || id === "selection-11",
+  ),
+);
+check(
+  "cross-session selection excludes prior IDs when unseen questions exist",
+  syntheticSessionOne.length === PRACTICE_SET_SIZE &&
+    syntheticSessionTwo.length === PRACTICE_SET_SIZE &&
+    syntheticSessionOne.every((id) => !syntheticSessionTwo.includes(id)),
+);
+check(
+  "cross-session fallback still fills a unique 10-question session",
+  syntheticSessionFour.length === PRACTICE_SET_SIZE &&
+    new Set(syntheticSessionFour).size === PRACTICE_SET_SIZE,
+);
 
 const threeEasyWins: LearningAttempt[] = [
   attempt("astro-q1", true),
