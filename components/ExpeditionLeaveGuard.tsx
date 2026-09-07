@@ -12,20 +12,25 @@ import {
   useState,
 } from "react";
 
-const ACTIVE_EXPEDITION_KEY = "jr-explorer-active-expedition";
+export const ACTIVE_EXPEDITION_KEY = "jr-explorer-active-expedition";
 const EXPEDITION_STATE_EVENT = "jr-explorer-expedition-state";
 
 export function setActiveExpedition(active: boolean) {
+  if (typeof window === "undefined") {
+    return;
+  }
+
   try {
     if (active) {
       window.sessionStorage.setItem(ACTIVE_EXPEDITION_KEY, "1");
     } else {
       window.sessionStorage.removeItem(ACTIVE_EXPEDITION_KEY);
     }
-    window.dispatchEvent(new Event(EXPEDITION_STATE_EVENT));
   } catch {
     // Navigation remains usable when browser storage is unavailable.
   }
+
+  window.dispatchEvent(new Event(EXPEDITION_STATE_EVENT));
 }
 
 function hasActiveExpedition() {
