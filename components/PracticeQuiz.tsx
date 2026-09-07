@@ -102,6 +102,7 @@ type CompleteQuizState = {
   history: LearningAttempt[];
   attemptCount: number;
   sessionXp: number;
+  sessionBonusXp: number;
   streakDays: number;
   /** Persisted total XP after the last successful save. Null if none. */
   totalXp: number | null;
@@ -173,6 +174,7 @@ function beginSet(
       history,
       attemptCount,
       sessionXp: 0,
+      sessionBonusXp: 0,
       streakDays: 0,
       totalXp: null,
       newlyEarnedIds: [],
@@ -325,6 +327,7 @@ export function PracticeQuiz({
     nextRecords: AnswerRecord[],
     nextHistory: LearningAttempt[],
     attemptCount: number,
+    sessionBonusXp: number,
   ): CompleteQuizState {
     const streakAfter = streakDaysRef.current;
     const newlyEarnedIds = newlyEarnedForSession(
@@ -360,6 +363,7 @@ export function PracticeQuiz({
       history: nextHistory,
       attemptCount,
       sessionXp: sessionXpRef.current,
+      sessionBonusXp,
       streakDays: streakAfter,
       totalXp: totalXpRef.current,
       newlyEarnedIds,
@@ -390,6 +394,7 @@ export function PracticeQuiz({
           setState(beginSet(questions, state.history, state.attemptCount, mode));
         }}
         sessionXp={state.sessionXp}
+        sessionBonusXp={state.sessionBonusXp}
         streakDays={state.streakDays}
         totalXp={state.totalXp}
         newlyEarned={definitionsForIds(state.newlyEarnedIds)}
@@ -535,7 +540,14 @@ export function PracticeQuiz({
     attemptIdRef.current = null;
 
     if (isLast) {
-      setState(finishSet(nextRecords, nextHistory, state.attemptCount));
+      setState(
+        finishSet(
+          nextRecords,
+          nextHistory,
+          state.attemptCount,
+          state.xpAward?.sessionBonusXp ?? 0,
+        ),
+      );
       return;
     }
 
@@ -549,7 +561,14 @@ export function PracticeQuiz({
     });
 
     if (!nextQuestion) {
-      setState(finishSet(nextRecords, nextHistory, state.attemptCount));
+      setState(
+        finishSet(
+          nextRecords,
+          nextHistory,
+          state.attemptCount,
+          state.xpAward?.sessionBonusXp ?? 0,
+        ),
+      );
       return;
     }
 
@@ -901,6 +920,7 @@ type ResultsCardProps = {
   revisitNote: string | null;
   onTryAgain: () => void;
   sessionXp: number;
+  sessionBonusXp: number;
   streakDays: number;
   totalXp: number | null;
   newlyEarned: BadgeDefinition[];
@@ -917,6 +937,7 @@ function ResultsCard({
   revisitNote,
   onTryAgain,
   sessionXp,
+  sessionBonusXp,
   streakDays,
   totalXp,
   newlyEarned,
@@ -975,9 +996,16 @@ function ResultsCard({
 
       <div className="mt-6 rounded-2xl border border-gold/40 bg-gold/15 px-5 py-4">
         {sessionXp > 0 ? (
-          <p className="font-display text-3xl font-semibold tabular-nums text-ink">
-            {formatXpGain(sessionXp)}
-          </p>
+          <>
+            <p className="font-display text-3xl font-semibold tabular-nums text-ink">
+              {formatXpGain(sessionXp)}
+            </p>
+            {sessionBonusXp > 0 ? (
+              <p className="mt-1 text-sm font-medium text-stone-700">
+                Includes +{sessionBonusXp} XP expedition-completion bonus.
+              </p>
+            ) : null}
+          </>
         ) : (
           <p className="text-sm font-medium text-stone-700">
             Your answers were saved.
