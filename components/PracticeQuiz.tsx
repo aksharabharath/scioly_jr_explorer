@@ -2,6 +2,7 @@
 
 import { savePracticeAttempt } from "@/app/practice/actions";
 import { ExpeditionRewardsOverlay } from "@/components/ExpeditionRewardsOverlay";
+import { setActiveExpedition } from "@/components/ExpeditionLeaveGuard";
 import { XpAwardFeedback } from "@/components/XpAwardFeedback";
 import {
   PRACTICE_SET_SIZE,
@@ -298,6 +299,12 @@ export function PracticeQuiz({
   const baselineStreakRef = useRef(initialStreakDays);
 
   const showFeedback = state.status === "active" && state.submitted;
+
+  useEffect(() => {
+    setActiveExpedition(
+      state.status === "active" && state.records.length < PRACTICE_SET_SIZE,
+    );
+  }, [state.records.length, state.status]);
 
   useEffect(() => {
     if (!showFeedback) {
