@@ -1,3 +1,4 @@
+import { ExplorerAvatarPicker } from "@/components/ExplorerAvatar";
 import { ExplorerProgress } from "@/components/ExplorerProgress";
 import { ProfileSettingsForm } from "@/components/ProfileSettingsForm";
 import {
@@ -42,6 +43,10 @@ export default async function ProfilePage() {
 
         <div className="mt-4">
           <ExplorerProgress explorer={explorer} compact />
+        </div>
+
+        <div className="journal-panel mt-5 rounded-3xl p-4 sm:p-5">
+          <ExplorerAvatarPicker />
         </div>
 
         <div className="journal-panel mt-5 rounded-3xl p-4 sm:p-5">

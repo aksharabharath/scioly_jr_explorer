@@ -1,3 +1,4 @@
+import { ExplorerAvatar } from "@/components/ExplorerAvatar";
 import { ProgressBar } from "@/components/ProgressBar";
 import { explorerRankLabel } from "@/lib/explorer-ranks";
 import {
@@ -72,19 +73,24 @@ export function ExplorerProgress({
       aria-labelledby="explorer-progress-heading"
       className="journal-panel rounded-2xl p-3 sm:p-4"
     >
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal">
-        {rank}
-      </p>
-      <div className="mt-0.5 flex items-baseline justify-between gap-3">
-        <h2
-          id="explorer-progress-heading"
-          className="font-display text-xl font-semibold tracking-tight text-ink"
-        >
-          Explorer Level {progress.level}
-        </h2>
-        <p className="font-display text-lg font-semibold tabular-nums text-ink">
-          {progress.totalXp} XP
-        </p>
+      <div className="flex items-center gap-3">
+        <ExplorerAvatar />
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-teal">
+            {rank}
+          </p>
+          <div className="mt-0.5 flex items-baseline justify-between gap-3">
+            <h2
+              id="explorer-progress-heading"
+              className="font-display text-xl font-semibold tracking-tight text-ink"
+            >
+              Explorer Level {progress.level}
+            </h2>
+            <p className="font-display text-lg font-semibold tabular-nums text-ink">
+              {progress.totalXp} XP
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="mt-2">
