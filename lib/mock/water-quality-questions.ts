@@ -152,7 +152,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q4",
     topicId: "indicator-classes",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "On the 2027 table, what is the title of Class 2?",
     choiceTexts: [
@@ -218,7 +218,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q7",
     topicId: "indicator-classes",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "The 2027 table prints the common name Damsefly. Which class heading sits above that name?",
     choiceTexts: [
@@ -284,7 +284,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q10",
     topicId: "indicator-classes",
-    difficulty: 3,
+    difficulty: 1,
     prompt:
       "The 2027 rules say the test will cover three named topics. Which set is that official trio?",
     choiceTexts: [
@@ -329,7 +329,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q12",
     topicId: "macroinvertebrates",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Which of these 2027 table names is in Class 2 - Moderately Sensitive?",
     choiceTexts: [
@@ -417,7 +417,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q16",
     topicId: "macroinvertebrates",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "On the 2027 table, which class includes Cranefly?",
     choiceTexts: [
@@ -439,7 +439,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q17",
     topicId: "macroinvertebrates",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "On the 2027 table, which class includes Leeches (plural, as printed)?",
     choiceTexts: [
@@ -483,7 +483,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q19",
     topicId: "macroinvertebrates",
-    difficulty: 3,
+    difficulty: 1,
     prompt:
       "Which name is in Class 3 - Moderately Tolerant on the 2027 table?",
     choiceTexts: [
@@ -615,7 +615,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q25",
     topicId: "nuisance-species",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Which name is not on the 2027 Aquatic Nuisance Plants list?",
     choiceTexts: [
@@ -637,7 +637,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q26",
     topicId: "nuisance-species",
-    difficulty: 3,
+    difficulty: 2,
     prompt:
       "The 2027 rules print both Mosquito and Asian Tiger Mosquito. How are those two strings placed?",
     choiceTexts: [
@@ -681,7 +681,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q28",
     topicId: "water-monitoring",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Which name is included in the 2027 monitoring-parameter list?",
     choiceTexts: [
@@ -725,7 +725,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q30",
     topicId: "water-monitoring",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Which statement is true of turbidity in the 2027 rules?",
     choiceTexts: [
@@ -769,7 +769,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q32",
     topicId: "water-monitoring",
-    difficulty: 3,
+    difficulty: 2,
     prompt:
       "Which name is not one of the eight 2027 monitoring parameters?",
     choiceTexts: [
@@ -857,7 +857,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q36",
     topicId: "water-monitoring",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Nitrates are a monitoring parameter. Nitrogen in the form of nitrate is which of the following?",
     choiceTexts: [
@@ -879,7 +879,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q37",
     topicId: "water-monitoring",
-    difficulty: 3,
+    difficulty: 2,
     prompt:
       "What can excess nitrogen cause in water?",
     choiceTexts: [
@@ -901,7 +901,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q38",
     topicId: "water-monitoring",
-    difficulty: 3,
+    difficulty: 2,
     prompt:
       "What can too much phosphorus in water do?",
     choiceTexts: [
@@ -945,7 +945,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
   wq({
     id: "wq-q40",
     topicId: "water-monitoring",
-    difficulty: 1,
+    difficulty: 2,
     prompt:
       "What does biochemical oxygen demand (BOD) represent?",
     choiceTexts: [

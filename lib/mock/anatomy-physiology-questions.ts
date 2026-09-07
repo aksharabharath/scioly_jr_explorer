@@ -99,7 +99,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     topicId: "integument-functions",
     difficulty: 1,
     prompt:
-      "The skin is described as a first line of defense against grit, microbes, and harmful chemicals. Which skin layer’s keratin and glycolipids also help stop the body from losing water?",
+      "Which skin layer uses keratin and glycolipids to help stop the body from losing water?",
     choiceTexts: [
       "The hypodermis",
       "The stratum corneum",
@@ -121,7 +121,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     topicId: "integument-functions",
     difficulty: 1,
     prompt:
-      "Where does the body first make vitamin D3 (cholecalciferol) when the skin is exposed to UV radiation?",
+      "Where does the body begin making vitamin D when the skin is exposed to UV radiation?",
     choiceTexts: [
       "In the red marrow of long bones",
       "In the synovial fluid of joints",
@@ -141,7 +141,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
   ap({
     id: "ap-q3",
     topicId: "integument-functions",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "After a long run on a hot day, a student’s skin is wet with sweat. How does that sweat help cool the body?",
     choiceTexts: [
@@ -187,7 +187,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     topicId: "integument-functions",
     difficulty: 1,
     prompt:
-      "Sweat can help keep microbes from over-colonizing the skin. Which substance in sweat has antibiotic properties that help with that role?",
+      "Which substance in sweat helps limit the growth of microbes on the skin?",
     choiceTexts: [
       "Melanin",
       "Dermcidin",
@@ -210,9 +210,9 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     difficulty: 1,
     prompt: "Why can the epidermis be described as avascular?",
     choiceTexts: [
-      "It contains only Pacinian corpuscles",
-      "It is made entirely of hyaline cartilage",
-      "It is a freely moveable synovial joint",
+      "It contains blood vessels",
+      "It is the deepest layer of skin",
+      "It is made entirely of connective tissue",
       "It contains no blood vessels",
     ],
     correctChoiceId: "d",
@@ -274,7 +274,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     topicId: "integument-structure",
     difficulty: 2,
     prompt:
-      "Which glands produce hypotonic sweat for thermoregulation and are especially abundant on the palms, soles, and forehead?",
+      "Which glands are the main cooling-sweat glands over much of the skin?",
     choiceTexts: [
       "Apocrine sweat glands",
       "Eccrine sweat glands",
@@ -284,7 +284,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     correctChoiceId: "b",
     hint: "These are the common cooling-sweat glands over much of the skin.",
     explanation:
-      "Eccrine sweat glands produce hypotonic sweat for thermoregulation and are especially abundant on the palms, soles, and forehead.",
+      "Eccrine sweat glands produce sweat for thermoregulation and are especially abundant on the palms, soles, and forehead.",
     cognitiveDemand: "recognition",
     sourceType: "openstax",
     sourceNote: "OpenStax A&P 2e §5.2; E-AP-034.",
@@ -298,10 +298,10 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     prompt:
       "How do apocrine sweat glands differ from eccrine sweat glands?",
     choiceTexts: [
-      "Apocrine glands associate with hair follicles in places such as the armpits, and their sweat includes organic compounds that bacteria can break down, causing odor",
-      "Apocrine glands are the main cooling glands on the palms and soles",
-      "Apocrine glands produce only hypotonic sweat made of water and salt, with no organic compounds",
-      "Apocrine glands are found only inside the synovial cavities of joints",
+      "Apocrine glands are associated with hair follicles, and their sweat includes organic compounds that bacteria can break down; eccrine glands are the main cooling glands",
+      "Apocrine glands are the main cooling glands; eccrine glands are associated with hair follicles and their sweat includes organic compounds that bacteria can break down",
+      "Apocrine glands are associated with hair follicles but their sweat has no organic compounds; eccrine glands are the main cooling glands",
+      "Apocrine glands are the main cooling glands and their sweat has no organic compounds; eccrine glands are associated with hair follicles",
     ],
     correctChoiceId: "a",
     hint: "Think about location (hairy regions) and why the sweat can smell after bacteria act on it.",
@@ -316,7 +316,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
   ap({
     id: "ap-q11",
     topicId: "integument-structure",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Wrinkling of aging skin occurs due to decreased production of which proteins in the dermis?",
     choiceTexts: [
@@ -360,7 +360,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
   ap({
     id: "ap-q13",
     topicId: "integument-conditions",
-    difficulty: 3,
+    difficulty: 2,
     prompt:
       "A person had chickenpox as a child. Years later they develop shingles. What does that later illness tell you about the virus?",
     choiceTexts: [
@@ -382,7 +382,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
   ap({
     id: "ap-q14",
     topicId: "integument-conditions",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Melanoma is a cancer of which skin cells?",
     choiceTexts: [
@@ -952,7 +952,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
   ap({
     id: "ap-q40",
     topicId: "muscle-types",
-    difficulty: 2,
+    difficulty: 1,
     prompt: "Smooth muscle is described as involuntary. Where is it found?",
     choiceTexts: [
       "Only in the epidermis between Meissner corpuscles",
@@ -977,10 +977,10 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
     prompt:
       "Which description matches rectus abdominis?",
     choiceTexts: [
-      "On the calcaneal tendon; it plantarflexes the foot",
-      "On the sternum and ribs 5 and 7; it flexes the vertebral column (as in sitting up)",
-      "On the deltoid tuberosity; it abducts the arm",
-      "On the central tendon only; it detects vibration",
+      "It originates on the sternum, ribs 6–12, and lumbar vertebrae; inserts on the central tendon; and changes thoracic volume during inhalation and exhalation",
+      "It originates on the pubis; inserts on the sternum and ribs 5 and 7; and flexes the vertebral column during a sit-up",
+      "It originates on the anterior superior iliac spine; inserts on the medial side of the proximal tibia; and flexes the knee and flexes, abducts, and laterally rotates at the hip",
+      "It originates on the skull and vertebral column; inserts on the acromion and spine of the scapula and the clavicle; and elevates the shoulders",
     ],
     correctChoiceId: "b",
     hint: "This muscle is the prime mover for sitting up.",
@@ -996,7 +996,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
   ap({
     id: "ap-q42",
     topicId: "listed-muscles",
-    difficulty: 3,
+    difficulty: 2,
     prompt:
       "Which description matches the diaphragm?",
     choiceTexts: [
@@ -1019,7 +1019,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
   ap({
     id: "ap-q43",
     topicId: "listed-muscles",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "What is one action of trapezius?",
     choiceTexts: [
@@ -1065,7 +1065,7 @@ export const MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS: AnatomyQuestion[] = [
   ap({
     id: "ap-q45",
     topicId: "listed-muscles",
-    difficulty: 3,
+    difficulty: 1,
     prompt:
       "What is one action of serratus anterior on the scapula?",
     choiceTexts: [

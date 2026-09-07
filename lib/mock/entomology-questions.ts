@@ -666,7 +666,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
   ento({
     id: "ento-q19",
     topicId: "dichotomous-keys",
-    difficulty: 3,
+    difficulty: 2,
     prompt:
       "Follow this key from the top.\n\n1a. Listed common name is short-horned grasshoppers → Acrididae\n1b. Any other grasshopper or cricket name → go to 2\n2a. Listed common name is katydids → Tettigoniidae\n2b. Listed common name is crickets/tree crickets → Gryllidae\n\nA specimen’s listed common name is short-horned grasshoppers. Which family do you reach?",
     choiceTexts: [
@@ -1226,7 +1226,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
   ento({
     id: "ento-q42",
     topicId: "taxonomy",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Saturniidae (Giant Silkworm moths) belong to which order?",
     choiceTexts: [
@@ -1300,7 +1300,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
   ento({
     id: "ento-q45",
     topicId: "dichotomous-keys",
-    difficulty: 3,
+    difficulty: 2,
     prompt:
       "Follow this key from the top.\n\n1a. Listed under Non-Insect Arthropods → Ixodidae\n1b. Listed in Class Insecta → go to 2\n2a. Listed common name is bees → Apidae\n2b. Listed common name is ants → Formicidae\n\nThe specimen is a hardback tick. Which family do you reach?",
     choiceTexts: [
@@ -1369,7 +1369,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
   ento({
     id: "ento-q48",
     topicId: "dichotomous-keys",
-    difficulty: 2,
+    difficulty: 3,
     prompt:
       "Follow this key from the top.\n\n1a. Family in Diptera (true flies) → go to 2\n1b. Family in Hymenoptera (bees, ants, wasps) → stop; not in this key\n2a. Listed common name is mosquitoes → Culicidae\n2b. Listed common name is fruit flies, husk fly → Tephritidae\n\nA specimen’s listed common name is fruit flies, husk fly. Which family do you reach?",
     choiceTexts: [
@@ -1415,7 +1415,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
   ento({
     id: "ento-q50",
     topicId: "dichotomous-keys",
-    difficulty: 2,
+    difficulty: 3,
     prompt:
       "Follow this key from the top.\n\n1a. Family in Coleoptera (beetles) → go to 2\n1b. Family in Diptera (true flies) → stop; not in this key\n2a. Listed common name is metallic wood-boring/jewel beetles → Buprestidae\n2b. Listed common name is diabolical ironclad Beetles → Zopheridae\n\nA specimen’s listed common name is metallic wood-boring/jewel beetles. Which family do you reach?",
     choiceTexts: [
@@ -1529,7 +1529,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
   ento({
     id: "ento-q55",
     topicId: "life-cycles",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Dragonflies and damselflies are listed as Order Odonata. Do they have a pupal stage?",
     choiceTexts: [
@@ -1554,7 +1554,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     topicId: "ecology-habitat",
     difficulty: 2,
     prompt:
-      "Students collect young insects from a freshwater pond. The order they want is listed as caddisflies. Which order is that?",
+      "Caddisflies are listed under which order?",
     choiceTexts: [
       "Ephemeroptera",
       "Plecoptera",
@@ -1562,14 +1562,14 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Trichoptera",
     ],
     correctChoiceId: "d",
-    hint: "Match the official common name first, then remember this order’s immatures were taught as freshwater.",
+    hint: "Match the official common name to its order on the 2027 list.",
     explanation:
-      "Caddisflies are Order Trichoptera on the 2027 list. The existing habitat item treats caddisfly larvae as living in freshwater such as streams and ponds. Ephemeroptera is mayflies; Plecoptera is stoneflies; Odonata is dragon/damselflies — different official names.",
+      "Caddisflies are Order Trichoptera on the 2027 list. Ephemeroptera is mayflies; Plecoptera is stoneflies; Odonata is dragon/damselflies — different official names.",
     taxonomyTags: ["Trichoptera"],
     cognitiveDemand: "application",
     sourceType: "generated",
     sourceNote:
-      "TAXON_LIST_2027.md Trichoptera = caddisflies; freshwater larval habitat from existing ento-q21. New stem combines list name with that habitat.",
+      "TAXON_LIST_2027.md Trichoptera = caddisflies. The item tests the official list mapping only.",
     verificationStatus: "needs-review",
   }),
   ento({

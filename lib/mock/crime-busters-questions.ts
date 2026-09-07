@@ -264,7 +264,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
   cb({
     id: "cb-q7",
     topicId: "fingerprints",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "The terms radial and ulnar for fingerprint loops are derived from which bones?",
     choiceTexts: [
@@ -462,7 +462,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
   cb({
     id: "cb-q16",
     topicId: "hair-fiber",
-    difficulty: 3,
+    difficulty: 2,
     prompt:
       "Which cuticle description matches human hair?",
     choiceTexts: [
@@ -506,7 +506,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
   cb({
     id: "cb-q18",
     topicId: "hair-fiber",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Fibers are grouped into which three classes?",
     choiceTexts: [
@@ -550,7 +550,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
   cb({
     id: "cb-q20",
     topicId: "hair-fiber",
-    difficulty: 3,
+    difficulty: 1,
     prompt:
       "Cotton fibrils are almost entirely which carbohydrate?",
     choiceTexts: [
@@ -704,7 +704,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
   cb({
     id: "cb-q27",
     topicId: "soil",
-    difficulty: 3,
+    difficulty: 2,
     prompt:
       "Chalky soil and chalk powder (calcium carbonate) both appear in this event. What is true?",
     choiceTexts: [
@@ -924,7 +924,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
   cb({
     id: "cb-q37",
     topicId: "chemical",
-    difficulty: 3,
+    difficulty: 1,
     prompt:
       "Powder tests in this event provide which three materials?",
     choiceTexts: [
@@ -946,7 +946,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
   cb({
     id: "cb-q38",
     topicId: "chemical",
-    difficulty: 3,
+    difficulty: 1,
     prompt:
       "Isopropanol sold as about a 70% water solution is which household product on the liquid list?",
     choiceTexts: [
@@ -968,7 +968,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
   cb({
     id: "cb-q39",
     topicId: "chemical",
-    difficulty: 3,
+    difficulty: 1,
     prompt:
       "Sodium hypochlorite is commonly found in which listed liquid?",
     choiceTexts: [
@@ -1036,7 +1036,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
   cb({
     id: "cb-q42",
     topicId: "fingerprints",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Which fingerprint pattern family is shown here?",
     choiceTexts: ["Arch", "Tented arch", "Loop", "Whorl"],
@@ -1084,7 +1084,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
   cb({
     id: "cb-q44",
     topicId: "fingerprints",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Which pattern family is this fingerprint?",
     choiceTexts: ["Loop", "Whorl", "Double loop", "Arch"],

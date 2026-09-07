@@ -162,7 +162,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
   eco({
     id: "eco-q4",
     topicId: "organization-and-energy",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Which statement describes an ecosystem?",
     choiceTexts: [
@@ -272,7 +272,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
   eco({
     id: "eco-q9",
     topicId: "communities-and-succession",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "In a mutualism, what happens to the two species?",
     choiceTexts: [
@@ -294,7 +294,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
   eco({
     id: "eco-q10",
     topicId: "communities-and-succession",
-    difficulty: 3,
+    difficulty: 2,
     prompt:
       "The competitive exclusion principle says that two species cannot coexist in a community if they are competing for all the same resources. What does that mean about their niches?",
     choiceTexts: [
@@ -338,7 +338,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
   eco({
     id: "eco-q12",
     topicId: "populations-and-evolution",
-    difficulty: 3,
+    difficulty: 2,
     prompt:
       "How does logistic growth differ from exponential growth in a limited environment?",
     choiceTexts: [
@@ -360,7 +360,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
   eco({
     id: "eco-q13",
     topicId: "populations-and-evolution",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Most density-dependent factors that regulate population growth are biological. Which set matches that description?",
     choiceTexts: [
@@ -382,7 +382,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
   eco({
     id: "eco-q14",
     topicId: "populations-and-evolution",
-    difficulty: 3,
+    difficulty: 2,
     prompt:
       "A forest fire kills deer whether the deer population is dense or sparse. What kind of factor is the fire?",
     choiceTexts: [
@@ -448,7 +448,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
   eco({
     id: "eco-q17",
     topicId: "populations-and-evolution",
-    difficulty: 3,
+    difficulty: 2,
     prompt:
       "How does allopatric speciation differ from sympatric speciation?",
     choiceTexts: [
@@ -558,7 +558,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
   eco({
     id: "eco-q22",
     topicId: "terrestrial-ecosystems",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Which statement describes subtropical deserts?",
     choiceTexts: [
@@ -580,7 +580,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
   eco({
     id: "eco-q23",
     topicId: "terrestrial-ecosystems",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "How do many desert plants reduce water loss?",
     choiceTexts: [
@@ -734,7 +734,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
   eco({
     id: "eco-q30",
     topicId: "human-impact",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Which three are described as the greatest proximate threats to biodiversity?",
     choiceTexts: [
@@ -822,7 +822,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
   eco({
     id: "eco-q34",
     topicId: "human-impact",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "What is biomagnification?",
     choiceTexts: [
@@ -910,7 +910,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
   eco({
     id: "eco-q38",
     topicId: "human-impact",
-    difficulty: 2,
+    difficulty: 1,
     prompt:
       "Which wildlife risk is described for wind turbines?",
     choiceTexts: [
@@ -954,7 +954,7 @@ export const MOCK_ECOLOGY_QUESTIONS: EcologyQuestion[] = [
   eco({
     id: "eco-q40",
     topicId: "human-impact",
-    difficulty: 3,
+    difficulty: 1,
     prompt:
       "On the IUCN Red List, which three categories are considered threatened with extinction?",
     choiceTexts: [
