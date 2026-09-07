@@ -1,14 +1,21 @@
+"use client";
+
+import { BadgeCelebration } from "@/components/BadgeCelebration";
 import {
   BADGE_DEFINITIONS,
+  definitionsForIds,
   formatBadgeProgress,
   type BadgeDefinition,
   type BadgeId,
   type BadgeProgress,
 } from "@/lib/badges";
+import { useEffect, useState } from "react";
 
 type BadgeShelfProps = {
   earnedIds: readonly BadgeId[];
   progress: readonly BadgeProgress[];
+  newlyEarnedIds?: readonly BadgeId[];
+  accountId?: string;
 };
 
 const GROUPS: Array<{ title: string; ids: readonly BadgeId[] }> = [
@@ -43,13 +50,57 @@ const GROUPS: Array<{ title: string; ids: readonly BadgeId[] }> = [
   },
 ];
 
-export function BadgeShelf({ earnedIds, progress }: BadgeShelfProps) {
+export function BadgeShelf({
+  earnedIds,
+  progress,
+  newlyEarnedIds = [],
+  accountId,
+}: BadgeShelfProps) {
   const earned = new Set(earnedIds);
   const byId = new Map(progress.map((row) => [row.id, row]));
   const empty = earnedIds.length === 0;
+  const [celebrationIds, setCelebrationIds] = useState<BadgeId[]>([]);
+
+  useEffect(() => {
+    if (newlyEarnedIds.length === 0) {
+      return;
+    }
+    const key = accountId
+      ? `jr-explorer-seen-badge-celebrations:${accountId}`
+      : null;
+    if (!key) {
+      // No account ID means there is no safe persistence key.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCelebrationIds([...newlyEarnedIds]);
+      return;
+    }
+    try {
+      const seen = new Set<BadgeId>(
+        JSON.parse(window.localStorage.getItem(key) ?? "[]"),
+      );
+      const unseen = newlyEarnedIds.filter((id) => !seen.has(id));
+      if (unseen.length === 0) {
+        return;
+      }
+      unseen.forEach((id) => seen.add(id));
+      window.localStorage.setItem(key, JSON.stringify([...seen]));
+      setCelebrationIds(unseen);
+    } catch {
+      setCelebrationIds([...newlyEarnedIds]);
+    }
+  }, [accountId, newlyEarnedIds]);
+  const celebrationBadges = definitionsForIds(celebrationIds);
 
   return (
-    <section aria-labelledby="badges-heading">
+    <>
+      {celebrationBadges.length > 0 ? (
+        <BadgeCelebration
+          eventName="recent"
+          badges={celebrationBadges}
+          onClose={() => setCelebrationIds([])}
+        />
+      ) : null}
+      <section aria-labelledby="badges-heading">
       <h1
         id="badges-heading"
         className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl"
@@ -93,7 +144,8 @@ export function BadgeShelf({ earnedIds, progress }: BadgeShelfProps) {
           </div>
         ))}
       </div>
-    </section>
+      </section>
+    </>
   );
 }
 
