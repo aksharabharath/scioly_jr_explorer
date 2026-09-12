@@ -2,6 +2,7 @@ import { EventHubLearning } from "@/components/EventHubLearning";
 import { EventHubTopicCatalog } from "@/components/EventHubTopicCatalog";
 import { EventHubTrickyTopics } from "@/components/EventHubTrickyTopics";
 import { EventIcon } from "@/components/EventIcon";
+import { EventRequestForm } from "@/components/EventRequestForm";
 import { ExplorerTrail } from "@/components/ExplorerTrail";
 import {
   learningTopicsForEventHub,
@@ -139,6 +140,10 @@ export default async function EventPage({ params }: EventRouteProps) {
           <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:text-base">
             {overview}
           </p>
+        </div>
+
+        <div className="mt-4">
+          <EventRequestForm />
         </div>
 
         {rulesHref ? (
