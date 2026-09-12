@@ -1,4 +1,5 @@
 import { EventSelectionForm } from "@/components/EventSelectionForm";
+import { EventRequestForm } from "@/components/EventRequestForm";
 import { getEvents } from "@/lib/mock/events";
 import { getMySelectedEventIds } from "@/lib/student-events";
 import type { Metadata } from "next";
@@ -30,6 +31,9 @@ export default async function OnboardingEventsPage() {
           Pick at least one ready field site. You will start expeditions from
           Base camp, not from this list. Other events are coming later.
         </p>
+        <div className="mt-4">
+          <EventRequestForm />
+        </div>
         <EventSelectionForm
           events={events}
           initialSelectedIds={[]}
