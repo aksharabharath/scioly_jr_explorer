@@ -31,6 +31,14 @@ import {
   MOCK_CRIME_BUSTERS_QUESTIONS,
   crimeBustersQuestionToPracticeQuestion,
 } from "@/lib/mock/crime-busters-questions";
+import {
+  MOCK_CODEBUSTERS_OVERVIEW,
+  MOCK_CODEBUSTERS_TOPICS,
+} from "@/lib/mock/codebusters";
+import {
+  MOCK_CODEBUSTERS_QUESTIONS,
+  codebustersQuestionToPracticeQuestion,
+} from "@/lib/mock/codebusters-questions";
 import { MOCK_ECOLOGY_OVERVIEW, MOCK_ECOLOGY_TOPICS } from "@/lib/mock/ecology";
 import {
   MOCK_ECOLOGY_QUESTIONS,
@@ -57,6 +65,9 @@ const QUESTIONS_BY_EVENT: Record<string, Question[]> = {
   "crime-busters": MOCK_CRIME_BUSTERS_QUESTIONS.map(
     crimeBustersQuestionToPracticeQuestion,
   ),
+  codebusters: MOCK_CODEBUSTERS_QUESTIONS.map(
+    codebustersQuestionToPracticeQuestion,
+  ),
   ecology: MOCK_ECOLOGY_QUESTIONS.map(ecologyQuestionToPracticeQuestion),
 };
 
@@ -66,6 +77,7 @@ const TOPICS_BY_EVENT: Record<string, Topic[]> = {
   "anatomy-physiology": MOCK_ANATOMY_TOPICS,
   "water-quality": MOCK_WATER_QUALITY_TOPICS,
   "crime-busters": MOCK_CRIME_BUSTERS_TOPICS,
+  codebusters: MOCK_CODEBUSTERS_TOPICS,
   ecology: MOCK_ECOLOGY_TOPICS,
 };
 
@@ -75,6 +87,7 @@ const OVERVIEW_BY_EVENT: Record<string, string> = {
   "anatomy-physiology": MOCK_ANATOMY_OVERVIEW,
   "water-quality": MOCK_WATER_QUALITY_OVERVIEW,
   "crime-busters": MOCK_CRIME_BUSTERS_OVERVIEW,
+  codebusters: MOCK_CODEBUSTERS_OVERVIEW,
   ecology: MOCK_ECOLOGY_OVERVIEW,
 };
 
