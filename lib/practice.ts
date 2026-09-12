@@ -1,4 +1,9 @@
-import type { DifficultyLevel, PracticeFollowUp, PracticeSummary } from "@/lib/types";
+import type {
+  DifficultyLevel,
+  PracticeFollowUp,
+  PracticeSummary,
+  Question,
+} from "@/lib/types";
 
 export type AnswerRecord = {
   questionId: string;
@@ -17,6 +22,64 @@ export function summarizePractice(records: AnswerRecord[]): PracticeSummary {
       : Math.round((correctAnswers / questionsAnswered) * 100);
 
   return { questionsAnswered, correctAnswers, accuracyPercent };
+}
+
+/**
+ * After a miss: name the chosen answer and the better match so the student
+ * can see what they mixed up before they read the explanation.
+ */
+export function missedAnswerContrast(
+  question: Pick<Question, "choices" | "correctChoiceId">,
+  selectedChoiceId: string,
+): string | null {
+  if (selectedChoiceId === question.correctChoiceId) {
+    return null;
+  }
+  const selected = question.choices.find(
+    (choice) => choice.id === selectedChoiceId,
+  );
+  const correct = question.choices.find(
+    (choice) => choice.id === question.correctChoiceId,
+  );
+  if (!selected || !correct) {
+    return null;
+  }
+  return `You chose ${selected.id.toUpperCase()} (${selected.text}). The better match is ${correct.id.toUpperCase()} (${correct.text}).`;
+}
+
+/** Non-empty Apply clue, or null when the question has only Orient. */
+export function authoredSecondHint(
+  question: Pick<Question, "hint2">,
+): string | null {
+  const text = question.hint2?.trim() ?? "";
+  return text.length > 0 ? text : null;
+}
+
+/** Opening either clue marks the attempt hinted. Does not change XP math. */
+export function attemptUsedAHint(
+  firstClueOpen: boolean,
+  secondClueOpen: boolean,
+): boolean {
+  return firstClueOpen || secondClueOpen;
+}
+
+/** Spread onto a Question / mapper result only when hint2 is authored. */
+export function optionalSecondHintFields(
+  hint2: string | undefined,
+): Pick<Question, "hint2"> {
+  const text = hint2?.trim() ?? "";
+  return text.length > 0 ? { hint2: text } : {};
+}
+
+/** If hint2 is omitted, valid. If present, it must differ from hint. */
+export function optionalSecondHintIsValid(
+  question: Pick<Question, "hint" | "hint2">,
+): boolean {
+  const second = authoredSecondHint(question);
+  if (second == null) {
+    return true;
+  }
+  return second !== question.hint.trim();
 }
 
 export const DIFFICULTY_LEVEL_LABEL: Record<DifficultyLevel, string> = {

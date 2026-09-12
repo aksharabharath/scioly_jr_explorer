@@ -1,4 +1,5 @@
 import { EventSelectionForm } from "@/components/EventSelectionForm";
+import { EventRequestForm } from "@/components/EventRequestForm";
 import { getEvents } from "@/lib/mock/events";
 import { getMySelectedEventIds } from "@/lib/student-events";
 import type { Metadata } from "next";
@@ -25,6 +26,9 @@ export default async function ProfileEventsPage() {
           Choose which field sites appear at Base camp. This page does not
           start an expedition.
         </p>
+        <div className="mt-4">
+          <EventRequestForm />
+        </div>
         <EventSelectionForm
           events={events}
           initialSelectedIds={selectedIds}

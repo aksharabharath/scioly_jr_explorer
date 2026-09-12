@@ -2,7 +2,10 @@
 
 import { savePracticeAttempt } from "@/app/practice/actions";
 import { ExpeditionRewardsOverlay } from "@/components/ExpeditionRewardsOverlay";
+import { TrickyTopicsEmpty } from "@/components/TrickyTopicsEmpty";
+import { PromptWithTerms } from "@/components/PromptWithTerms";
 import { XpAwardFeedback } from "@/components/XpAwardFeedback";
+import { glossaryForEvent } from "@/lib/mock/glossary";
 import {
   PRACTICE_SET_SIZE,
   attemptFromQuestion,
@@ -21,14 +24,14 @@ import {
   type BadgeProgressAttempt,
 } from "@/lib/badges";
 import {
-  DIFFICULTY_LEVEL_LABEL,
+  attemptUsedAHint,
+  authoredSecondHint,
+  missedAnswerContrast,
   recommendNextStep,
   summarizePractice,
   type AnswerRecord,
 } from "@/lib/practice";
 import {
-  XP_CORRECT,
-  XP_CORRECT_WITH_HINT,
   calculateLevelFromXp,
   formatXpGain,
   localCalendarDate,
@@ -46,7 +49,7 @@ import {
 } from "@/lib/student-preferences";
 import type { PracticeFollowUp, PracticeSummary, Question } from "@/lib/types";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 type PracticeQuizProps = {
   eventId: string;
@@ -70,8 +73,8 @@ type PracticeQuizProps = {
   };
   dailyPracticeGoal?: DailyPracticeGoal;
   mode?: PracticeMode;
-  previouslyAnsweredQuestionIds?: string[];
-  completedExpeditions?: number;
+  previouslyAnsweredQuestionIds: string[];
+  completedExpeditions: number;
 };
 
 type ActiveQuizState = {
@@ -81,6 +84,7 @@ type ActiveQuizState = {
   sessionTopics: string[];
   selectedChoiceId: string | null;
   revealedHint: boolean;
+  revealedHint2: boolean;
   submitted: boolean;
   records: AnswerRecord[];
   history: LearningAttempt[];
@@ -93,10 +97,6 @@ type ActiveQuizState = {
     attemptXp: number;
     sessionBonusXp: number;
   } | null;
-  /** Running total of XP the server has awarded in this expedition. */
-  sessionXp: number;
-  /** Which expedition question is on screen. Past answers are review-only. */
-  viewIndex: number;
 };
 
 type CompleteQuizState = {
@@ -105,7 +105,6 @@ type CompleteQuizState = {
   history: LearningAttempt[];
   attemptCount: number;
   sessionXp: number;
-  sessionBonusXp: number;
   streakDays: number;
   /** Persisted total XP after the last successful save. Null if none. */
   totalXp: number | null;
@@ -115,21 +114,23 @@ type CompleteQuizState = {
   dailyMissionComplete: boolean;
 };
 
-type QuizState = ActiveQuizState | CompleteQuizState;
+type ClearedWeakQuizState = {
+  status: "cleared-weak";
+  history: LearningAttempt[];
+  attemptCount: number;
+};
+
+type QuizState = ActiveQuizState | CompleteQuizState | ClearedWeakQuizState;
 
 function beginSet(
   questions: Question[],
   history: LearningAttempt[],
   attemptCount: number,
   mode: PracticeMode,
-<<<<<<< ours
-  resumeSession?: PracticeQuizProps["resumeSession"],
-||||||| base
-=======
   eventId: string,
   expeditionNumber: number,
   previouslyAnsweredQuestionIds: string[],
->>>>>>> theirs
+  resumeSession?: PracticeQuizProps["resumeSession"],
 ): QuizState {
   const resumedAttempts = resumeSession?.attempts ?? [];
   const byId = new Map(questions.map((item) => [item.id, item]));
@@ -167,37 +168,38 @@ function beginSet(
   const question = selectNextQuestion({
     bank: questions,
     history,
-<<<<<<< ours
     askedQuestionIds: askedIds,
+    previouslyAnsweredQuestionIds:
+      resumeSession ? undefined : previouslyAnsweredQuestionIds,
     sessionTopicSequence: sessionTopics,
     lastWasRevisitEvidence:
       resumedRecords.length > 0
         ? !resumedRecords[resumedRecords.length - 1].isCorrect ||
           resumedRecords[resumedRecords.length - 1].hintUsed
         : false,
-||||||| base
-    askedQuestionIds: [],
-    sessionTopicSequence: [],
-    lastWasRevisitEvidence: false,
-=======
-    askedQuestionIds: [],
-    previouslyAnsweredQuestionIds,
-    sessionTopicSequence: [],
-    lastWasRevisitEvidence: false,
->>>>>>> theirs
     mode,
     eventId,
     expeditionNumber,
+  } as Parameters<typeof selectNextQuestion>[0] & {
+    previouslyAnsweredQuestionIds?: string[];
+    eventId?: string;
+    expeditionNumber?: number;
   });
 
   if (!question) {
+    if (mode === "weak") {
+      return {
+        status: "cleared-weak",
+        history,
+        attemptCount,
+      };
+    }
     return {
       status: "complete",
       records: [],
-      history,
+      history: sessionHistory,
       attemptCount,
       sessionXp: 0,
-      sessionBonusXp: 0,
       streakDays: 0,
       totalXp: null,
       newlyEarnedIds: [],
@@ -214,6 +216,7 @@ function beginSet(
     sessionTopics: [...sessionTopics, question.topicId],
     selectedChoiceId: null,
     revealedHint: false,
+    revealedHint2: false,
     submitted: false,
     records: resumedRecords,
     history: sessionHistory,
@@ -222,49 +225,7 @@ function beginSet(
     saving: false,
     attemptCount,
     xpAward: null,
-    sessionXp: resumeSession?.sessionXp ?? 0,
-    viewIndex: resumedRecords.length,
   };
-}
-
-function consecutiveCorrectStreak(
-  records: AnswerRecord[],
-  pendingAnswer: Pick<AnswerRecord, "isCorrect" | "hintUsed"> | null,
-): number {
-  if (pendingAnswer && !pendingAnswer.isCorrect) {
-    return 0;
-  }
-  let streak = 0;
-  for (let i = records.length - 1; i >= 0; i -= 1) {
-    if (!records[i].isCorrect) {
-      break;
-    }
-    if (records[i].hintUsed) {
-      continue;
-    }
-    streak += 1;
-  }
-  if (pendingAnswer?.isCorrect && !pendingAnswer.hintUsed) {
-    streak += 1;
-  }
-  return streak;
-}
-
-function formatExpeditionXp(sessionXp: number): string {
-  return `+ ${Math.max(0, sessionXp)} XP Earned`;
-}
-
-function formatQuestionStreak(streak: number): string {
-  if (streak <= 0) {
-    return "No streak yet";
-  }
-  if (streak === 1) {
-    return "1 in a row";
-  }
-  if (streak === 2) {
-    return "2 Question Streak";
-  }
-  return `${streak} Question Streak!!!!!`;
 }
 
 function newlyEarnedForSession(
@@ -297,8 +258,8 @@ export function PracticeQuiz({
   resumeSession,
   dailyPracticeGoal = DEFAULT_DAILY_PRACTICE_GOAL,
   mode = "normal",
-  previouslyAnsweredQuestionIds = [],
-  completedExpeditions = 0,
+  previouslyAnsweredQuestionIds,
+  completedExpeditions,
 }: PracticeQuizProps) {
   const expeditionNumberRef = useRef(completedExpeditions + 1);
   const sessionModeRef = useRef(mode);
@@ -306,17 +267,6 @@ export function PracticeQuiz({
     ...previouslyAnsweredQuestionIds,
   ]);
   const [state, setState] = useState<QuizState>(() =>
-<<<<<<< ours
-    beginSet(
-      questions,
-      priorAttempts,
-      initialAttemptCount,
-      mode,
-      resumeSession,
-    ),
-||||||| base
-    beginSet(questions, priorAttempts, initialAttemptCount, mode),
-=======
     beginSet(
       questions,
       priorAttempts,
@@ -325,8 +275,8 @@ export function PracticeQuiz({
       eventId,
       completedExpeditions + 1,
       previouslyAnsweredQuestionIds,
+      resumeSession,
     ),
->>>>>>> theirs
   );
   const feedbackRef = useRef<HTMLDivElement>(null);
   const savingRef = useRef(false);
@@ -340,7 +290,14 @@ export function PracticeQuiz({
   const badgeAttemptsRef = useRef(priorBadgeAttempts);
   const baselineXpRef = useRef(initialXp);
   const baselineStreakRef = useRef(initialStreakDays);
-
+  const clueRegionId = useId();
+  const wordingHelpRegionId = useId();
+  const [wordingHelpQuestionId, setWordingHelpQuestionId] = useState<
+    string | null
+  >(null);
+  const activeQuestionId =
+    state.status === "active" ? state.question.id : "";
+  const wordingHelpOpen = wordingHelpQuestionId === activeQuestionId;
   const showFeedback = state.status === "active" && state.submitted;
 
   useEffect(() => {
@@ -353,8 +310,7 @@ export function PracticeQuiz({
     });
   }, [showFeedback]);
 
-  function startNewSession(nextMode: PracticeMode = "normal") {
-    sessionModeRef.current = nextMode;
+  function startNewSession(nextMode: PracticeMode) {
     if (totalXpRef.current != null) {
       baselineXpRef.current = totalXpRef.current;
     }
@@ -366,13 +322,13 @@ export function PracticeQuiz({
     sessionXpRef.current = 0;
     streakDaysRef.current = 0;
     totalXpRef.current = null;
+    sessionModeRef.current = nextMode;
   }
 
   function finishSet(
     nextRecords: AnswerRecord[],
     nextHistory: LearningAttempt[],
     attemptCount: number,
-    sessionBonusXp: number,
   ): CompleteQuizState {
     const streakAfter = streakDaysRef.current;
     const newlyEarnedIds = newlyEarnedForSession(
@@ -408,7 +364,6 @@ export function PracticeQuiz({
       history: nextHistory,
       attemptCount,
       sessionXp: sessionXpRef.current,
-      sessionBonusXp,
       streakDays: streakAfter,
       totalXp: totalXpRef.current,
       newlyEarnedIds,
@@ -423,6 +378,12 @@ export function PracticeQuiz({
     };
   }
 
+  if (state.status === "cleared-weak") {
+    return (
+      <TrickyTopicsEmpty eventId={eventId} eventName={eventName} />
+    );
+  }
+
   if (state.status === "complete") {
     const summary = summarizePractice(state.records);
     const followUp = recommendNextStep(summary.accuracyPercent, eventName);
@@ -434,17 +395,6 @@ export function PracticeQuiz({
         summary={summary}
         followUp={followUp}
         revisitNote={revisitNote}
-<<<<<<< ours
-        onTryAgain={() => {
-          startNewSession();
-          setState(beginSet(questions, state.history, state.attemptCount, mode));
-||||||| base
-        onTryAgain={() => {
-          startNewSession();
-          setState(
-            beginSet(questions, state.history, state.attemptCount, mode),
-          );
-=======
         hasRemediation={hasWeakTopics(state.history)}
         onMoveOn={() => {
           startNewSession("normal");
@@ -473,10 +423,8 @@ export function PracticeQuiz({
               previouslyAnsweredQuestionIdsRef.current,
             ),
           );
->>>>>>> theirs
         }}
         sessionXp={state.sessionXp}
-        sessionBonusXp={state.sessionBonusXp}
         streakDays={state.streakDays}
         totalXp={state.totalXp}
         newlyEarned={definitionsForIds(state.newlyEarnedIds)}
@@ -536,7 +484,7 @@ export function PracticeQuiz({
       const result = await savePracticeAttempt({
         questionId: question.id,
         selectedOptionId: selectedChoiceId,
-        hintUsed: state.revealedHint,
+        hintUsed: attemptUsedAHint(state.revealedHint, state.revealedHint2),
         attemptId: attemptIdRef.current,
         sessionId: sessionIdRef.current,
         practiceDate: localCalendarDate(),
@@ -566,10 +514,6 @@ export function PracticeQuiz({
                   attemptXp: result.attemptXp,
                   sessionBonusXp: result.sessionBonusXp,
                 },
-                sessionXp:
-                  earned > 0
-                    ? current.sessionXp + earned
-                    : current.sessionXp,
                 attemptCount:
                   earned > 0
                     ? current.attemptCount + 1
@@ -609,7 +553,7 @@ export function PracticeQuiz({
       return;
     }
 
-    const hintUsed = state.revealedHint;
+    const hintUsed = attemptUsedAHint(state.revealedHint, state.revealedHint2);
     const record: AnswerRecord = {
       questionId: question.id,
       selectedChoiceId: state.selectedChoiceId,
@@ -627,14 +571,7 @@ export function PracticeQuiz({
     attemptIdRef.current = null;
 
     if (isLast) {
-      setState(
-        finishSet(
-          nextRecords,
-          nextHistory,
-          state.attemptCount,
-          state.xpAward?.sessionBonusXp ?? 0,
-        ),
-      );
+      setState(finishSet(nextRecords, nextHistory, state.attemptCount));
       return;
     }
 
@@ -649,17 +586,14 @@ export function PracticeQuiz({
       mode: sessionModeRef.current,
       eventId,
       expeditionNumber: expeditionNumberRef.current,
+    } as Parameters<typeof selectNextQuestion>[0] & {
+      previouslyAnsweredQuestionIds?: string[];
+      eventId?: string;
+      expeditionNumber?: number;
     });
 
     if (!nextQuestion) {
-      setState(
-        finishSet(
-          nextRecords,
-          nextHistory,
-          state.attemptCount,
-          state.xpAward?.sessionBonusXp ?? 0,
-        ),
-      );
+      setState(finishSet(nextRecords, nextHistory, state.attemptCount));
       return;
     }
 
@@ -670,6 +604,7 @@ export function PracticeQuiz({
       sessionTopics: [...state.sessionTopics, nextQuestion.topicId],
       selectedChoiceId: null,
       revealedHint: false,
+      revealedHint2: false,
       submitted: false,
       records: nextRecords,
       history: nextHistory,
@@ -678,94 +613,29 @@ export function PracticeQuiz({
       saving: false,
       attemptCount: state.attemptCount,
       xpAward: null,
-      sessionXp: state.sessionXp,
-      viewIndex: nextRecords.length,
     });
   }
 
-  function goToPrevious() {
-    if (state.status !== "active" || state.viewIndex <= 0) {
-      return;
-    }
-    setState({ ...state, viewIndex: state.viewIndex - 1 });
-  }
-
-  function goToNext() {
-    if (state.status !== "active") {
-      return;
-    }
-    if (state.viewIndex < state.records.length) {
-      setState({ ...state, viewIndex: state.viewIndex + 1 });
-      return;
-    }
-    continueToNext();
-  }
-
-  const viewingCurrent = state.viewIndex === state.records.length;
-  const reviewedRecord = viewingCurrent
-    ? null
-    : state.records[state.viewIndex] ?? null;
-  const viewedQuestion = viewingCurrent
-    ? question
-    : (questions.find((item) => item.id === reviewedRecord?.questionId) ??
-      question);
-  const viewedSelectedChoiceId = viewingCurrent
-    ? state.selectedChoiceId
-    : (reviewedRecord?.selectedChoiceId ?? null);
-  const viewedSubmitted = viewingCurrent ? state.submitted : true;
-  const canGoPrevious = state.viewIndex > 0;
-  const canGoNext = viewingCurrent
-    ? Boolean(
-        state.submitted && state.saved && !isLast && state.selectedChoiceId,
-      )
-    : true;
-  const viewedIsCorrect =
-    viewedSelectedChoiceId === viewedQuestion.correctChoiceId;
-  const viewedAskedIndex = state.askedIds.indexOf(viewedQuestion.id);
-  const sessionNumber =
-    viewedAskedIndex >= 0
-      ? viewedAskedIndex + 1
-      : viewingCurrent
-        ? state.askedIds.length
-        : state.viewIndex + 1;
+  const sessionNumber = state.records.length + 1;
   const progressPercent =
     plannedTotal === 0 ? 0 : Math.round((sessionNumber / plannedTotal) * 100);
-  const pendingAnswer =
-    state.saved && viewingCurrent
-      ? { isCorrect, hintUsed: state.revealedHint }
+  const missContrast =
+    !isCorrect && state.selectedChoiceId
+      ? missedAnswerContrast(question, state.selectedChoiceId)
       : null;
-  const questionStreak = consecutiveCorrectStreak(
-    state.records,
-    pendingAnswer,
-  );
-  const showFireCelebration =
-    viewingCurrent && state.saved && isCorrect && questionStreak === 3;
 
-  const hasImage = Boolean(viewedQuestion.imageSrc);
+  const hasImage = Boolean(question.imageSrc);
+  const secondHint = authoredSecondHint(question);
+  const hintUsed = attemptUsedAHint(state.revealedHint, state.revealedHint2);
+  const wordingHelp = question.wordingHelp?.trim() ?? "";
+  const glossary = glossaryForEvent(question.eventId);
 
   return (
     <section className="journal-panel rounded-3xl p-4 sm:p-5">
-      <div className="flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1.5">
-        <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-          <p className="font-medium text-stone-700">
-            Question {sessionNumber} of {plannedTotal}
-          </p>
-          <p className="font-medium tabular-nums text-ink">
-            {formatExpeditionXp(state.sessionXp)}
-          </p>
-          <p
-            className={
-              questionStreak >= 3
-                ? "font-semibold text-teal-dark"
-                : "font-medium text-stone-600"
-            }
-          >
-            {formatQuestionStreak(questionStreak)}
-          </p>
-        </div>
-        <span className="rounded-full bg-parchment px-2.5 py-1 text-xs font-semibold text-ink">
-          {DIFFICULTY_LEVEL_LABEL[viewedQuestion.difficulty]}
-        </span>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="font-medium text-stone-700">
+          Question {sessionNumber} of {plannedTotal}
+        </p>
       </div>
       <div
         className="mt-2 h-1.5 overflow-hidden rounded-full bg-stone-200"
@@ -789,21 +659,25 @@ export function PracticeQuiz({
         }`}
       >
         <div>
-          <h2 className="font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
-            {viewedQuestion.prompt}
-          </h2>
-          {viewedQuestion.imageSrc ? (
+          <div className="font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
+            <PromptWithTerms
+              prompt={question.prompt}
+              promptTerms={question.promptTerms}
+              glossary={glossary}
+            />
+          </div>
+          {question.imageSrc ? (
             <figure className="mt-3 overflow-hidden rounded-2xl border border-stone-200/80 bg-parchment">
               {/* Local public JPEGs (and any other static imageSrc); next/image is not required. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={viewedQuestion.imageSrc}
-                alt={viewedQuestion.imageAlt ?? ""}
+                src={question.imageSrc}
+                alt={question.imageAlt ?? ""}
                 className="mx-auto max-h-[min(36vh,280px)] w-full object-contain p-2"
               />
-              {viewedQuestion.imageCredit ? (
+              {question.imageCredit ? (
                 <figcaption className="px-3 pb-2 text-center text-xs leading-snug text-stone-500">
-                  {viewedQuestion.imageCredit}
+                  {question.imageCredit}
                 </figcaption>
               ) : null}
             </figure>
@@ -812,40 +686,46 @@ export function PracticeQuiz({
 
         <div>
           <div
-            className={viewedSubmitted ? "space-y-1.5" : "space-y-2"}
+            className={state.submitted ? "space-y-1.5" : "space-y-2"}
             role="group"
             aria-label="Answer choices"
           >
-            {viewedQuestion.choices.map((choice) => {
-              const selected = viewedSelectedChoiceId === choice.id;
-              const correctChoice = choice.id === viewedQuestion.correctChoiceId;
+            {question.choices.map((choice) => {
+              const selected = state.selectedChoiceId === choice.id;
+              const correctChoice = choice.id === question.correctChoiceId;
               let choiceClass =
                 "border-stone-200 bg-parchment/50 hover:border-teal/40 hover:bg-parchment";
+              let letterClass = "bg-white text-stone-600";
 
-              if (viewedSubmitted && correctChoice) {
+              if (state.submitted && correctChoice) {
                 choiceClass =
-                  "choice-pulse border-teal bg-teal/10 text-teal-dark";
-              } else if (viewedSubmitted && selected && !correctChoice) {
-                choiceClass = "border-rose-300 bg-rose-50 text-rose-950";
-              } else if (!viewedSubmitted && selected) {
+                  "choice-pulse border-teal bg-teal/10 text-teal-dark disabled:border-teal disabled:bg-teal/10 disabled:text-teal-dark disabled:opacity-100";
+              } else if (state.submitted && selected && !correctChoice) {
+                choiceClass =
+                  "border-rose-300 bg-rose-50 text-rose-950 disabled:border-rose-300 disabled:bg-rose-50 disabled:text-rose-950 disabled:opacity-100";
+                letterClass = "bg-rose-100 text-rose-900";
+              } else if (!state.submitted && selected) {
                 choiceClass = "border-teal bg-teal/10 text-teal-dark";
+              } else if (state.submitted) {
+                choiceClass =
+                  "border-stone-200 bg-parchment/50 text-ink disabled:border-stone-200 disabled:bg-parchment/50 disabled:text-ink disabled:opacity-100";
               }
 
               return (
                 <button
                   key={choice.id}
                   type="button"
-                  disabled={viewedSubmitted}
+                  disabled={state.submitted}
                   onClick={() => selectChoice(choice.id)}
                   className={`flex w-full items-start text-left transition disabled:cursor-default ${
-                    viewedSubmitted
+                    state.submitted
                       ? "gap-2 rounded-xl border px-3 py-1.5 text-sm"
                       : "min-h-11 gap-3 rounded-2xl border px-4 py-2.5 text-base"
                   } ${choiceClass}`}
                 >
                   <span
-                    className={`mt-0.5 flex shrink-0 items-center justify-center rounded-full bg-white font-semibold text-stone-600 ${
-                      viewedSubmitted
+                    className={`mt-0.5 flex shrink-0 items-center justify-center rounded-full font-semibold ${letterClass} ${
+                      state.submitted
                         ? "h-6 w-6 text-xs"
                         : "h-7 w-7 text-sm"
                     }`}
@@ -858,22 +738,58 @@ export function PracticeQuiz({
             })}
           </div>
 
-          {viewingCurrent && !state.submitted ? (
+          {!state.submitted ? (
             <div className="mt-3 space-y-2">
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              {wordingHelp ? (
+                <div>
+                  <button
+                    type="button"
+                    aria-expanded={wordingHelpOpen}
+                    aria-controls={wordingHelpRegionId}
+                    onClick={() =>
+                      setWordingHelpQuestionId((current) =>
+                        current === activeQuestionId ? null : activeQuestionId,
+                      )
+                    }
+                    className="text-sm font-medium text-teal-dark underline-offset-4 hover:underline"
+                  >
+                    Explain this question
+                  </button>
+                  {wordingHelpOpen ? (
+                    <div
+                      id={wordingHelpRegionId}
+                      className="mt-2 rounded-2xl border border-teal/20 bg-teal/5 px-4 py-2.5 text-sm leading-relaxed text-stone-700"
+                    >
+                      <p className="font-semibold text-ink">
+                        What this is asking
+                      </p>
+                      <p className="mt-1">{wordingHelp}</p>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+              {!state.revealedHint ||
+              (secondHint && !state.revealedHint2) ? (
                 <button
                   type="button"
-                  onClick={() => setState({ ...state, revealedHint: true })}
-                  className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-teal/40 bg-teal/10 px-5 py-2.5 text-sm font-semibold text-teal-dark transition hover:bg-teal/15"
+                  aria-expanded={state.revealedHint}
+                  aria-controls={clueRegionId}
+                  onClick={() =>
+                    setState(
+                      state.revealedHint
+                        ? {
+                            ...state,
+                            revealedHint: true,
+                            revealedHint2: true,
+                          }
+                        : { ...state, revealedHint: true },
+                    )
+                  }
+                  className="text-sm font-medium text-teal underline-offset-4 hover:underline"
                 >
-                  {state.revealedHint ? "Hint is showing" : "Need a hint?"}
+                  {state.revealedHint ? "Another clue" : "Need a hint?"}
                 </button>
-                <p className="min-w-0 flex-1 text-sm leading-relaxed text-stone-600">
-                  {state.revealedHint
-                    ? `Hint used — this question can earn up to ${XP_CORRECT_WITH_HINT} XP instead of ${XP_CORRECT} XP.`
-                    : "Using a hint means a little less XP for this question."}
-                </p>
-              </div>
+              ) : null}
               <button
                 type="button"
                 onClick={checkAnswer}
@@ -885,56 +801,66 @@ export function PracticeQuiz({
             </div>
           ) : null}
 
-          {viewingCurrent && state.revealedHint && !state.submitted ? (
-            <p className="mt-2 rounded-2xl bg-amber-50 px-4 py-2.5 text-sm leading-relaxed text-amber-950">
-              <span className="font-semibold">Hint: </span>
-              {viewedQuestion.hint}
-            </p>
+          {state.revealedHint && !state.submitted ? (
+            <div
+              id={clueRegionId}
+              className="mt-2 space-y-2"
+              aria-live="polite"
+            >
+              <p className="rounded-2xl border border-stone-200 bg-amber-50 px-4 py-2.5 text-sm leading-relaxed text-amber-950">
+                <span className="font-semibold">Clue </span>
+                {question.hint}
+              </p>
+              {state.revealedHint2 && secondHint ? (
+                <p className="rounded-2xl border border-stone-200 bg-amber-50 px-4 py-2.5 text-sm leading-relaxed text-amber-950">
+                  <span className="font-semibold">Clue </span>
+                  {secondHint}
+                </p>
+              ) : null}
+            </div>
           ) : null}
 
-          {viewedSubmitted ? (
+          {state.submitted ? (
             <div
-              ref={viewingCurrent ? feedbackRef : undefined}
+              ref={feedbackRef}
               className="mt-3 space-y-2 rounded-2xl border border-stone-200/80 bg-parchment/50 p-3"
-              aria-live={viewingCurrent ? "polite" : undefined}
+              aria-live="polite"
             >
               <p
                 className={`rounded-xl px-3 py-2 text-sm font-semibold ${
-                  viewedIsCorrect
+                  isCorrect
                     ? "border border-teal/30 bg-teal/10 text-teal-dark"
                     : "border border-stone-200 bg-surface text-ink"
                 }`}
               >
-                {viewedIsCorrect
+                {isCorrect
                   ? "Correct."
                   : "Not quite. Explorers miss things. Here is what this was asking."}
               </p>
-              {showFireCelebration ? (
-                <p
-                  className="rounded-xl border border-gold-dark/30 bg-gold/15 px-3 py-2 text-sm font-semibold text-ink"
-                  aria-live="polite"
-                >
-                  🔥 3 right in a row! You&apos;re on fire!!!
+              {missContrast ? (
+                <p className="text-sm leading-snug text-ink">
+                  {missContrast}
                 </p>
               ) : null}
               <p className="text-sm leading-snug text-stone-700">
-                {viewedQuestion.explanation}
+                {question.explanation}
               </p>
-              {!viewedIsCorrect ? (
+              {!isCorrect && !state.revealedHint ? (
                 <p className="text-sm leading-snug text-stone-600">
                   <span className="font-semibold text-ink">Hint: </span>
-                  {viewedQuestion.hint}
+                  {question.hint}
                 </p>
               ) : null}
-              {viewingCurrent && state.saved && state.xpAward ? (
+              {state.saved && state.xpAward ? (
                 <XpAwardFeedback
                   attemptXp={state.xpAward.attemptXp}
                   sessionBonusXp={state.xpAward.sessionBonusXp}
                   isCorrect={isCorrect}
-                  hintUsed={state.revealedHint}
+                  hintUsed={hintUsed}
+                  quiet={!isCorrect}
                 />
               ) : null}
-              {viewingCurrent && !state.saved ? (
+              {!state.saved ? (
                 <div className="space-y-2">
                   {state.saveError ? (
                     <p className="rounded-xl bg-amber-50 px-3 py-2 text-sm text-amber-950">
@@ -959,45 +885,17 @@ export function PracticeQuiz({
                   ) : null}
                 </div>
               ) : null}
-              {viewingCurrent ? (
-                <button
-                  type="button"
-                  onClick={continueToNext}
-                  disabled={!state.saved}
-                  className="min-h-11 w-full rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment transition enabled:hover:bg-teal disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {isLast ? "See results" : "Next question →"}
-                </button>
-              ) : null}
+              <button
+                type="button"
+                onClick={continueToNext}
+                disabled={!state.saved}
+                className="min-h-11 w-full rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment transition enabled:hover:bg-teal disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isLast ? "See results" : "Next question →"}
+              </button>
             </div>
           ) : null}
         </div>
-      </div>
-
-      <div className="mt-5 flex items-center justify-between gap-3 border-t border-stone-200/80 pt-4">
-        <button
-          type="button"
-          onClick={goToPrevious}
-          disabled={!canGoPrevious}
-          className="inline-flex min-h-11 min-w-[7.5rem] items-center justify-center rounded-full border border-stone-200 px-5 py-2.5 text-sm font-semibold text-ink transition enabled:hover:bg-parchment disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          Previous
-        </button>
-        <p className="text-center text-xs text-stone-500">
-          {viewingCurrent && !state.submitted
-            ? "Check your answer to continue."
-            : viewingCurrent && isLast && state.submitted
-              ? "This is the last question."
-              : null}
-        </p>
-        <button
-          type="button"
-          onClick={goToNext}
-          disabled={!canGoNext}
-          className="inline-flex min-h-11 min-w-[7.5rem] items-center justify-center rounded-full border border-stone-200 px-5 py-2.5 text-sm font-semibold text-ink transition enabled:hover:bg-parchment disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          Next
-        </button>
       </div>
     </section>
   );
@@ -1010,7 +908,6 @@ type ResultsCardProps = {
   followUp: PracticeFollowUp;
   revisitNote: string | null;
   sessionXp: number;
-  sessionBonusXp: number;
   streakDays: number;
   totalXp: number | null;
   newlyEarned: BadgeDefinition[];
@@ -1029,7 +926,6 @@ function ResultsCard({
   followUp,
   revisitNote,
   sessionXp,
-  sessionBonusXp,
   streakDays,
   totalXp,
   newlyEarned,
@@ -1091,16 +987,9 @@ function ResultsCard({
 
       <div className="mt-6 rounded-2xl border border-gold/40 bg-gold/15 px-5 py-4">
         {sessionXp > 0 ? (
-          <>
-            <p className="font-display text-3xl font-semibold tabular-nums text-ink">
-              {formatXpGain(sessionXp)}
-            </p>
-            {sessionBonusXp > 0 ? (
-              <p className="mt-1 text-sm font-medium text-stone-700">
-                Includes +{sessionBonusXp} XP expedition-completion bonus.
-              </p>
-            ) : null}
-          </>
+          <p className="font-display text-3xl font-semibold tabular-nums text-ink">
+            {formatXpGain(sessionXp)}
+          </p>
         ) : (
           <p className="text-sm font-medium text-stone-700">
             Your answers were saved.
@@ -1172,7 +1061,7 @@ function ResultsCard({
           Back to {eventName}
         </Link>
         <Link
-          href="/"
+          href="/camp"
           className="rounded-full border border-stone-200 px-5 py-2.5 text-center text-sm font-semibold text-ink hover:bg-parchment"
         >
           Base camp

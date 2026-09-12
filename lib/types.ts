@@ -111,6 +111,21 @@ export type AnswerChoice = {
   text: string;
 };
 
+/** Shared kid-friendly vocabulary. Referenced from questions by `id`. */
+export type GlossaryEntry = {
+  id: string;
+  term: string;
+  definition: string;
+  example?: string;
+};
+
+/** Points at a glossary entry as it appears in a question prompt. */
+export type PromptTermRef = {
+  glossaryId: string;
+  /** 0-based match of `term` in the prompt. Omit for the first match. */
+  occurrence?: number;
+};
+
 export type Question = {
   id: string;
   eventId: string;
@@ -120,6 +135,22 @@ export type Question = {
   correctChoiceId: string;
   explanation: string;
   hint: string;
+  /**
+   * Optional second authored clue (Apply). Shown only after the student
+   * opens `hint`. Omit when one clue is enough. Never required for live
+   * practice.
+   */
+  hint2?: string;
+  /**
+   * Optional vocabulary taps in the prompt. Omit when the prompt needs none.
+   * Does not affect hints, XP, or scoring.
+   */
+  promptTerms?: PromptTermRef[];
+  /**
+   * Optional wording-only restatement of what the prompt is asking.
+   * Shown before Check answer. Never a hint, never the post-answer explanation.
+   */
+  wordingHelp?: string;
   difficulty: DifficultyLevel;
   /**
    * True when the item is written as an image question. Live practice still
