@@ -1,792 +1,476 @@
-# Hint authoring guide
+# Jr. Explorer Hint Authoring Guide
 
-**Source of truth** for writing and reviewing `hint` text on Jr. Explorer live practice questions.
+**Definitive specification for the single student-facing hint on every live
+question.**
 
-This is not a generic tutoring style sheet. It is the product rule set for the current implementation: one student-facing clue per question, four multiple-choice options, optional reference materials, and a separate “Explain this question” field that is **not** a hint.
+## 1. Purpose
 
----
+Jr. Explorer uses one static hint per multiple-choice question. A hint is
+optional scaffolding for a stuck K–8 learner. It should make the next useful
+move clear while preserving the work that makes the question educational.
 
-## 1. What exists today
+The central rule is:
 
-### Live catalog
+> A good single hint helps the student identify or perform the next useful
+> cognitive action while leaving the final retrieval, inference, comparison,
+> calculation, or decision to the student.
 
-Practice draws from five unlocked quiz events. Live items are `verified` questions that pass `isLivePracticeQuestion` in `lib/mock/curriculum.ts` (image items also need a real `imageSrc`).
+A hint is not merely a true fact, a safer restatement, an explanation of the
+answer, or a test-taking trick. It is a small scaffold that gets a learner
+moving without completing the target task.
 
-| Event | Live questions |
-| --- | ---: |
-| Anatomy & Physiology | 45 |
-| Ecology | 40 |
-| Water Quality | 40 |
-| Crime Busters | 44 |
-| Entomology | 36 |
-| **Total** | **205** |
+This guide applies to all 205 live questions. `hint2` is not part of the MVP:
+do not author or populate it.
 
-Astronomy and `needs-review` items are not in the student catalog.
+## 2. Hint versus explanation
 
-### Data model
+### Hint
 
-Each `Question` has a required `hint: string` (`lib/types.ts`).
+Helps the student solve the current question. It supplies a next action,
+retrieval cue, comparison setup, observation target, reference-navigation
+step, calculation setup, or first subgoal.
 
-`hint2` exists on the type and in mappers (`optionalSecondHintFields` in `lib/practice.ts`). **Live banks do not author `hint2`.** Do not populate it. Do not design a two-level hint system.
+### Post-answer explanation
 
-`wordingHelp` is a different field. Practice shows it as **“What this is asking”** before Check answer. It restates the task. It is not a hint, not XP-related, and not a substitute for `hint`.
+Explains why the keyed answer is correct and teaches the underlying concept.
 
-`promptTerms` (tap-a-word glossary) also does not replace a hint.
+A hint does not need to teach the entire concept. Its job is to preserve useful
+problem-solving effort. Do not turn a hint into a mini textbook explanation.
 
-### Student UI (`components/PracticeQuiz.tsx`)
+## 3. The specificity sweet spot
 
-- Before Check answer, the student can tap **Need a hint?**
-- That reveals the authored `hint` labeled **Clue**.
-- Opening a clue does **not** submit the question.
-- Opening a clue does **not** award XP by itself.
-- If the student never opened a clue and then misses, the same `hint` text can appear in the feedback panel after submit.
+Specificity should apply to the **process**, not the **conclusion**.
 
-An **Another clue** control exists only when a non-empty `hint2` is present. That path is unused in the live catalog. Do not write content for it.
+| Level | What it looks like | Decision |
+| --- | --- | --- |
+| Too vague | “Think carefully.” “Use what you know.” “Read the choices.” | Reject: no actionable help |
+| Optimal | “Compare the latitude and climate of the two regions.” | Prefer: concrete method, conclusion remains open |
+| Too specific | States the answer, requested relationship, unique property, lookup result, calculation result, or enough information to make one option obvious | Reject: leakage |
 
-### Scoring and selection (boundaries only)
+The author should be able to answer:
 
-Gamification and adaptive selection already treat “hint used” as a property of the attempt:
+> What can the student do after reading this hint that they could not identify
+> before?
 
-- `hintUsed` is true if the student opened the clue (see `attemptUsedAHint` in `lib/practice.ts`).
-- A **correct** answer with `hintUsed` awards less attempt XP than an unhinted correct answer (`XP_CORRECT_WITH_HINT` vs `XP_CORRECT` in `lib/gamification.ts`).
-- An **incorrect** answer is the same XP whether or not a hint was opened.
-- Adaptive difficulty treats “independent correct” as correct **and** not hinted (`lib/learning/adaptive.ts`).
+If the answer is “nothing concrete,” revise it. A short hint is good only when
+it is useful; brevity alone is not a quality standard.
 
-This guide does **not** redefine those numbers or flows. Authors only need to know: a hint is optional assistance; it is not a penalty button and not a reward button.
+## 4. Preserve the cognitive work
 
-### Layers the student already has
+The student must still perform the operation the question is testing.
 
-Keep these jobs separate:
-
-| Layer | Job |
+| Question tests | The student must still |
 | --- | --- |
-| Stem + choices | The assessment |
-| `wordingHelp` | What the question is asking (task restatement) |
-| `hint` | What to **do next** (this document) |
-| Post-answer `explanation` | Why the keyed choice is right |
+| Recall | Retrieve the fact |
+| Comparison | Perform the comparison |
+| Classification | Classify using the relevant criteria |
+| Sequence | Reconstruct or determine the missing position |
+| Direction or rule | Retrieve and apply the governing rule |
+| Calculation | Perform the calculation |
+| Image identification | Interpret visual evidence |
+| Reference lookup | Interpret the reference result |
+| Multi-step reasoning | Complete the important inference |
 
-If the hint restates the stem, it is competing with `wordingHelp`. If it teaches the fact, it is competing with the explanation.
+The hint may support that operation, but must not perform it.
 
----
+## 5. Question quality comes before hint quality
 
-## 2. Central rule
+Run two separate gates:
 
-> **A hint should tell the student what to DO next, not tell them what the answer MEANS.**
+1. **Is the question itself sound?**
+2. **If it is sound, is the hint sound?**
 
-**Do next** means a solving move: inspect, compare, look up, start a key, keep units consistent, separate two ideas.
+A hint cannot repair a fundamentally answer-revealing question. If the stem,
+choices, image, or displayed reference already reveals the answer, flag a
+**QUESTION DESIGN FAILURE** instead of trying to compensate with a clever
+hint.
 
-**What the answer means** is a definition, synonym, alternate name, formula that *is* the keyed choice, or a classifier that only one choice matches.
+Example:
 
-A hint is **not** good merely because it makes the question easier.
+**Bad item:** `Individual → Population → Community → Ecosystem → Biome →
+Biosphere. Which level comes immediately after Community?`
 
-A hint is good if it makes the **solving process clearer** without giving away the answer.
+The answer is visibly present. A better item is:
 
----
+`Individual → Population → Community → ______ → Biome → Biosphere.`
 
-## 3. Purpose of a hint
+Only after the item is sound should its hint be authored.
 
-A finished hint should do all three:
+## 6. Choice-space preservation
 
-1. **Preserve the challenge.** The student still has to reason, observe, calculate, classify, or look something up.
-2. **Reduce uncertainty.** After reading it, they know a concrete next move.
-3. **Teach a reusable strategy** when possible (how to use a table, how to start a key, how to compare function vs structure).
+Jr. Explorer uses four-option multiple choice. Evaluate every hint against
+**all four choices**, not only the keyed answer.
 
-Reject:
+A hint fails if a student can scan the choices and match a distinctive phrase,
+concept, definition, synonym, classifier, relationship, numerical clue,
+reference result, or other cue to one option without performing the intended
+task.
 
-> “A hint is good if it makes the question easier.”
+Ask:
 
-Use:
+> Could a student match the hint to one option without actually knowing the
+> underlying concept?
 
-> “A hint is good if it makes the solving process clearer without giving away the answer.”
+If yes, reject the hint. Parentheses, em dashes, aliases, and explanatory text
+attached to a choice are part of its answer-bearing text.
 
----
+Also ask whether the hint collapses the answer space by making one or more
+distractors obviously wrong without teaching the intended reasoning. Helpful
+process guidance is allowed; answer-specific elimination is not.
 
-## 4. Recurring principle: next step, not destination
+## 7. Complete leakage taxonomy
 
-> **Give the next step, not the destination.**
+Lexical matching is only one form of leakage. Reject any of the following:
 
-The student should receive enough to make progress, but not enough to identify the keyed choice by:
+1. **Direct answer term:** repeats the keyed choice.
+2. **Synonym / alternate name:** gives a textbook name, common name,
+   abbreviation, formula name, or alias for the keyed choice.
+3. **Definition leakage:** defines the keyed idea in different words.
+4. **Parenthetical / explanatory leakage:** supplies text attached to the
+   keyed choice, including parentheses, dashes, or appositives.
+5. **Unique-property leakage:** gives a property only one option has.
+6. **Distractor elimination:** names or characterizes distractors so the answer
+   is left by elimination rather than reasoning.
+7. **Target-relation leakage:** states the relationship the student is asked
+   to determine.
+8. **Sequence-position leakage:** supplies the missing order or next item.
+9. **Category/classification isolation:** introduces a category that uniquely
+   identifies one choice.
+10. **Visual diagnostic leakage:** names a unique image feature or taxon.
+11. **Reference-result leakage:** gives the row, column, cell, heading, value,
+   or classification the student is supposed to look up.
+12. **Numerical/intermediate-result leakage:** gives the answer, an
+   answer-specific number, or an intermediate that selects one option.
+13. **Syllogistic collapse:** gives premises that allow the keyed choice to be
+   deduced without the intended subject knowledge.
+14. **Distinctive-phrase matching:** repeats a phrase that appears in only one
+   choice, even if it is not the answer term.
+15. **Answer-space collapse:** any combination of cues reduces four choices to
+   one (or makes the keyed option unmistakably plausible).
 
-- keyword matching
-- synonym matching
-- definition matching
-- unfair elimination
-- being told the lookup result
-- being told the diagnostic image label
+The deeper test is:
 
----
+> Does the hint allow the student to identify the correct option without
+> performing the intended cognitive task?
 
-## 5. Answer-leakage standard
+If yes, it fails regardless of how educational, concise, or scientifically
+true it otherwise is.
 
-Leakage is a **fairness** failure. A hint can be scientifically true and still be invalid.
+## 8. Target-relation leakage
 
-Semantic equivalence counts. Exact string match is not required.
+Do not directly provide the relationship the question asks the student to
+determine. This includes:
 
-Inspect **all four choice texts**, including aliases (see §6). Ask:
+- north/south, above/below, inside/outside, adjacent/non-adjacent
+- before/after, earlier/later
+- greater/less, more/less, faster/slower, closer/farther
+- increase/decrease, cause/effect
+- upstream/downstream
+- any other spatial, temporal, quantitative, causal, or relational result
 
-> Could a student select the keyed choice by matching something in the hint to one option, without doing the intended work?
+**Bad:** “Use the north-of-boreal-forest location in the Arctic.”
 
-### 5.0 Choice-match leakage test
+**Better:** “Compare the latitude and climate of the two biomes.”
 
-A hint fails this test if a student can scan the four choices and match a
-distinctive phrase, concept, definition, synonym, parenthetical, classifier,
-or other answer-bearing wording in the hint to one choice and identify or
-eliminate the answer without doing the intended reasoning.
+The better hint specifies the comparison process; the student still determines
+the spatial relationship.
 
-The test is not merely “Does the hint contain the exact answer?” Ask:
+## 9. One cognitive job
 
-> If I were a student who did not know the answer, could I scan the four choices, find a phrase or concept from the hint that uniquely matches one choice, and get the answer without doing the intended reasoning?
+Each hint should primarily provide one kind of support:
 
-If yes, rewrite the hint. Treat all of these as potentially answer-bearing:
+- schema or principle retrieval
+- retrieval cue
+- observational focus
+- comparison setup
+- subgoal setup
+- procedural next step
+- reference navigation
+- calculation setup
 
-- exact terms, synonyms, and alternate names
-- parenthetical text attached to a choice (parentheses are part of the answer-bearing text)
-- definitions or distinctive phrases appearing in only one choice
-- unique classifiers such as a body part, population concept, process, category, location, or material
-- wording that makes one choice fit while making the others obviously wrong
-- reference results, image diagnostics, or calculation results that reveal one choice
+Do not force every hint into a question. A direct instruction can be excellent.
+Avoid generic Socratic prompts for novice learners when a concrete action is
+clearer.
 
-Keep these failure modes separate:
+## 10. Hint strategy by question type
 
-1. **LEAKAGE:** the hint gives away the answer or a unique match to it.
-2. **ELIMINATION:** the hint makes distractors obviously wrong without teaching the intended reasoning.
-3. **USELESSNESS:** the hint merely rephrases the question or says “focus on X” without a useful next action.
+### Concept or definition
 
-The core principle is:
+Prompt retrieval of the role, mechanism, or real-world manifestation. Do not
+provide the formal definition or a unique defining property.
 
-> A hint should tell the student **what to do next**, not **what to look for in the answer choices**.
+**Bad:** “Think about the maximum population size an environment can support.”
 
-For reference questions, use **RESOURCE + ACTION**: “Use the official
-list/reference. Find the relevant entry and compare the printed information
-with the choices.” Do not name the exact entry or result the student should
-discover. For image questions, describe where or how to inspect the specimen,
-not its unique identifying feature. For calculation questions, point to the
-relevant relationship, method, or units without giving an answer-specific
-result or enough instructions to mechanically select one choice. For
-conceptual questions, provide a decision rule or comparison framework, not the
-defining property of only the correct choice.
+**Better:** “Think about what happens to population growth as food, water, and
+space become limiting.”
 
-### 5.1 Exact terminology
+Check the four choices: even the better pattern must be revised if it uniquely
+matches one option.
 
-If a distinctive word or multi-word fragment appears in the keyed choice (and not as a generic word already in the stem), the hint must not use it.
+### Comparison
 
-**BAD**
+Specify dimensions to compare, without stating the result.
 
-- Choice: `Osteon`
-- Hint: `This is also called a Haversian system.`
+**Good pattern:** “Compare the latitude and climate of the two regions.”
 
-### 5.2 Synonyms and alternate names
+### Sequence or order
 
-Treat as the same concept:
+Prompt reconstruction of the ordering rule or the first useful step. Do not
+give the missing item or its position. If the complete sequence is displayed
+and the question asks for a displayed item, flag the question.
 
-- textbook name ↔ common name
-- abbreviation ↔ expansion
-- formula name ↔ formula
-- scientific name ↔ official common name
-- parenthetical alias (see §6)
+### Direction or rule
 
-**BAD**
+Prompt retrieval of the governing rule and its application. Do not state the
+directional result.
 
-- Choice: `Osteon (Haversian system)`
-- Hint: `This unit is called a Haversian system.`
+### Classification
 
-The reverse is also a leak (`osteon` in the hint when the choice says `Haversian system`).
+Tell the student which characteristics or criteria to compare with the
+categories. Do not name the category that is the answer.
 
-### 5.3 Definitions (critical)
+### Reference or lookup
 
-A hint must not define the keyed idea in other words.
+Use **RESOURCE + ACTION**:
 
-**BAD**
+> “Use the official list/reference. Find the relevant entry and compare the
+> printed information with the choices.”
 
-- Choice: `Hematopoiesis (blood-cell production)`
-- Hint: `Red marrow is where new blood cells are made.`
+The resource may be an official event list, table, rules section, handbook,
+source paragraph, or permitted reference already relevant to the question.
+Do not provide the answer row, column, cell, value, heading, or lookup result.
 
-The word “hematopoiesis” never appears, but the hint supplies the parenthetical definition. The student can match meaning, not skill.
+### Image or specimen
 
-Guide the student to a **distinction** (process vs place vs structure vs function vs list heading) without stating the keyed definition.
+Direct attention to where and how to inspect: a marked region, arrangement,
+shape, count, proportion, or comparison. Do not name a diagnostic feature that
+uniquely identifies one choice.
 
-### 5.4 Unique-choice mapping
+### Calculation
 
-A hint can leak without using any answer word.
+Point toward the governing relationship, formula family, units, or first step.
+Do not perform arithmetic, substitute values, provide an intermediate result,
+or reproduce an answer-specific formula choice.
 
-**BAD** (choices: chemical / living organism / machine / public-awareness campaign)
+### Multi-step reasoning
 
-- Hint: `Look for the living agent.`
+Give the first useful subgoal or tell the student what process to trace. Do not
+provide the complete causal chain or final inference.
 
-That classifier uniquely tags one choice.
+## 11. Retrieval, difficulty, and help-seeking
 
-> **Do not introduce a classifier that uniquely identifies the correct choice.**
+Hints should support retrieval practice rather than replace it. Let the learner
+attempt the question first; the hint should provide contingent assistance when
+they are stuck, not a second explanation that removes the challenge.
 
-Preserve meaningful uncertainty among remaining options.
+This is a desirable difficulty: the student receives enough structure to make
+progress, but still retrieves, compares, interprets, or decides. Scaffolding
+should be smaller than the target task and should preserve active sense-making.
 
-### 5.5 Elimination leakage
+Use metacognitive prompts only when they name a concrete action:
 
-Do not strike enough options that the keyed choice is the only one left—or the only plausible one.
+**Good:** “First identify what each choice is measuring, then compare it with
+the named quantity.”
 
-**BAD**
+**Bad:** “Think about the concept.”
 
-- `Don't choose the skin, bone, or nerve option.` (when the fourth option is keyed)
-
-**BAD** (softer)
-
-- `Do not pick beetle families or the grasshopper family.` (when that leaves one family)
-
-**Legitimate narrowing:** point at a *kind of work* (use the table; start at couplet 1; compare function) while several choices still fit that work.
-
-**Unfair elimination:** name distractors, or name a property only the keyed choice has.
-
-### 5.6 Stem-aware exception
-
-If the stem already uses a term, repeating it in the hint is not automatically a leak.
-
-Ask: **Did the hint introduce a distinctive answer term the stem did not give?**
-
-If yes, treat it as a potential leak even if the science is fair.
-
-### 5.7 Phrase-level matches
-
-Multi-word fragments shared with the keyed choice are leaks even when the hint never says “the answer is…”.
-
-**BAD**
-
-- Choice: `Stratum corneum`
-- Hint: `The outer stratum corneum layer…`
-
----
-
-## 6. Parenthetical and alias text is part of the answer
-
-> **Parenthetical text in an answer choice is part of the answer concept.**
-
-`Hematopoiesis (blood-cell production)` is one concept. The hint must not give:
-
-- hematopoiesis
-- blood-cell production
-- a paraphrase of blood-cell production
-- a definition that makes the parenthetical obvious
-
-`Osteon (Haversian system)`: neither name belongs in the hint.
-
-Apply the same rule to:
-
-- parentheses
-- em dashes
-- colons introducing an alias
-- explanatory appositives
-- slash-separated aliases (`Crayfish/Crawdads`)
-- scientific / common-name pairs (`Apidae — bees`)
-
----
-
-## 7. Helpfulness standard (not just fairness)
-
-A fair hint can still fail.
-
-### LOW / USELESS HINT (question rephrase)
-
-The hint must not merely restate the stem.
-
-**BAD**
-
-- Stem: Which structure controls X?
-- Hint: Think about which structure controls X.
-
-**BAD**
-
-- Stem: What happens when X occurs?
-- Hint: Think about what happens when X occurs.
-
-**BAD**
-
-- Stem: Which statement is true about Y?
-- Hint: Compare the statements about Y.
-
-Those do not answer “What should I do next?”
-
-A hint should add a **move**: a comparison, a resource, a procedure, a distinction—not a paraphrase of the ask. (`wordingHelp` already covers task restatement.)
-
----
-
-## 8. Competition vs general learning
-
-Jr. Explorer is built from Science Olympiad–style 2027 event material, but students also use it as a study product.
-
-### Competition-specific language
-
-If current in-repo event rules explicitly permit a resource at the event, you may describe it as the official / permitted list, table, or rules text **for that event**. Do not invent what is allowed at a tournament.
-
-### General-learning language
-
-A field guide, textbook, or website may be suggested as a **study** aid.
-
-Do **not** say a general study resource is legal in competition unless the current rules document for that event says so.
-
-**GOOD**
-
-> Have an insect reference handy — the official list or a field guide can help.
-
-That supports both official-list lookup and study use. It does **not** claim the field guide is tournament-legal.
-
-**BAD**
-
-> A field guide is allowed during competition.
-
-(unless the event’s current rules explicitly say that)
-
----
-
-## 9. Reference-lookup hints (RESOURCE + ACTION)
-
-Used heavily in Entomology, Water Quality, Crime Busters list items, and some Ecology “official names” items.
-
-Preferred shape:
-
-> **RESOURCE + ACTION**
-
-Safe to include:
-
-- which resource (official 2027 list, adult-macroinvertebrate table, rules section, NIST/RHS paragraph as already named in the stem or event materials)
-- which section, column, or heading *type* to inspect
-- what to search for (names **already in the stem**)
-- what to compare
-- what action to take (read the heading above the name; start at couplet 1)
-
-Must **not** include:
-
-- the correct classification, row, value, or name if that is the keyed choice
-- answer-bearing terminology that appears in only one choice
-- the lookup **result**
-
-**GOOD**
-
-> Have an insect reference handy. Find the names already in the question and check which order each is listed under.
-
-**BAD**
-
-> Find cockroaches and termites and check whether they are listed under Blattodea.
-
-The resource/action strategy is good. The endpoint is not.
-
-For dichotomous keys, teach **procedure**, not the terminal taxon (see §11 and §16).
-
----
-
-## 10. Image hints
-
-Tell the student **where/how to look**, not what the image *is*.
-
-Safe:
-
-- count visible structures (only if counting is not a unique classifier for one choice—always check the options)
-- compare shape, arrangement, proportions
-- inspect a circled or marked region
-- compare two labeled specimens
-- follow a key using what is visible
-
-**BAD** if the keyed choice is that pattern or taxon:
-
-> Look for a loop pattern.
-
-**GOOD** (fingerprint-style observation)
-
-> Watch whether ridges come back out on the same side, make a complete circuit, or rise and leave on the other side.
-
-The student still has to interpret what they see.
-
-Do not name the diagnostic feature when that feature uniquely tags one choice (for example “aquatic beetle family” when only one option is an aquatic beetle family).
-
----
-
-## 11. Dichotomous-key hints
-
-Teach the procedure.
-
-**GOOD**
-
-> Start at couplet 1 and choose the branch that matches the specimen.
-
-**BAD**
-
-> The specimen follows the branch leading to [taxon].
-
-Do not reveal the endpoint. Do not say which couplet letter (1a vs 1b) is correct unless that is not recoverable from the stem and would uniquely name the answer.
-
-For **construct-a-key** items (“best first split”), point at the *kind* of evidence to use (official printed names vs unsourced habits) only if several choices still compete. If only one choice uses list headings, that classifier is a unique-choice leak.
-
----
-
-## 12. Calculation and formula hints
-
-Hints may say:
-
-- which quantities matter
-- what relationship family to use (mass and volume; keep units consistent)
-- what conceptual operation to perform
-
-Do **not** paste the keyed expression when the four choices *are* formulas or relationships and only one matches that expression.
-
-Always evaluate the actual choices first. The same sentence can be SAFE on a numeric item and BLOCKER on a “which formula” item.
-
----
-
-## 13. Conceptual hints
-
-Create a **decision process**, not a definition.
-
-Useful patterns (only if they do not uniquely map to one choice):
-
-- Compare what each choice actually describes.
-- Separate structure from function.
-- Decide whether the process involves movement, selection, or chance—**only if those three labels do not 1:1 match the four options**.
-- Compare where each structure occurs.
-- Focus on the function named in the stem, then see which choice is about that function rather than another job.
-
-Avoid vague filler: “Think carefully.” “Use what you know.”
-
----
-
-## 14. Information budget
-
-Give the smallest next step that reduces genuine confusion.
-
-Stop before the student can finish by matching.
-
-If you need a second sentence, you are often sliding into the explanation. Cut back to one concrete move.
-
----
-
-## 15. Tone
+## 12. Age and readability
 
 Hints should be:
 
-- short (usually one or two sentences)
-- concrete
-- student-friendly for the Jr. Explorer learner
-- actionable
-- calm
-- non-condescending
-
-Avoid:
-
-- textbook lecture
-- “obviously” / “clearly”
-- exclamation points
-- motivational fluff
-- introducing extra technical terms not needed for the next move
-- long explanations (that is `explanation` after submit)
-
----
-
-## 16. Question-type patterns
-
-Examples are **patterns**. They are not permission to skip reading the four choices.
-
-### Conceptual / reasoning
-
-| | |
-| --- | --- |
-| Accomplish | A distinction or comparison the student can apply to every option. |
-| Safe | Axes of comparison that several choices still share. |
-| Too revealing | The keyed definition, or a 1:1 label for each option. |
-| **BAD** | Biological control uses living enemies. |
-| **GOOD** | Compare the choices by what kind of tool they describe, not by whether they would “work.” |
-
-### Image identification
-
-| | |
-| --- | --- |
-| Accomplish | A systematic look at the photo. |
-| Safe | Where to look; what to compare; marked region. |
-| Too revealing | The taxon, pattern name, or unique diagnostic that only one choice has. |
-| **BAD** | This is a swallowtail. / Look for the loop. |
-| **GOOD** | Compare the marked region to the choices; do not decide from the everyday name alone. |
-
-### Official-list lookup
-
-| | |
-| --- | --- |
-| Accomplish | How to use the closed list. |
-| Safe | RESOURCE + ACTION; search terms from the stem. |
-| Too revealing | The order, family, class heading, or cell that is the answer. |
-| **BAD** | It is listed under Blattodea. |
-| **GOOD** | Have an insect reference handy — the official list or a field guide can help. Find the names in the question and read the rank printed with them. |
-
-### Field-guide / study reference
-
-| | |
-| --- | --- |
-| Accomplish | Same as lookup, without claiming tournament legality. |
-| Safe | “Official list or a field guide can help.” |
-| Too revealing | “A field guide is allowed at the event.” (unless rules say so) |
-| **BAD** | Use any website; the answer is the common name bees. |
-| **GOOD** | Match the specimen to an official common name on the list, not to a look-alike everyday word. |
-
-### Dichotomous key (follow a printed key)
-
-| | |
-| --- | --- |
-| Accomplish | Start at the top; follow the matching couplet. |
-| Safe | Procedure. |
-| Too revealing | The terminal name or “take 1a.” |
-| **BAD** | Couplet 1a leads to Acrididae. |
-| **GOOD** | Start at couplet 1. Use the printed names, then follow only the couplet that applies. |
-
-### Classification / grouping
-
-| | |
-| --- | --- |
-| Accomplish | Which *kind* of grouping the question wants (rank, list heading, functional class)—without naming the keyed group. |
-| Safe | “Check rank and what is printed under the name.” |
-| Too revealing | “See whether any families are listed” when only one choice mentions families listed/none. |
-| **BAD** | It is an order with no families. |
-| **GOOD** | Find the name on the official list and compare how it is placed relative to the other choices. |
+- concise and concrete
+- readable by K–8 learners
+- one idea at a time
+- free of unnecessary jargon
+- grammatically simple
+- calm and non-condescending
 
-### Anatomy / structure
+Aim for roughly 8–20 words when possible. Twenty-five words is a practical
+ceiling unless a longer hint is genuinely necessary for clarity. Do not
+sacrifice educational quality to meet an arbitrary word count.
 
-| | |
-| --- | --- |
-| Accomplish | Separate layer vs organ vs process; stay in the system named by the stem. |
-| Safe | “Stay with a skin layer, not marrow or a joint cavity” **only if that does not name the keyed layer and several skin-layer choices remain**. |
-| Too revealing | Alternate names (Haversian), definitions (blood-cell production), “get taller” when only one choice is about length growth. |
-| **BAD** | This unit is also called a Haversian system. |
-| **GOOD** | The stem already names compact bone. Stay with a compact-bone term, not a muscle or skin term. |
+## 13. Single-hint constraint
 
-### Ecology / process
+The MVP has one authored hint. There is no Hint 1 → Hint 2 → bottom-out
+sequence. Do not add:
 
-| | |
-| --- | --- |
-| Accomplish | Which process family, without paraphrasing the keyed sentence. |
-| Safe | “Ask whether resources stay limited” if both logistic and exponential choices discuss resources. |
-| Too revealing | Restating “early maturity and many unattended offspring” when that is the keyed choice. |
-| **BAD** | r-selected species mature early and have many young. |
-| **GOOD** | Compare timing of maturity and how much care offspring receive—without copying one choice. |
+- a second-stage answer
+- a solution walkthrough
+- “if you are still stuck” answer content
+- a hidden conclusion
+- `hint2`
 
-### Source / table lookup (Water Quality and similar)
+The one hint should be useful enough to unstick the learner while preserving
+the target cognitive work.
 
-| | |
-| --- | --- |
-| Accomplish | Find the printed name; read the heading above it. |
-| Safe | Table, column, closed list; spelling as printed in the stem. |
-| Too revealing | “Not the Class 5 title” when Class 5 is a choice; naming the keyed class. |
-| **BAD** | Air Breathing Snail is Class 4. |
-| **GOOD** | Find the printed name on the table and read the heading above that cell. |
+## 14. Bad-hint patterns
 
-### Chemistry / powders and liquids
+Reject:
 
-| | |
-| --- | --- |
-| Accomplish | Match the name in the stem to the right *kind* of record (formula vs use vs product list). |
-| Safe | “Match this chemical name to the printed product list, not to a different kitchen liquid.” |
-| Too revealing | The formula itself when choices are formulas; “not water” when H₂O is a choice and three remain—borderline; prefer not naming leftover formulas. |
-| **BAD** | Table salt is NaCl. |
-| **GOOD** | Match the everyday name in the stem to that compound’s formula, not the formula of a different listed powder. |
+- “Think carefully.”
+- “Use what you know.”
+- “Focus on the question.”
+- “Read the choices carefully.”
+- “Focus on [the exact thing asked].”
+- a declarative restatement of the stem
+- a mini explanation of the science
+- a named distractor list
+- an answer-specific lookup result
+- a unique image diagnostic
+- a requested relationship stated as a clue
 
-### Calculation / formula
+Question rephrasing is a distinct failure:
 
-| | |
-| --- | --- |
-| Accomplish | Quantities and unit discipline. |
-| Safe | “Use mass and volume together; keep units consistent.” |
-| Too revealing | `density = mass ÷ volume` when that string is one of four choices. |
-| **BAD** | Use density = mass ÷ volume. |
-| **GOOD** | Decide which quantities the stem gives, then which relationship among the choices uses those quantities. |
+**Question:** “What does biodiversity measure?”
+**Hint:** “Focus on what biodiversity measures.”
 
-### Fingerprint / image observation
+**Result:** FAIL. It adds no retrieval, comparison, lookup, or reasoning step.
 
-| | |
-| --- | --- |
-| Accomplish | How ridges behave, not the family name. |
-| Safe | Same-side exit vs complete circuit vs rise-and-leave. |
-| Too revealing | “This is a loop.” |
-| **BAD** | Look for the loop pattern. |
-| **GOOD** | Watch whether ridges come back out on the same side, make a complete circuit, or rise and leave on the other side. |
+## 15. Canonical Jr. Explorer examples
 
----
+### Example 1: the question gives away the answer
 
-## 17. Quality rating (for audits)
+**Bad:** `Individual → Population → Community → Ecosystem → Biome →
+Biosphere. Which level comes immediately after Community?`
 
-| Rating | Meaning |
-| --- | --- |
-| **BLOCKER** | The hint effectively gives away the keyed choice (paraphrase, unique classifier, lookup result, or elimination to one option). |
-| **HIGH RISK** | Distinctive keyed terminology, synonym, definition, named distractors, or diagnostic that substantially narrows to the answer. |
-| **MEDIUM** | Some narrowing; real reasoning or lookup still required. |
-| **LOW** | Fair but useless (stem rephrase, empty “think about it”). |
-| **SAFE** | Fair **and** useful: a concrete next step that does not identify the answer. |
+**Diagnosis:** QUESTION DESIGN FAILURE. The answer is displayed.
 
-> A hint should only be considered finished when it is both **SAFE** and **USEFUL**.
+**Better item:** `Individual → Population → Community → ______ → Biome →
+Biosphere.`
 
-MEDIUM is not a ship target. LOW is a fail for helpfulness even when leakage is absent.
+The eventual hint may support the ordering rule, but must not name the missing
+level.
 
----
+### Example 2: Coriolis
 
-## 18. BAD → GOOD transformations
+**Question:** “In the Northern Hemisphere, toward which side is moving air
+deflected?”
 
-Always re-check the **actual four choices** after rewriting. A “GOOD” pattern can still leak on a specific item.
+**Bad:** “Northern and Southern Hemispheres deflect opposite ways.”
 
-### Direct terminology / alias
+**Diagnosis:** Safe from a direct answer term, but too weak and insufficiently
+actionable.
 
-**BAD:** This unit is also called a Haversian system.
+A better hint should direct the student to retrieve and apply the
+hemisphere-specific Coriolis rule without stating the direction.
 
-**GOOD (pattern):** The stem already asks for the repeating unit of compact bone. Stay with a compact-bone unit name, not a muscle or receptor name.
+### Example 3: carrying capacity
 
-If “repeating unit of compact bone” appears only in one choice, this GOOD example is still a leak. Change the move.
+**Bad:** “This quantity is an environmental limit on population size...”
 
-### Definition
+**Diagnosis:** ANSWER-SPACE COLLAPSE / DISTINCTIVE-PHRASE LEAKAGE. The correct
+choice contains the distinctive population-limit idea.
 
-**BAD:** Red marrow is where new blood cells are made.
+A better hint should direct the learner to think about what happens to
+population growth as environmental resources become limiting, after checking
+that the wording does not uniquely match one option.
 
-**GOOD (pattern):** Separate the place this happens from the *name of the process* the stem is asking for—without defining that process.
+### Example 4: Arctic tundra
 
-### Unique classifier
+**Bad:** “Use the north-of-boreal-forest location in the Arctic...”
 
-**BAD:** Look for the living agent.
+**Diagnosis:** TARGET-RELATION LEAKAGE. The requested spatial relationship is
+supplied.
 
-**GOOD (pattern):** Compare the choices by what kind of tool they describe.
+A better hint should direct the learner to compare latitude and climate without
+stating their relationship.
 
-If the stem already says “living tools” and only one choice is living, do not repeat “living.”
+## 16. Gold-standard authoring algorithm
 
-### Elimination
+For every question:
 
-**BAD:** It isn’t A, B, or C. / Do not pick the beetle or grasshopper families.
-
-**GOOD (pattern):** Compare the choices using the feature the question is testing (list heading, photo, couplet), without naming options to drop.
-
-### Reference result
-
-**BAD:** Look up the insect under Blattodea.
-
-**GOOD:** Find the insect in the official list and check which order it is listed under.
-
-### Stem rephrase
-
-**BAD:** Think about which structure controls movement.
-
-**GOOD:** Compare the choices by what each structure actually does, not by which system it sounds like.
-
----
-
-## 19. Authoring workflow
-
-1. Read the stem.
-2. Read **all four** choices (including aliases and parentheticals).
-3. Identify the skill (lookup, key, image, distinction, formula, …).
-4. Decide the solving strategy you want to teach.
-5. Write the **smallest useful next step**.
-6. Compare the draft to every choice for exact words, phrases, and synonyms.
-7. Check definitions and parentheticals.
-8. Check unique classifiers and elimination.
-9. Check that the hint is not a restatement of the stem (`wordingHelp` is the restatement slot).
-10. Revise until the hint is SAFE and USEFUL.
-
-> **Never write the hint from the stem alone.**
->
-> **Never write the hint from the correct answer alone.**
->
-> The four choices must be visible while authoring.
-
----
-
-## 20. AI / Cursor authoring rule
-
-Do **not** generate a hint from only:
-
-- the stem
-- the correct answer
-- the topic name
-
-Must inspect:
-
-- stem
-- all four choices
-- which choice is keyed
-- event reference context when the item is a list/table/key question
-
-Then ask:
-
-1. Could a student match something in this hint directly to one choice?
-2. Am I defining the answer rather than teaching a solving move?
-3. Does this hint tell the student what to do next?
-4. Did I introduce a term the stem did not give that appears (or is synonymous with text) in only the keyed choice?
-
-If yes to (1), (2), or (4), rewrite. If no to (3), rewrite (avoid LOW / useless).
-
-Do not populate `hint2`. Do not change XP, UI, or adaptive code to “fix” a bad hint.
-
----
-
-## 21. Review checklist
-
-Run against **every** hint before it ships.
-
-### Answer leakage
-
-- [ ] Hint does not contain the keyed answer text
-- [ ] No synonym / alternate name / abbreviation / formula alias for the keyed choice
-- [ ] Does not define the keyed idea in other words
-- [ ] Does not define parenthetical, dash, slash, or “Name — common name” aliases
-- [ ] Does not introduce a classifier that uniquely tags one choice
-- [ ] Does not eliminate so many options that the answer is obvious
-- [ ] Does not reveal a reference-lookup **result**
-- [ ] Does not name a diagnostic image feature that uniquely IDs one choice
-- [ ] Does not paste the keyed formula when choices are formulas
-
-### Helpfulness
-
-- [ ] Tells the student what to do next
-- [ ] Gives a concrete comparison, procedure, resource, or observation
-- [ ] A student would know what to try after reading it
-
-### Originality vs stem
-
-- [ ] Adds a solving move beyond the question wording
-- [ ] Is not a rephrase of the stem (and does not duplicate `wordingHelp`)
+1. Read the stem, all four choices, keyed answer, existing explanation,
+   existing hint, and relevant source/reference.
+2. Identify what the question actually tests.
+3. Check whether the question itself is flawed or answer-revealing.
+4. Identify the operation: retrieve, compare, classify, sequence, apply a rule,
+   inspect, calculate, look up, or reason through a subgoal.
+5. Choose one hint strategy from this guide.
+6. Write one concise hint directing the next useful action.
+7. Compare the draft against all four choices.
+8. Run every leakage test, including target relation and answer-space collapse.
+9. Ask: “If the student follows this hint, do they still have to know or
+   reason their way to the answer?” If no, rewrite.
+10. Ask: “Would removing this hint remove a useful next step?” If no, rewrite
+    or remove the hint.
+11. Check age-appropriateness, readability, and one-cognitive-job focus.
+12. Accept only when every hard gate passes.
+
+## 17. Final QA checklist
+
+### Question integrity
+
+- [ ] The stem does not reveal the answer.
+- [ ] The choices do not structurally reveal the answer.
+- [ ] There is one intended answer.
+- [ ] Any question defect is flagged separately from hint quality.
+
+### Actionability
+
+- [ ] The hint tells the student what to do next.
+- [ ] The action is concrete and appropriate to the question type.
+- [ ] The hint is more than “think,” “focus,” or a stem rephrase.
+
+### Cognitive preservation
+
+- [ ] The student still retrieves, reasons, compares, classifies, calculates,
+      interprets, or looks up the result.
+- [ ] The hint does not complete the important inference or subgoal chain.
+
+### Leakage and choice-space preservation
+
+- [ ] No direct answer term, synonym, alias, or parenthetical answer text.
+- [ ] No definition or distinctive phrase matching one choice.
+- [ ] No unique property, category, classifier, or distractor elimination.
+- [ ] No target relation or sequence position.
+- [ ] No visual diagnostic that uniquely identifies an option.
+- [ ] No reference result, numerical result, or answer-specific formula.
+- [ ] The hint does not collapse four choices into one or make one choice
+      uniquely recognizable.
 
 ### Student experience
 
-- [ ] Concise
-- [ ] Understandable to the target learner
-- [ ] Encouraging without filler
-- [ ] Preserves the challenge
+- [ ] One clear cognitive-support function.
+- [ ] Concise, concrete, and K–8 readable.
+- [ ] No unnecessary jargon or textbook lecture.
+- [ ] No second-stage answer or `hint2`.
 
----
+If any leakage test fails, the hint is rejected regardless of its other
+strengths.
 
-## 22. MVP boundaries (do not expand in hint work)
+## 18. Final pass/fail rubric
 
-- One authored hint per live question.
-- `hint2` remains unused; do not start a multi-level clue product.
-- Do not add new hint XP events (opening a clue is not an XP grant).
-- Opening a hint does not submit the answer.
-- Do not redefine gamification; hinted-correct vs unhinted-correct already exists.
-- Vocabulary taps and Explain (`wordingHelp`) are not hints.
-- Do not change routing, database, or PracticeQuiz to paper over leakage.
+Leakage is a hard gate; it cannot be averaged away.
 
----
+### GOLD / PASS
 
-## 23. All five live events
+Specific, actionable, educationally useful, preserves the target cognitive
+work, and contains no meaningful leakage.
 
-The same leakage and usefulness rules apply everywhere. The **solving move** changes:
+### PASS
 
-| Event | Typical next step |
-| --- | --- |
-| Anatomy & Physiology | Stay in the named system; separate structure, process, and location; do not supply textbook aliases. |
-| Ecology | Compare process families; do not paraphrase the keyed sentence. |
-| Water Quality | Find the printed string; read the heading; do not name the class or list. |
-| Crime Busters | Point at the named handbook/table/paragraph; observe prints without naming the pattern family. |
-| Entomology | Official list or key procedure; do not name the taxon or unique diagnostic. |
+Useful and safe, but broader or less elegant than ideal.
 
-Do not force every hint into one sentence template. Force every hint through the same **fairness + usefulness** gate.
+### REVISE
 
----
+Safe but too vague, generic, or insufficiently actionable.
 
-## 24. Related files (implementation)
+### FAIL
 
-| File | Role |
-| --- | --- |
-| `lib/types.ts` | `hint`, optional `hint2`, `wordingHelp` |
-| `lib/practice.ts` | `attemptUsedAHint`, unused `hint2` helpers |
-| `components/PracticeQuiz.tsx` | Need a hint? → Clue |
-| `lib/mock/curriculum.ts` | Live question filter |
-| `lib/gamification.ts` | Hinted-correct XP (do not redefine here) |
-| `lib/learning/adaptive.ts` | Independent correct = unhinted |
+Meaningful answer-space reduction, target-relation leakage, distinctive
+matching cue, unfair elimination, or another structural leakage.
 
-Event banks live under `lib/mock/*-questions.ts`. This guide does not replace event evidence matrices; those govern facts. This guide governs **hint fairness**.
+### FATAL FAIL
+
+Direct answer, definition, solution, exact lookup result, or unmistakable
+equivalent.
+
+Only GOLD / PASS or PASS should ship. A safe but useless hint is not finished.
+
+## 19. Final AI agent specification
+
+When authoring or reviewing a live hint, follow this guide as the source of
+truth. Never author from the stem, topic, or correct answer alone. Always
+inspect all four choices and relevant evidence, preserve the tested cognitive
+operation, write one process-specific next action, and reject any hint that
+lets a learner select an option by matching the hint instead of solving.

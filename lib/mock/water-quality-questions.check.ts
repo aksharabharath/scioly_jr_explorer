@@ -2,6 +2,7 @@
  * Structural checks for the Water Quality 2027 MVP bank (wq-q1–wq-q40).
  * Run: npx tsx lib/mock/water-quality-questions.check.ts
  */
+import { WATER_QUALITY_GLOSSARY } from "@/lib/mock/glossary/water-quality";
 import {
   MOCK_WATER_QUALITY_QUESTIONS,
   WATER_QUALITY_EVENT_ID,
@@ -10,6 +11,7 @@ import {
   type WaterQualitySourceType,
 } from "@/lib/mock/water-quality-questions";
 import { optionalSecondHintIsValid } from "@/lib/practice";
+import { questionHelpIssues } from "@/lib/question-help";
 
 const failures: string[] = [];
 
@@ -74,6 +76,11 @@ for (const question of questions) {
   check(
     `${question.id} optional hint2 differs from hint when present`,
     optionalSecondHintIsValid(question),
+  );
+  const helpIssues = questionHelpIssues(question, WATER_QUALITY_GLOSSARY);
+  check(
+    `${question.id} question help annotations are structurally valid`,
+    helpIssues.length === 0,
   );
   check(`${question.id} has exactly 4 choices`, question.choices.length === 4);
   check(`${question.id} is text-only`, question.imageRequired === false);
@@ -168,6 +175,25 @@ check(
     const number = Number(question.id.replace("wq-q", ""));
     return number >= 1 && number <= 40;
   }),
+);
+check(
+  "wq-q33 is not annotated for dissolved oxygen",
+  questions.find((question) => question.id === "wq-q33")?.promptTerms ===
+    undefined,
+);
+const promptTermIds = questions
+  .filter((question) => question.promptTerms)
+  .map((question) => question.id);
+check(
+  "water quality promptTerms stay on the approved vocabulary set",
+  promptTermIds.join(",") === "wq-q1,wq-q30,wq-q34",
+);
+const wordingHelpIds = questions
+  .filter((question) => question.wordingHelp)
+  .map((question) => question.id);
+check(
+  "water quality wordingHelp stays on the approved explain set",
+  wordingHelpIds.join(",") === "wq-q9,wq-q20,wq-q26",
 );
 
 if (failures.length > 0) {

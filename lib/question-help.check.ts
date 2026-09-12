@@ -2,6 +2,11 @@
  * Question understanding help: matching and validation guardrails.
  * Run: npx tsx lib/question-help.check.ts
  */
+import { glossaryForEvent } from "@/lib/mock/glossary";
+import { ANATOMY_PHYSIOLOGY_GLOSSARY } from "@/lib/mock/glossary/anatomy-physiology";
+import { CRIME_BUSTERS_GLOSSARY } from "@/lib/mock/glossary/crime-busters";
+import { ECOLOGY_GLOSSARY } from "@/lib/mock/glossary/ecology";
+import { WATER_QUALITY_GLOSSARY } from "@/lib/mock/glossary/water-quality";
 import {
   annotatePrompt,
   findTermOccurrences,
@@ -269,6 +274,19 @@ check(
     term: "biome",
     definition: "Biome",
   }).some((issue) => issue.includes("repeats the term")),
+);
+
+check(
+  "glossaryForEvent resolves ecology, water quality, A&P, and crime busters",
+  glossaryForEvent("ecology") === ECOLOGY_GLOSSARY &&
+    glossaryForEvent("water-quality") === WATER_QUALITY_GLOSSARY &&
+    glossaryForEvent("anatomy-physiology") === ANATOMY_PHYSIOLOGY_GLOSSARY &&
+    glossaryForEvent("crime-busters") === CRIME_BUSTERS_GLOSSARY,
+);
+check(
+  "glossaryForEvent is empty for entomology and unknown events",
+  glossaryForEvent("entomology").length === 0 &&
+    glossaryForEvent("astronomy").length === 0,
 );
 
 if (failures.length > 0) {

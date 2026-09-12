@@ -2,6 +2,7 @@
  * Structural checks for the A&P 2027 MVP question bank (ap-q1–ap-q45).
  * Run: npx tsx lib/mock/anatomy-physiology-questions.check.ts
  */
+import { ANATOMY_PHYSIOLOGY_GLOSSARY } from "@/lib/mock/glossary/anatomy-physiology";
 import {
   ANATOMY_PHYSIOLOGY_EVENT_ID,
   ANATOMY_TOPIC_IDS,
@@ -10,6 +11,7 @@ import {
   type AnatomySourceType,
 } from "@/lib/mock/anatomy-physiology-questions";
 import { optionalSecondHintIsValid } from "@/lib/practice";
+import { questionHelpIssues } from "@/lib/question-help";
 
 const failures: string[] = [];
 
@@ -79,6 +81,11 @@ for (const question of questions) {
   check(
     `${question.id} optional hint2 differs from hint when present`,
     optionalSecondHintIsValid(question),
+  );
+  const helpIssues = questionHelpIssues(question, ANATOMY_PHYSIOLOGY_GLOSSARY);
+  check(
+    `${question.id} question help annotations are structurally valid`,
+    helpIssues.length === 0,
   );
   check(`${question.id} has exactly 4 choices`, question.choices.length === 4);
   check(`${question.id} is text-only`, question.imageRequired === false);
@@ -202,6 +209,22 @@ check(
 check(
   "no items remain draft",
   questions.every((question) => question.verificationStatus !== "draft"),
+);
+const promptTermIds = questions
+  .filter((question) => question.promptTerms)
+  .map((question) => question.id);
+check(
+  "anatomy promptTerms stay on the approved vocabulary set",
+  promptTermIds.join(",") ===
+    "ap-q1,ap-q7,ap-q9,ap-q11,ap-q18,ap-q31,ap-q32,ap-q34,ap-q40",
+);
+const wordingHelpIds = questions
+  .filter((question) => question.wordingHelp)
+  .map((question) => question.id);
+check(
+  "anatomy wordingHelp stays on the approved explain set",
+  wordingHelpIds.join(",") ===
+    "ap-q1,ap-q4,ap-q13,ap-q18,ap-q21,ap-q22,ap-q26,ap-q31,ap-q32",
 );
 
 if (failures.length > 0) {

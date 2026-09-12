@@ -233,12 +233,76 @@ check(
       ).filter((span) => span.type === "term").length === 2,
   ),
 );
-const pilotIds = questions
-  .filter((question) => question.promptTerms || question.wordingHelp)
+check(
+  "eco-q27 matches hyphenated ecosystem-service in the stem",
+  questions.some(
+    (question) =>
+      question.id === "eco-q27" &&
+      annotatePrompt(
+        question.prompt,
+        question.promptTerms,
+        ECOLOGY_GLOSSARY,
+      ).some(
+        (span) =>
+          span.type === "term" &&
+          span.text.toLowerCase() === "ecosystem-service",
+      ),
+  ),
+);
+check(
+  "eco-q28 is not annotated for greenhouse gases",
+  questions.find((question) => question.id === "eco-q28")?.promptTerms ===
+    undefined,
+);
+check(
+  "eco-q37 matches multi-word greenhouse gases",
+  questions.some(
+    (question) =>
+      question.id === "eco-q37" &&
+      annotatePrompt(
+        question.prompt,
+        question.promptTerms,
+        ECOLOGY_GLOSSARY,
+      ).some(
+        (span) =>
+          span.type === "term" &&
+          span.text.toLowerCase() === "greenhouse gases",
+      ),
+  ),
+);
+check(
+  "eco-q40 matches IUCN Red List without annotating threatened",
+  questions.some((question) => {
+    if (question.id !== "eco-q40") {
+      return false;
+    }
+    const terms = annotatePrompt(
+      question.prompt,
+      question.promptTerms,
+      ECOLOGY_GLOSSARY,
+    ).filter((span) => span.type === "term");
+    return (
+      terms.length === 1 &&
+      terms[0].type === "term" &&
+      terms[0].text === "IUCN Red List"
+    );
+  }),
+);
+const promptTermIds = questions
+  .filter((question) => question.promptTerms)
   .map((question) => question.id);
 check(
-  "ecology question-help pilot stays small",
-  pilotIds.join(",") === "eco-q10,eco-q13,eco-q16,eco-q20,eco-q21",
+  "ecology promptTerms stay on the approved vocabulary set",
+  promptTermIds.join(",") ===
+    "eco-q10,eco-q13,eco-q16,eco-q20,eco-q21,eco-q27,eco-q30,eco-q37,eco-q39,eco-q40",
+);
+const wordingHelpIds = questions
+  .filter((question) => question.wordingHelp)
+  .map((question) => question.id);
+check(
+  "ecology wordingHelp stays on the approved explain set",
+  wordingHelpIds.join(",") ===
+    "eco-q10,eco-q13,eco-q16,eco-q19,eco-q20,eco-q21,eco-q39",
 );
 
 if (failures.length > 0) {

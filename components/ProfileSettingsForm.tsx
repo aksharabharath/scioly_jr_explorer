@@ -48,7 +48,7 @@ export function ProfileSettingsForm({
             htmlFor="displayName"
             className="block text-sm font-medium text-ink"
           >
-            What should we call you?
+            Name your inner explorer
           </label>
           <input
             id="displayName"

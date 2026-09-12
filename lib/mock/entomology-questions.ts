@@ -11,8 +11,10 @@
  * `Question` so live-practice filtering can see it; it is not shown to students.
  */
 import { optionalSecondHintFields } from "@/lib/practice";
+import { optionalQuestionHelpFields } from "@/lib/question-help";
 import type {
   DifficultyLevel,
+  PromptTermRef,
   Question,
   QuestionVerificationStatus,
 } from "@/lib/types";
@@ -147,6 +149,8 @@ function ento(
     correctChoiceId: "a" | "b" | "c" | "d";
     hint: string;
     hint2?: string;
+    promptTerms?: PromptTermRef[];
+    wordingHelp?: string;
     explanation: string;
     taxonomyTags: EntomologyTaxonId[];
     cognitiveDemand: EntomologyCognitiveDemand;
@@ -173,6 +177,7 @@ function ento(
     correctChoiceId: input.correctChoiceId,
     hint: input.hint,
     ...optionalSecondHintFields(input.hint2),
+    ...optionalQuestionHelpFields(input),
     explanation: input.explanation,
     taxonomyTags: input.taxonomyTags,
     cognitiveDemand: input.cognitiveDemand,
@@ -254,6 +259,8 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     ],
     correctChoiceId: "d",
     hint: "Inspect the specimen’s overall form, then compare its observable classification clues with the listed groups.",
+    wordingHelp:
+      "This question is asking which kind of list group this animal belongs in.",
     explanation:
       "Ixodidae is listed under Non-Insect Arthropods with the common name hardback ticks. It is not an insect order or a beetle or true-bug family. Eight walking legs and a fused body are visible in the photo; those characters are not printed on the 2027 list.",
     taxonomyTags: ["Ixodidae"],
@@ -449,7 +456,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Order Thysanoptera — thrips",
     ],
     correctChoiceId: "b",
-    hint: "This taxon is listed under Entognatha, not as an insect order.",
+    hint: "Have an insect reference handy — the official list or a field guide can help. Find the taxon that matches the photo, then read the rank and the heading printed with that name.",
     explanation:
       "Springtails (Collembola) are Class Entognatha. Many have a furcula used to jump. Silverfish are wingless insects (Zygentoma). Diplurans have paired tail filaments, not a ventral jumping fork. Thrips are slender insects in Thysanoptera, often with fringe wings as adults.",
     taxonomyTags: ["Collembola", "Entognatha"],
@@ -628,6 +635,8 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     ],
     correctChoiceId: "c",
     hint: "Inspect the circled structures and compare their body-region location with each listed term.",
+    wordingHelp:
+      "This question is asking where those structures are on the insect’s body.",
     explanation:
       "Cerci arise at the posterior end of the abdomen. They are not parts of the antennae, tarsi, or eyes.",
     taxonomyTags: ["Insecta"],
@@ -680,6 +689,8 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     ],
     correctChoiceId: "c",
     hint: "Start at the first couplet, test both branches against the official name, and follow the supported branch.",
+    wordingHelp:
+      "This question is asking which family you reach if you start at the top of the key and follow the listed common name.",
     explanation:
       "Couplet 1a matches the official common name short-horned grasshoppers → Acrididae. Couplet 2 is only for the other listed Orthoptera families. Membracidae are treehoppers (Hemiptera), so they are not in this key.",
     taxonomyTags: ["Acrididae", "Tettigoniidae", "Gryllidae", "Orthoptera"],
@@ -703,6 +714,8 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
     ],
     correctChoiceId: "a",
     hint: "For each proposed split, ask whether it separates all four groups using evidence available for those groups.",
+    wordingHelp:
+      "This question is asking how you should first divide these four listed groups if you are writing a simple key.",
     explanation:
       "Dytiscidae is printed as predaceous diving beetles; Hydrophilidae is printed as water scavenger. Acrididae is printed as short-horned grasshoppers; Gryllidae is printed as crickets/tree crickets. Grouping by those official-name clues splits the four taxa evenly. All four are insects; none are Ixodidae. Glow belongs to Lampyridae, which is not in this set.",
     taxonomyTags: ["Dytiscidae", "Hydrophilidae", "Acrididae", "Gryllidae"],
@@ -793,7 +806,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Pollen-collecting legs in all Coleoptera",
     ],
     correctChoiceId: "c",
-    hint: "Natatorial means adapted for swimming.",
+    hint: "Use the circled hind-leg in the photo. Compare that shape with the adaptation term in each choice, then check whether the taxon named beside that term is a plausible match.",
     explanation:
       "Flattened, hair-fringed hind legs used to row through water are natatorial. Predaceous diving beetles (Dytiscidae) show this well. Fossorial legs dig; raptorial legs seize prey (mantids). Beetles do not all collect pollen.",
     taxonomyTags: ["Dytiscidae", "Coleoptera"],
@@ -960,7 +973,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "cicadas",
     ],
     correctChoiceId: "b",
-    hint: "Match the exact printed common-name string. Nearby true-bug families on the list use different strings.",
+    hint: "Have an insect reference handy — the official list or a field guide can help. Find this family name and read the common name listed for it.",
     explanation:
       "Scutelleridae is printed as metallic shield bugs. Stink bugs (official capitals) are Pentatomidae; treehoppers are Membracidae; cicadas are Cicadidae. The list strings are what students should record.",
     taxonomyTags: ["Scutelleridae", "Hemiptera"],
@@ -982,7 +995,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Cicadidae",
     ],
     correctChoiceId: "c",
-    hint: "Match the printed common name to the family — nearby Hemiptera names are different families.",
+    hint: "Have an insect reference handy — the official list or a field guide can help. Find this common name and see which family it is listed with.",
     explanation:
       "Pentatomidae is printed as Stink bugs. Scutelleridae is metallic shield bugs; Membracidae is treehoppers; Cicadidae is cicadas. Using the official string avoids mixing two listed true-bug families.",
     taxonomyTags: ["Pentatomidae", "Hemiptera"],
@@ -1005,7 +1018,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Coccinellidae — lady-bird beetles (ladybugs)",
     ],
     correctChoiceId: "b",
-    hint: "Match the specimen to a listed Hemiptera family common name. Do not pick a beetle family.",
+    hint: "Inspect the specimen and match it to one of the listed family common names.",
     explanation:
       "Cicadidae is printed as cicadas under Hemiptera. Treehoppers are Membracidae; metallic shield bugs are Scutelleridae; lady-bird beetles(ladybugs) are Coccinellidae in Coleoptera.",
     taxonomyTags: ["Cicadidae", "Hemiptera"],
@@ -1034,7 +1047,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "dobsonflies",
     ],
     correctChoiceId: "d",
-    hint: "Several aquatic-looking order names are on the list; match this order’s printed string.",
+    hint: "Have an insect reference handy — the official list or a field guide can help. Find this order name and read the common name listed for it.",
     explanation:
       "Megaloptera is printed as dobsonflies. Stoneflies are Plecoptera; dragon/damselflies are Odonata; caddisflies are Trichoptera. Those nearby order names are easy to mix if you only remember “aquatic insect.”",
     taxonomyTags: ["Megaloptera"],
@@ -1085,7 +1098,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "weevils",
     ],
     correctChoiceId: "a",
-    hint: "This Coleoptera family has a long, distinctive official common name on the list.",
+    hint: "Have an insect reference handy — the official list or a field guide can help. Find this family name and read the common name listed for it.",
     explanation:
       "Zopheridae is printed as diabolical ironclad Beetles. Dung beetles are Scarabaeidae; darkling beetles are Tenebrionidae; weevils are Curculionidae. All four are listed beetle families with different official strings.",
     taxonomyTags: ["Zopheridae", "Coleoptera"],
@@ -1129,7 +1142,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Mantodea — mantids",
     ],
     correctChoiceId: "d",
-    hint: "Match the specimen to the listed order’s official common name. Do not pick cockroaches or crickets.",
+    hint: "Inspect the specimen, then match it to an official order common name on the 2027 list.",
     explanation:
       "Mantodea is printed as mantids. Silverfish and firebrats are Zygentoma; cockroaches/termites are Blattodea; grasshoppers & crickets are Orthoptera. Folded grasping front legs are visible in the photo; that character is not printed on the 2027 list.",
     taxonomyTags: ["Mantodea"],
@@ -1158,7 +1171,9 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "As a subclass under Entognatha",
     ],
     correctChoiceId: "a",
-    hint: "Check whether the list prints families under this name, and whether it sits in Insecta.",
+    hint: "Have an insect reference handy — the official list or a field guide can help. Find this name and compare how it is placed with each of the four choices.",
+    wordingHelp:
+      "This question is asking how that name is arranged on the official list.",
     explanation:
       "Siphonaptera is an insect order whose official common name is fleas, and the list prints no families under it. It is not a fly family, not Ixodidae, and not a subclass of Entognatha. Rank and “families listed: none” both come from the list.",
     taxonomyTags: ["Siphonaptera", "Insecta"],
@@ -1261,7 +1276,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Collembola is a subclass of Entognatha; Diplura is an order of Entognatha",
     ],
     correctChoiceId: "d",
-    hint: "Neither name is a family. One is the list’s only subclass.",
+    hint: "Have an insect reference handy — the official list or a field guide can help. Find both names and compare the rank listed for each.",
     explanation:
       "Collembola is Subclass Collembola under Class Entognatha. Diplura is Order Diplura under the same class. They are not Insecta families or Insecta orders, and the subclass/order labels are not interchangeable.",
     taxonomyTags: ["Collembola", "Diplura", "Entognatha"],
@@ -1284,7 +1299,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Pentatomidae — Stink bugs",
     ],
     correctChoiceId: "c",
-    hint: "Match the specimen to a listed Hemiptera family common name. Do not pick a grasshopper family.",
+    hint: "Inspect the specimen and compare its visible features with each listed family common name.",
     explanation:
       "Membracidae is printed as treehoppers under Hemiptera. Cicadas are Cicadidae; Stink bugs are Pentatomidae; short-horned grasshoppers are Acrididae in Orthoptera. A peaked dorsal shield is visible in the photo; that character is not printed on the 2027 list.",
     taxonomyTags: ["Membracidae", "Hemiptera"],
@@ -1313,7 +1328,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Collembola",
     ],
     correctChoiceId: "a",
-    hint: "Start at couplet 1 using the list heading, not the insect families in couplet 2.",
+    hint: "Start at couplet 1. Use the 2027 list heading for this specimen, then follow only the couplet that applies.",
     explanation:
       "Hardback ticks are Family Ixodidae under Non-Insect Arthropods, so 1a finishes the key. Couplet 2 is only for Insecta. Bees and ants are listed hymenopteran families; Collembola is Entognatha, not the tick family.",
     taxonomyTags: ["Ixodidae", "Apidae", "Formicidae"],
@@ -1336,7 +1351,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Coccinellidae",
     ],
     correctChoiceId: "c",
-    hint: "Stay on the Hemiptera branch, then match the official common name in couplet 2.",
+    hint: "Start at couplet 1. Compare the specimen with both branches before following the one that matches, then continue the same way at the next couplet.",
     explanation:
       "Couplet 1a keeps Hemiptera. Couplet 2b matches metallic shield bugs → Scutelleridae. Cicadidae is 2a. Pentatomidae (Stink bugs) is a listed hemipteran family not in this key. Coccinellidae is a beetle family, so 1b would exclude it.",
     taxonomyTags: ["Scutelleridae", "Cicadidae", "Hemiptera"],
@@ -1359,7 +1374,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Siphonaptera",
     ],
     correctChoiceId: "b",
-    hint: "Reject couplet 1a, then read couplet 2 using the printed common name.",
+    hint: "Start at couplet 1. Compare the specimen’s listed name with both options in that couplet, then follow only the matching branch.",
     explanation:
       "Dobsonflies are not thrips, so 1b leads to couplet 2. Couplet 2a matches dobsonflies → Megaloptera. Trichoptera is caddisflies; Siphonaptera is fleas and is not in this key. The splits use official common names only.",
     taxonomyTags: ["Megaloptera", "Thysanoptera", "Trichoptera"],
@@ -1382,7 +1397,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Tephritidae",
     ],
     correctChoiceId: "d",
-    hint: "Stay on Diptera, then match the exact official common-name string in couplet 2.",
+    hint: "Start at couplet 1. Compare the specimen with both branches before following the one that matches, then continue the same way at the next couplet.",
     explanation:
       "Couplet 1a keeps Diptera. Couplet 2b matches fruit flies, husk fly → Tephritidae. Culicidae is mosquitoes (2a). Apidae is bees in Hymenoptera (1b). Bombyliidae is bee flies, a listed dipteran family not used in this key.",
     taxonomyTags: ["Tephritidae", "Culicidae", "Diptera"],
@@ -1405,7 +1420,9 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Can glow versus cannot glow",
     ],
     correctChoiceId: "b",
-    hint: "Use how the 2027 list groups the three names, not unsourced habits.",
+    hint: "Look up the three named groups. Evaluate each proposed first split against the evidence you actually have for those groups, not against how a key might start in general.",
+    wordingHelp:
+      "This question is asking how you should first divide these three listed groups if you are writing a simple key.",
     explanation:
       "Collembola is a subclass of Entognatha, Blattodea is an insect order, and Ixodidae is under Non-Insect Arthropods. That list grouping splits the three taxa cleanly. Water vs land, wings, and glowing are not characters this key is allowed to assume from the list.",
     taxonomyTags: ["Collembola", "Blattodea", "Ixodidae", "Entognatha", "Insecta"],
@@ -1428,7 +1445,7 @@ export const MOCK_ENTOMOLOGY_QUESTIONS: EntomologyQuestion[] = [
       "Tephritidae",
     ],
     correctChoiceId: "a",
-    hint: "Stay on Coleoptera, then read couplet 2’s official common names.",
+    hint: "Start at couplet 1. Compare the specimen with both branches before following the one that matches, then continue the same way at the next couplet.",
     explanation:
       "Couplet 1a keeps Coleoptera. Couplet 2a matches metallic wood-boring/jewel beetles → Buprestidae. Zopheridae is 2b. Lampyridae (fireflies) is a listed beetle family not in this key. Tephritidae is a fly family, so 1b would exclude it.",
     taxonomyTags: ["Buprestidae", "Zopheridae", "Coleoptera"],
@@ -1687,6 +1704,7 @@ export function entomologyQuestionToPracticeQuestion(
     explanation: question.explanation,
     hint: question.hint,
     ...optionalSecondHintFields(question.hint2),
+    ...optionalQuestionHelpFields(question),
     difficulty: question.difficulty,
     imageRequired: question.imageRequired,
     verificationStatus: question.verificationStatus,

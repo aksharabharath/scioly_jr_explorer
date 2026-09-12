@@ -362,6 +362,22 @@ for (const question of questions) {
   assertImageBrief(question);
 }
 
+const promptTermIds = questions
+  .filter((question) => question.promptTerms)
+  .map((question) => question.id);
+check(
+  "entomology promptTerms stay on the approved vocabulary set",
+  promptTermIds.join(",") === "",
+);
+const wordingHelpIds = questions
+  .filter((question) => question.wordingHelp)
+  .map((question) => question.id);
+check(
+  "entomology wordingHelp stays on the approved explain set",
+  wordingHelpIds.join(",") ===
+    "ento-q3,ento-q17,ento-q19,ento-q20,ento-q39,ento-q49",
+);
+
 if (failures.length > 0) {
   throw new Error(`Entomology bank checks failed:\n- ${failures.join("\n- ")}`);
 }

@@ -11,7 +11,9 @@ import {
   type CrimeBustersCognitiveDemand,
   type CrimeBustersSourceType,
 } from "@/lib/mock/crime-busters-questions";
+import { CRIME_BUSTERS_GLOSSARY } from "@/lib/mock/glossary/crime-busters";
 import { optionalSecondHintIsValid } from "@/lib/practice";
+import { questionHelpIssues } from "@/lib/question-help";
 
 const failures: string[] = [];
 
@@ -83,6 +85,11 @@ for (const question of questions) {
   check(
     `${question.id} optional hint2 differs from hint when present`,
     optionalSecondHintIsValid(question),
+  );
+  const helpIssues = questionHelpIssues(question, CRIME_BUSTERS_GLOSSARY);
+  check(
+    `${question.id} question help annotations are structurally valid`,
+    helpIssues.length === 0,
   );
   check(`${question.id} has exactly 4 choices`, question.choices.length === 4);
   if (question.imageRequired) {
@@ -224,6 +231,20 @@ check(
     const number = Number(question.id.replace("cb-q", ""));
     return number >= 1 && number <= 44;
   }),
+);
+const promptTermIds = questions
+  .filter((question) => question.promptTerms)
+  .map((question) => question.id);
+check(
+  "crime busters promptTerms stay on the approved vocabulary set",
+  promptTermIds.join(",") === "cb-q8,cb-q11,cb-q12,cb-q15,cb-q16,cb-q26",
+);
+const wordingHelpIds = questions
+  .filter((question) => question.wordingHelp)
+  .map((question) => question.id);
+check(
+  "crime busters wordingHelp stays on the approved explain set",
+  wordingHelpIds.join(",") === "cb-q8,cb-q10,cb-q15,cb-q27",
 );
 
 if (failures.length > 0) {

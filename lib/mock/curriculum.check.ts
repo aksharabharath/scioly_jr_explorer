@@ -23,10 +23,20 @@ import {
   ENTOMOLOGY_EVENT_ID,
   ENTOMOLOGY_TOPIC_IDS,
   MOCK_ENTOMOLOGY_QUESTIONS,
+  entomologyQuestionToPracticeQuestion,
 } from "@/lib/mock/entomology-questions";
-import { MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS } from "@/lib/mock/anatomy-physiology-questions";
-import { MOCK_WATER_QUALITY_QUESTIONS } from "@/lib/mock/water-quality-questions";
-import { MOCK_CRIME_BUSTERS_QUESTIONS } from "@/lib/mock/crime-busters-questions";
+import {
+  MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS,
+  anatomyPhysiologyQuestionToPracticeQuestion,
+} from "@/lib/mock/anatomy-physiology-questions";
+import {
+  MOCK_WATER_QUALITY_QUESTIONS,
+  waterQualityQuestionToPracticeQuestion,
+} from "@/lib/mock/water-quality-questions";
+import {
+  MOCK_CRIME_BUSTERS_QUESTIONS,
+  crimeBustersQuestionToPracticeQuestion,
+} from "@/lib/mock/crime-busters-questions";
 import { MOCK_ECOLOGY_OVERVIEW } from "@/lib/mock/ecology";
 import {
   MOCK_ECOLOGY_QUESTIONS,
@@ -116,6 +126,62 @@ async function run() {
   check(
     "practice mapper omits missing wordingHelp",
     ecologyQuestionToPracticeQuestion(MOCK_ECOLOGY_QUESTIONS[0])
+      .wordingHelp === undefined,
+  );
+  const wqQ1 = MOCK_WATER_QUALITY_QUESTIONS.find(
+    (question) => question.id === "wq-q1",
+  );
+  check(
+    "practice mapper keeps promptTerms on wq-q1",
+    waterQualityQuestionToPracticeQuestion(wqQ1 ?? MOCK_WATER_QUALITY_QUESTIONS[0])
+      .promptTerms?.map((ref) => ref.glossaryId)
+      .join(",") === "macroinvertebrate",
+  );
+  const apQ1 = MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS.find(
+    (question) => question.id === "ap-q1",
+  );
+  check(
+    "practice mapper keeps promptTerms on ap-q1",
+    anatomyPhysiologyQuestionToPracticeQuestion(
+      apQ1 ?? MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS[0],
+    )
+      .promptTerms?.map((ref) => ref.glossaryId)
+      .join(",") === "keratin",
+  );
+  const cbQ8 = MOCK_CRIME_BUSTERS_QUESTIONS.find(
+    (question) => question.id === "cb-q8",
+  );
+  check(
+    "practice mapper keeps promptTerms on cb-q8",
+    crimeBustersQuestionToPracticeQuestion(cbQ8 ?? MOCK_CRIME_BUSTERS_QUESTIONS[0])
+      .promptTerms?.map((ref) => ref.glossaryId)
+      .join(",") === "recurve",
+  );
+  check(
+    "practice mapper keeps promptTerms on entomology when present",
+    entomologyQuestionToPracticeQuestion({
+      ...MOCK_ENTOMOLOGY_QUESTIONS[0],
+      promptTerms: [{ glossaryId: "temperate" }],
+    })
+      .promptTerms?.map((ref) => ref.glossaryId)
+      .join(",") === "temperate",
+  );
+  check(
+    "practice mapper keeps wordingHelp on entomology when present",
+    entomologyQuestionToPracticeQuestion({
+      ...MOCK_ENTOMOLOGY_QUESTIONS[0],
+      wordingHelp: "This question is asking which listed order includes both groups.",
+    }).wordingHelp ===
+      "This question is asking which listed order includes both groups.",
+  );
+  check(
+    "practice mapper omits missing entomology promptTerms",
+    entomologyQuestionToPracticeQuestion(MOCK_ENTOMOLOGY_QUESTIONS[0])
+      .promptTerms === undefined,
+  );
+  check(
+    "practice mapper omits missing entomology wordingHelp",
+    entomologyQuestionToPracticeQuestion(MOCK_ENTOMOLOGY_QUESTIONS[0])
       .wordingHelp === undefined,
   );
   check(

@@ -16,6 +16,7 @@ import {
   toLearningAttempts,
   topicLearningState,
 } from "@/lib/learning/adaptive";
+import { hasEventRules } from "@/lib/event-rules";
 import {
   getAllQuestions,
   getEventPageData,
@@ -93,6 +94,9 @@ export default async function EventPage({ params }: EventRouteProps) {
   }));
   const site = fieldSiteSubtitle(event.id);
   const tint = fieldSiteTint(event.id);
+  const rulesHref = hasEventRules(event.id)
+    ? `/events/${event.id}/rules`
+    : null;
 
   return (
     <main className="flex flex-1 flex-col">
@@ -111,8 +115,19 @@ export default async function EventPage({ params }: EventRouteProps) {
             >
               <EventIcon id={event.icon} className="h-6 w-6" />
             </span>
-            <div>
-              <p className="text-sm font-semibold text-teal">Field site</p>
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <p className="text-sm font-semibold text-teal">Field site</p>
+                {rulesHref ? (
+                  <Link
+                    href={rulesHref}
+                    aria-label="Open Event Rules & Overview"
+                    className="rounded-full border border-stone-300/90 bg-surface/80 px-2.5 py-0.5 text-xs font-semibold text-ink hover:bg-parchment"
+                  >
+                    Field site
+                  </Link>
+                ) : null}
+              </div>
               <h1 className="mt-0.5 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
                 {event.name}
               </h1>
@@ -125,6 +140,21 @@ export default async function EventPage({ params }: EventRouteProps) {
             {overview}
           </p>
         </div>
+
+        {rulesHref ? (
+          <Link
+            href={rulesHref}
+            className="journal-panel mt-4 block rounded-3xl p-4 outline-offset-4 transition hover:-translate-y-0.5 sm:p-5"
+          >
+            <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
+              Event Rules & Overview
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed text-stone-600">
+              Read the official 2027 rules and event information.
+            </p>
+            <p className="mt-2 text-sm font-semibold text-teal">Open Event Rules</p>
+          </Link>
+        ) : null}
 
         {!event.unlocked ? (
           <div className="journal-panel mt-5 rounded-3xl p-4 sm:p-5">

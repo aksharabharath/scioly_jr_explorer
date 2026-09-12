@@ -6,8 +6,10 @@
  * docs/events/water_quality/EVIDENCE_MATRIX_2027.md.
  */
 import { optionalSecondHintFields } from "@/lib/practice";
+import { optionalQuestionHelpFields } from "@/lib/question-help";
 import type {
   DifficultyLevel,
+  PromptTermRef,
   Question,
   QuestionVerificationStatus,
 } from "@/lib/types";
@@ -53,6 +55,8 @@ function wq(input: {
   correctChoiceId: "a" | "b" | "c" | "d";
   hint: string;
   hint2?: string;
+  promptTerms?: PromptTermRef[];
+  wordingHelp?: string;
   explanation: string;
   cognitiveDemand: WaterQualityCognitiveDemand;
   sourceType: WaterQualitySourceType;
@@ -75,6 +79,7 @@ function wq(input: {
     correctChoiceId: input.correctChoiceId,
     hint: input.hint,
     ...optionalSecondHintFields(input.hint2),
+    ...optionalQuestionHelpFields(input),
     explanation: input.explanation,
     cognitiveDemand: input.cognitiveDemand,
     sourceType: input.sourceType,
@@ -99,6 +104,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Class 1 - Pollution Tolerant",
     ],
     correctChoiceId: "b",
+    promptTerms: [{ glossaryId: "macroinvertebrate" }],
     hint: "Find the relevant table entry or heading in the official reference, then compare its wording with all four choices.",
     explanation:
       "The table heading is Class 1 - Pollution Sensitive. Moderately Tolerant is Class 3; Pollution Tolerant is Class 4; Air Breathing is Class 5.",
@@ -275,6 +281,8 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Mosquito",
     ],
     correctChoiceId: "b",
+    wordingHelp:
+      "This question is asking which name you land on if you start at the top of the key and follow the specimen’s listed name.",
     hint: "Start at couplet 1 using the Class 1 column, then read couplet 2’s printed names.",
     explanation:
       "Stonefly is a Class 1 name, so 1a applies. Couplet 2a matches the printed name Stonefly. Mosquito is Class 5, so 1b would exclude it. Mayfly would require 2b.",
@@ -518,6 +526,8 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Giant Water Bug",
     ],
     correctChoiceId: "d",
+    wordingHelp:
+      "This question is asking which name you land on if you start at the top of the key and follow the specimen’s listed name.",
     hint: "Check whether the name is in the Class 5 column, then match couplet 2.",
     explanation:
       "Giant Water Bug is Class 5, so 1a applies. Couplet 2a matches Giant Water Bug. Dobsonfly is Class 1, so 1b would exclude it. Water Boatman would require 2b.",
@@ -606,7 +616,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Crayfish/Crawdads",
     ],
     correctChoiceId: "d",
-    hint: "Keep the slash-joined animal-list string as one printed name. Deer/Horse Fly is a Class 4 table cell.",
+    hint: "Look for the slash-joined name exactly as printed, then read the heading of the list where you find it.",
     explanation:
       "Crayfish/Crawdads is the nuisance-animal string. Deer/Horse Fly is a Class 4 macro table name. Eurasian Water Milfoil is a nuisance plant. Asian Tiger Mosquito is a nuisance animal without a slash.",
     cognitiveDemand: "distinction",
@@ -628,7 +638,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Water Hyacinth",
     ],
     correctChoiceId: "a",
-    hint: "The plant list has exactly three names. Mayfly is on the adult-macroinvertebrate table.",
+    hint: "The Aquatic Nuisance Plants list is a short closed list. Check each name against that list, not against the adult-macroinvertebrate table.",
     explanation:
       "The three nuisance plants are Purple Loosestrife, Eurasian Water Milfoil, and Water Hyacinth. Mayfly is a Class 1 table name.",
     cognitiveDemand: "distinction",
@@ -650,6 +660,8 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Asian Tiger Mosquito is Class 5; Mosquito is an Aquatic Nuisance Plants name",
     ],
     correctChoiceId: "c",
+    wordingHelp:
+      "This question is asking how each of those two printed names is listed in the rules.",
     hint: "Compare the Class 5 column with the Aquatic Nuisance Animals sentence. Do not merge the two printed strings.",
     explanation:
       "Mosquito is printed under Class 5 - Air Breathing. Asian Tiger Mosquito is an Aquatic Nuisance Animals string. They are separate official strings; this item does not claim extra biology about either name.",
@@ -672,7 +684,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Dobsonfly",
     ],
     correctChoiceId: "b",
-    hint: "The monitoring section names salinity, pH, phosphates, turbidity, dissolved oxygen, temperature, nitrates, and biochemical oxygen demand.",
+    hint: "Use the eight-name Water Monitoring and Analysis list. Check which choice is printed there.",
     explanation:
       "salinity is a listed monitoring parameter. Mayfly and Dobsonfly are table names. Purple Loosestrife is a nuisance plant.",
     cognitiveDemand: "recognition",
@@ -716,7 +728,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "An Aquatic Nuisance Animal",
     ],
     correctChoiceId: "a",
-    hint: "pH is in the bold parameter list. This item does not define what pH measures.",
+    hint: "Find pH in the 2027 Water Monitoring and Analysis section. Decide what kind of listed item it is.",
     explanation:
       "pH is one of the eight named monitoring parameters. It is not an organism or nuisance-list name. The 2027 rules and this MVP bank do not define pH further.",
     cognitiveDemand: "recall",
@@ -738,7 +750,8 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "It is one of the three Aquatic Nuisance Plants",
     ],
     correctChoiceId: "c",
-    hint: "Turbidity is in the same bold list as salinity and dissolved oxygen. Do not invent a definition.",
+    promptTerms: [{ glossaryId: "turbidity" }],
+    hint: "Find turbidity in the 2027 Water Monitoring and Analysis section. Decide what kind of listed name it is, and do not invent a definition.",
     explanation:
       "turbidity is a listed monitoring-parameter name. This item does not state what turbidity measures (that fact is not evidenced in the MVP matrix).",
     cognitiveDemand: "recognition",
@@ -760,7 +773,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "The official title of Class 4",
     ],
     correctChoiceId: "b",
-    hint: "Keep phosphates as a printed parameter name. Do not treat it as a phosphorus definition.",
+    hint: "Use the word as it is printed in that section. Do not turn it into a phosphorus definition.",
     explanation:
       "phosphates is one of the eight named monitoring parameters. This MVP item does not equate phosphates with phosphorus or describe eutrophication.",
     cognitiveDemand: "recall",
@@ -804,7 +817,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "The printed common name for Tubifex",
     ],
     correctChoiceId: "a",
-    hint: "Use the USGS definition of oxygen dissolved in water. Do not pick a 2027 organism or class title.",
+    hint: "Focus on the USGS definition, not on a 2027 list name.",
     explanation:
       "USGS: “Dissolved oxygen (DO) is a measure of how much oxygen is dissolved in the water - the amount of oxygen available to living aquatic organisms.” It is also a named 2027 monitoring parameter, but the definition comes from USGS, not from the rules table.",
     cognitiveDemand: "recall",
@@ -826,6 +839,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Only a sample labeled Class 5 - Air Breathing",
     ],
     correctChoiceId: "c",
+    promptTerms: [{ glossaryId: "dissolved-oxygen" }],
     hint: "USGS compares cold water and warm water. No graph or numeric cutoff is required.",
     explanation:
       "USGS: “Cold water can hold more dissolved oxygen than warm water.” Also: “Warm water holds less dissolved oxygen than cool water.” No milligram-per-liter threshold is used here.",
@@ -848,7 +862,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "It is printed as the common name for Blood Midge",
     ],
     correctChoiceId: "b",
-    hint: "USGS ties temperature to biological activity and which organisms can live in the water.",
+    hint: "The question asks why temperature matters. Use the USGS statement, not a 2027 class or list label.",
     explanation:
       "USGS: “Temperature exerts a major influence on biological activity and growth. Temperature governs the kinds of organisms that can live in rivers and lakes.” Temperature is also a named 2027 parameter; the biological statement is from USGS.",
     cognitiveDemand: "recall",
@@ -870,7 +884,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "A nutrient needed for plant growth",
     ],
     correctChoiceId: "d",
-    hint: "USGS describes nitrate as a form of nitrogen used as a plant nutrient. Do not use unsourced concentration limits.",
+    hint: "Use the USGS description of nitrate and match the statement to what the source actually says.",
     explanation:
       "USGS: “Nitrogen, in the forms of nitrate, nitrite, or ammonium, is a nutrient needed for plant growth.” Dissolved oxygen is a different USGS definition (V-U1). This item does not use ppm or drinking-water cutoffs.",
     cognitiveDemand: "application",
@@ -892,7 +906,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Biochemical oxygen demand to become a nuisance plant",
     ],
     correctChoiceId: "a",
-    hint: "USGS describes excess nitrogen and aquatic plants/algae. Do not change 2027 list membership.",
+    hint: "Use the USGS effect of excess nitrogen. Discard choices that rewrite 2027 list membership.",
     explanation:
       "USGS: “Excess nitrogen can cause overstimulation of growth of aquatic plants and algae.” List membership and BOD’s identity as a parameter are not changed by nitrogen.",
     cognitiveDemand: "application",
@@ -914,7 +928,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Prove that the rules word phosphates means the same thing as phosphorus",
     ],
     correctChoiceId: "c",
-    hint: "Quote USGS on phosphorus and eutrophication. Do not treat phosphates as proven identical to phosphorus.",
+    hint: "Use the USGS statement about too much phosphorus in water. Do not treat the rules word phosphates as proven identical to phosphorus.",
     explanation:
       "USGS: too much phosphorus “can speed up eutrophication (a reduction in dissolved oxygen in water bodies caused by an increase of mineral and organic nutrients).” The 2027 rules name phosphates, not phosphorus; this item does not equate those two words.",
     cognitiveDemand: "application",
@@ -936,7 +950,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "Purple Loosestrife as a required dissolved mineral",
     ],
     correctChoiceId: "b",
-    hint: "USGS defines saline water using dissolved salts. Do not use parts-per-million classification bands.",
+    hint: "Use the USGS wording for saline water. Do not use parts-per-million classification bands.",
     explanation:
       "USGS: “Water that is saline contains significant amounts (referred to as ‘concentrations’) of dissolved salts, the most common being … sodium chloride (NaCl).” Freshwater/ocean ppm bands from that page are not used in this MVP item.",
     cognitiveDemand: "recall",
@@ -958,7 +972,7 @@ export const MOCK_WATER_QUALITY_QUESTIONS: WaterQualityQuestion[] = [
       "The amount of oxygen consumed by bacteria and other microorganisms while they decompose organic matter under aerobic conditions at a specified temperature",
     ],
     correctChoiceId: "d",
-    hint: "BOD is about oxygen used while microbes break down organic matter. That is not the same sentence USGS uses for dissolved oxygen.",
+    hint: "Use the USGS BOD sentence. Compare it with the USGS dissolved-oxygen sentence; they are not the same claim.",
     explanation:
       "USGS: “Biochemical oxygen demand (BOD) represents the amount of oxygen consumed by bacteria and other microorganisms while they decompose organic matter under aerobic (oxygen is present) conditions at a specified temperature.” Dissolved oxygen’s definition is V-U1, a different claim. No 5-day/20 °C method details are tested.",
     cognitiveDemand: "distinction",
@@ -982,6 +996,7 @@ export function waterQualityQuestionToPracticeQuestion(
     explanation: question.explanation,
     hint: question.hint,
     ...optionalSecondHintFields(question.hint2),
+    ...optionalQuestionHelpFields(question),
     difficulty: question.difficulty,
     imageRequired: question.imageRequired,
     verificationStatus: question.verificationStatus,

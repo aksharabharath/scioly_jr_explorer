@@ -14,6 +14,12 @@ export default async function ProfileEventsPage() {
     getEvents(),
     getMySelectedEventIds(),
   ]);
+  const selectionEvents = events.filter(
+    (event) =>
+      !["engineering-cad", "hovercraft", "rubber-band-catapult"].includes(
+        event.id,
+      ),
+  );
 
   return (
     <main className="flex flex-1 flex-col">
@@ -26,7 +32,7 @@ export default async function ProfileEventsPage() {
           start an expedition.
         </p>
         <EventSelectionForm
-          events={events}
+          events={selectionEvents}
           initialSelectedIds={selectedIds}
           submitLabel="Save field sites"
           description="Keep at least one ready field site selected. Expeditions you already finished stay saved."

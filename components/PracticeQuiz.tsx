@@ -5,7 +5,7 @@ import { ExpeditionRewardsOverlay } from "@/components/ExpeditionRewardsOverlay"
 import { TrickyTopicsEmpty } from "@/components/TrickyTopicsEmpty";
 import { PromptWithTerms } from "@/components/PromptWithTerms";
 import { XpAwardFeedback } from "@/components/XpAwardFeedback";
-import { ECOLOGY_GLOSSARY } from "@/lib/mock/glossary/ecology";
+import { glossaryForEvent } from "@/lib/mock/glossary";
 import {
   PRACTICE_SET_SIZE,
   attemptFromQuestion,
@@ -24,7 +24,6 @@ import {
   type BadgeProgressAttempt,
 } from "@/lib/badges";
 import {
-  DIFFICULTY_LEVEL_LABEL,
   attemptUsedAHint,
   authoredSecondHint,
   missedAnswerContrast,
@@ -514,8 +513,7 @@ export function PracticeQuiz({
   const secondHint = authoredSecondHint(question);
   const hintUsed = attemptUsedAHint(state.revealedHint, state.revealedHint2);
   const wordingHelp = question.wordingHelp?.trim() ?? "";
-  const glossary =
-    question.eventId === "ecology" ? ECOLOGY_GLOSSARY : [];
+  const glossary = glossaryForEvent(question.eventId);
 
   return (
     <section className="journal-panel rounded-3xl p-4 sm:p-5">
@@ -523,9 +521,6 @@ export function PracticeQuiz({
         <p className="font-medium text-stone-700">
           Question {sessionNumber} of {plannedTotal}
         </p>
-        <span className="rounded-full bg-parchment px-2.5 py-1 text-xs font-semibold text-ink">
-          {DIFFICULTY_LEVEL_LABEL[question.difficulty]}
-        </span>
       </div>
       <div
         className="mt-2 h-1.5 overflow-hidden rounded-full bg-stone-200"
@@ -549,13 +544,13 @@ export function PracticeQuiz({
         }`}
       >
         <div>
-          <p className="font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
+          <div className="font-display text-xl font-semibold tracking-tight text-ink sm:text-2xl">
             <PromptWithTerms
               prompt={question.prompt}
               promptTerms={question.promptTerms}
               glossary={glossary}
             />
-          </p>
+          </div>
           {question.imageSrc ? (
             <figure className="mt-3 overflow-hidden rounded-2xl border border-stone-200/80 bg-parchment">
               {/* Local public JPEGs (and any other static imageSrc); next/image is not required. */}
@@ -585,14 +580,20 @@ export function PracticeQuiz({
               const correctChoice = choice.id === question.correctChoiceId;
               let choiceClass =
                 "border-stone-200 bg-parchment/50 hover:border-teal/40 hover:bg-parchment";
+              let letterClass = "bg-white text-stone-600";
 
               if (state.submitted && correctChoice) {
                 choiceClass =
-                  "choice-pulse border-teal bg-teal/10 text-teal-dark";
+                  "choice-pulse border-teal bg-teal/10 text-teal-dark disabled:border-teal disabled:bg-teal/10 disabled:text-teal-dark disabled:opacity-100";
               } else if (state.submitted && selected && !correctChoice) {
-                choiceClass = "border-stone-400 bg-stone-100 text-ink";
+                choiceClass =
+                  "border-rose-300 bg-rose-50 text-rose-950 disabled:border-rose-300 disabled:bg-rose-50 disabled:text-rose-950 disabled:opacity-100";
+                letterClass = "bg-rose-100 text-rose-900";
               } else if (!state.submitted && selected) {
                 choiceClass = "border-teal bg-teal/10 text-teal-dark";
+              } else if (state.submitted) {
+                choiceClass =
+                  "border-stone-200 bg-parchment/50 text-ink disabled:border-stone-200 disabled:bg-parchment/50 disabled:text-ink disabled:opacity-100";
               }
 
               return (
@@ -608,7 +609,7 @@ export function PracticeQuiz({
                   } ${choiceClass}`}
                 >
                   <span
-                    className={`mt-0.5 flex shrink-0 items-center justify-center rounded-full bg-white font-semibold text-stone-600 ${
+                    className={`mt-0.5 flex shrink-0 items-center justify-center rounded-full font-semibold ${letterClass} ${
                       state.submitted
                         ? "h-6 w-6 text-xs"
                         : "h-7 w-7 text-sm"
@@ -942,7 +943,7 @@ function ResultsCard({
           >
             {practiceMode === "weak"
               ? "Keep practicing these topics"
-              : "Try this expedition again"}
+              : "Go on to next expedition in Ecology"}
           </button>
         )}
         <Link
