@@ -11,7 +11,6 @@ import {
   type CrimeBustersCognitiveDemand,
   type CrimeBustersSourceType,
 } from "@/lib/mock/crime-busters-questions";
-import { isQuestionAnswerCorrect } from "@/lib/practice";
 
 const failures: string[] = [];
 
@@ -63,7 +62,7 @@ const byDifficulty = { 1: 0, 2: 0, 3: 0 };
 const bySource: Record<string, number> = {};
 const byDemand: Record<string, number> = {};
 const byVerification: Record<string, number> = {};
-const answerLength: Record<string, number> = {};
+const correctLetter: Record<string, number> = { a: 0, b: 0, c: 0, d: 0 };
 
 for (const question of questions) {
   check(
@@ -80,17 +79,7 @@ for (const question of questions) {
     question.explanation.trim().length > 0,
   );
   check(`${question.id} has a non-empty hint`, question.hint.trim().length > 0);
-  check(
-    `${question.id} is open-ended`,
-    question.answerMode === "open-ended",
-  );
-  check(`${question.id} exposes no choices`, question.choices.length === 0);
-  check(
-    `${question.id} has accepted answers`,
-    question.acceptedAnswers !== undefined &&
-      question.acceptedAnswers.length > 0 &&
-      question.acceptedAnswers.every((answer) => answer.trim().length > 0),
-  );
+  check(`${question.id} has exactly 4 choices`, question.choices.length === 4);
   if (question.imageRequired) {
     check(
       `${question.id} has imageBrief`,
@@ -141,28 +130,27 @@ for (const question of questions) {
     !question.prompt.includes("[IMAGE REQUIRED:"),
   );
 
+  const choiceIds = question.choices.map((choice) => choice.id);
   check(
-    `${question.id} has a canonical answer`,
-    question.correctChoiceId.trim().length > 0 &&
-      question.acceptedAnswers?.includes(question.correctChoiceId) === true,
+    `${question.id} has unique choice IDs`,
+    new Set(choiceIds).size === 4,
   );
+  check(`${question.id} uses choice IDs a–d`, choiceIds.join("") === "abcd");
   check(
-    `${question.id} accepts its canonical answer with casing/space variation`,
-    isQuestionAnswerCorrect(
-      question,
-      `  ${question.correctChoiceId.toUpperCase()}  `,
-    ),
+    `${question.id} has exactly one correct choice`,
+    choiceIds.filter((id) => id === question.correctChoiceId).length === 1,
   );
-  for (const acceptedAnswer of question.acceptedAnswers ?? []) {
+  const choiceTexts = question.choices.map((choice) => choice.text.trim());
+  check(
+    `${question.id} choice texts are unique`,
+    new Set(choiceTexts).size === 4,
+  );
+  for (const choice of question.choices) {
     check(
-      `${question.id} accepts ${acceptedAnswer}`,
-      isQuestionAnswerCorrect(question, acceptedAnswer),
+      `${question.id} choice ${choice.id} has text`,
+      choice.text.trim().length > 0,
     );
   }
-  check(
-    `${question.id} rejects an unrelated typed answer`,
-    !isQuestionAnswerCorrect(question, "not the answer"),
-  );
   check(
     `${question.id} difficulty is 1, 2, or 3`,
     question.difficulty === 1 ||
@@ -210,8 +198,8 @@ for (const question of questions) {
   bySource[question.sourceType] = (bySource[question.sourceType] ?? 0) + 1;
   byDemand[question.cognitiveDemand] =
     (byDemand[question.cognitiveDemand] ?? 0) + 1;
-  const answerSize = question.acceptedAnswers?.length ?? 0;
-  answerLength[answerSize] = (answerLength[answerSize] ?? 0) + 1;
+  correctLetter[question.correctChoiceId] =
+    (correctLetter[question.correctChoiceId] ?? 0) + 1;
   byVerification[question.verificationStatus] =
     (byVerification[question.verificationStatus] ?? 0) + 1;
 }
@@ -273,9 +261,7 @@ console.log(
     `topics={${Object.entries(byTopic)
       .map(([key, value]) => `${key}:${value}`)
       .join(",")}}`,
-    `acceptedAnswerCounts={${Object.entries(answerLength)
-      .map(([key, value]) => `${key}:${value}`)
-      .join(",")}}`,
+    `correct={a:${correctLetter.a},b:${correctLetter.b},c:${correctLetter.c},d:${correctLetter.d}}`,
     `verification={${Object.entries(byVerification)
       .map(([key, value]) => `${key}:${value}`)
       .join(",")}}`,

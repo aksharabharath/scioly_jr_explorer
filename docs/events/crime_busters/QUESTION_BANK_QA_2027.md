@@ -2,9 +2,9 @@
 
 Content QA of `lib/mock/crime-busters-questions.ts` (**cb-q1–cb-q50**). Questions `cb-q46`–`cb-q50` are intentionally held out until real image/data stimuli are sourced and reviewed. Crime Busters remains on the shared route; only verified questions are live.
 
-All 50 Crime Busters items now use the shared `open-ended` answer mode. The
-canonical answer and any explicitly equivalent spellings are normalized by the
-shared practice matcher; no Crime Busters choices are exposed to students.
+All 50 Crime Busters items use the existing multiple-choice answer mode. The
+shared open-ended matcher remains available for Codebusters; Crime Busters
+does not use `acceptedAnswers`.
 
 **Authority:**
 
@@ -51,7 +51,7 @@ A conservative reading of the matrix supported verifying the whole MVP set after
 - Cognitive demand: recall 17; recognition 9; distinction 6; application 15; multi-step 3.
 - Answer positions: a = 19; b = 11; c = 10; d = 10.
 - Images: 9 image-required items; 4 verified with assets; 5 held out.
-- Answer mode: 50 open-ended; 0 multiple-choice.
+- Answer mode: 0 open-ended; 50 multiple-choice.
 
 ---
 

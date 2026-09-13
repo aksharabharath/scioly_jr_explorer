@@ -43,14 +43,7 @@ export type CrimeBustersSourceType =
   | "libretexts"
   | "commons";
 
-type CrimeBustersBase = Omit<
-  Question,
-  "choices" | "correctChoiceId" | "answerMode" | "acceptedAnswers"
-> & {
-  choices: [];
-  correctChoiceId: string;
-  answerMode: "open-ended";
-  acceptedAnswers: string[];
+type CrimeBustersBase = Question & {
   topicId: CrimeBustersTopicId;
   cognitiveDemand: CrimeBustersCognitiveDemand;
   sourceType: CrimeBustersSourceType;
@@ -73,41 +66,6 @@ export type CrimeBustersQuestion =
     });
 
 const EVENT_ID = CRIME_BUSTERS_EVENT_ID;
-
-const OPEN_ANSWER_ALIASES: Record<string, string[]> = {
-  "cb-q1": ["loops whorls and arches"],
-  "cb-q2": ["ulnar radial central pocket"],
-  "cb-q3": ["plain accidental double loop"],
-  "cb-q4": ["plain tented"],
-  "cb-q6": ["ulnar loop"],
-  "cb-q7": ["radius and ulna"],
-  "cb-q8": ["pass out on the same side", "same side"],
-  "cb-q9": ["ridges flow out the other side with a rise or wave"],
-  "cb-q10": ["recurve delta ridge count"],
-  "cb-q11": ["ridge ending and bifurcation"],
-  "cb-q12": ["epidermis and dermis"],
-  "cb-q14": ["cuticle cortex and medulla"],
-  "cb-q15": ["less than one third of the shaft width"],
-  "cb-q16": ["imbricate flattened scales"],
-  "cb-q20": ["cellulose"],
-  "cb-q22": ["mixtures of clay sand and silt"],
-  "cb-q27": ["two different listed items", "a soil type and a powder"],
-  "cb-q28": ["sodium chloride", "table salt"],
-  "cb-q29": ["sucrose", "table sugar"],
-  "cb-q30": ["sodium bicarbonate", "sodium hydrogen carbonate"],
-  "cb-q31": ["calcium carbonate", "chalk"],
-  "cb-q32": ["hydrogen peroxide"],
-  "cb-q34": ["an antacid"],
-  "cb-q35": ["bluish black", "blue black"],
-  "cb-q36": ["carbon dioxide", "co2", "CO₂"],
-  "cb-q37": ["iodine hcl distilled water"],
-  "cb-q38": ["isopropanol", "isopropyl alcohol"],
-  "cb-q39": ["sodium hypochlorite", "liquid bleach", "bleach"],
-  "cb-q40": ["do not consume", "do not eat or drink"],
-  "cb-q45": [
-    "the suspect motive all evidence pieces and why each piece incriminates the suspect",
-  ],
-};
 
 function cb(
   input: {
@@ -141,14 +99,13 @@ function cb(
     topicId: input.topicId,
     prompt: input.prompt,
     difficulty: input.difficulty,
-    choices: [] as [],
-    correctChoiceId:
-      input.choiceTexts[["a", "b", "c", "d"].indexOf(input.correctChoiceId)],
-    answerMode: "open-ended" as const,
-    acceptedAnswers: [
-      input.choiceTexts[["a", "b", "c", "d"].indexOf(input.correctChoiceId)],
-      ...(OPEN_ANSWER_ALIASES[input.id] ?? []),
+    choices: [
+      { id: "a" as const, text: input.choiceTexts[0] },
+      { id: "b" as const, text: input.choiceTexts[1] },
+      { id: "c" as const, text: input.choiceTexts[2] },
+      { id: "d" as const, text: input.choiceTexts[3] },
     ],
+    correctChoiceId: input.correctChoiceId,
     hint: input.hint,
     explanation: input.explanation,
     cognitiveDemand: input.cognitiveDemand,
@@ -1303,8 +1260,6 @@ export function crimeBustersQuestionToPracticeQuestion(
     prompt: question.prompt,
     choices: question.choices,
     correctChoiceId: question.correctChoiceId,
-    answerMode: question.answerMode,
-    acceptedAnswers: question.acceptedAnswers,
     explanation: question.explanation,
     hint: question.hint,
     difficulty: question.difficulty,
