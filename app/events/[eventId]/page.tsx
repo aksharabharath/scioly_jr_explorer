@@ -1,10 +1,14 @@
 import { EventNotebookCallout } from "@/components/EventHomeNotes";
 import { EventIcon } from "@/components/EventIcon";
-import { EventPracticeProgress } from "@/components/EventPracticeProgress";
+import { EventProgressDashboard } from "@/components/EventProgressDashboard";
 import { ExplorerTrail } from "@/components/ExplorerTrail";
 import { eventHomeCallout } from "@/lib/event-home-notes";
-import { completedSessionCountForEvent } from "@/lib/expeditions";
+import {
+  completedSessionCountForEvent,
+  expeditionLogEntries,
+} from "@/lib/expeditions";
 import { fieldSiteSubtitle, fieldSiteTint } from "@/lib/field-sites";
+import { localCalendarDate } from "@/lib/gamification";
 import { getAllQuestions, getEventPageData } from "@/lib/mock/curriculum";
 import { isStudentCatalogEventId } from "@/lib/mock/events";
 import {
@@ -60,13 +64,26 @@ export default async function EventPage({ params }: EventRouteProps) {
     questions,
     topics.length,
   );
-  const questionsAnswered = eventProgress.uniqueQuestions;
-  const topicsExplored = eventProgress.topicsPracticed;
+  const questionsAnswered = eventProgress.totalQuestions;
   const expeditionsCompleted = completedSessionCountForEvent(
     event.id,
     attempts,
     questions,
   );
+  const expeditionEntries = expeditionLogEntries(
+    attempts,
+    questions,
+    { [event.id]: event.name },
+    1000,
+  ).filter((entry) => entry.eventId === event.id);
+  const activeDays = new Set(
+    expeditionEntries
+      .map((entry) =>
+        entry.endedAt ? localCalendarDate(new Date(entry.endedAt)) : null,
+      )
+      .filter((date): date is string => date !== null),
+  ).size;
+  const now = new Date();
   const hasInProgressExpedition =
     latestInProgressPracticeSessionForEvent(
     event.id,
@@ -110,6 +127,9 @@ export default async function EventPage({ params }: EventRouteProps) {
                 ) : null}
               </div>
             </div>
+            <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:text-base">
+              {event.shortDescription}
+            </p>
           </div>
 
           {!event.unlocked ? (
@@ -124,10 +144,15 @@ export default async function EventPage({ params }: EventRouteProps) {
           ) : hasPractice ? (
             <>
               <div className="grid gap-3 lg:grid-cols-2 lg:items-stretch">
-                <EventPracticeProgress
+                <EventProgressDashboard
+                  eventName={event.name}
                   questionsAnswered={questionsAnswered}
-                  topicsExplored={topicsExplored}
+                  accuracyPercent={eventProgress.accuracyPercent}
                   expeditionsCompleted={expeditionsCompleted}
+                  activeDays={activeDays}
+                  expeditionEntries={expeditionEntries}
+                  calendarYear={now.getFullYear()}
+                  calendarMonth={now.getMonth()}
                 />
                 <EventNotebookCallout title={callout.title} body={callout.body} />
               </div>
