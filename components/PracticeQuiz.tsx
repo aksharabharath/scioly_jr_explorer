@@ -1,6 +1,10 @@
 "use client";
 
-import { savePracticeAttempt } from "@/app/practice/actions";
+import {
+  savePracticeAttempt,
+  saveQuestionFeedback,
+  type QuestionFeedbackIssue,
+} from "@/app/practice/actions";
 import { ExpeditionRewardsOverlay } from "@/components/ExpeditionRewardsOverlay";
 import { TrickyTopicsEmpty } from "@/components/TrickyTopicsEmpty";
 import { PromptWithTerms } from "@/components/PromptWithTerms";
@@ -99,7 +103,30 @@ type ActiveQuizState = {
     attemptXp: number;
     sessionBonusXp: number;
   } | null;
+  questionFeedback: QuestionFeedbackState;
 };
+
+type QuestionFeedbackState = {
+  feedback: "positive" | "negative" | null;
+  issueCodes: QuestionFeedbackIssue[];
+  otherText: string;
+  detailSubmitted: boolean;
+};
+
+const QUESTION_FEEDBACK_OPTIONS: Array<{
+  value: QuestionFeedbackIssue;
+  label: string;
+}> = [
+  { value: "unfamiliar_words", label: "I don’t know a word" },
+  {
+    value: "correct_answer_may_be_wrong",
+    label: "The right answer looks wrong",
+  },
+  { value: "explanation_confusing", label: "The explanation is confusing" },
+  { value: "too_easy", label: "This was too easy" },
+  { value: "too_hard", label: "This was too hard" },
+  { value: "other", label: "Something else" },
+];
 
 type CompleteQuizState = {
   status: "complete";
@@ -228,6 +255,12 @@ function beginSet(
     saving: false,
     attemptCount,
     xpAward: null,
+    questionFeedback: {
+      feedback: null,
+      issueCodes: [],
+      otherText: "",
+      detailSubmitted: false,
+    },
   };
 }
 
@@ -287,6 +320,7 @@ export function PracticeQuiz({
     resumeSession?.sessionId ?? crypto.randomUUID(),
   );
   const attemptIdRef = useRef<string | null>(null);
+  const feedbackSavingRef = useRef(false);
   const sessionXpRef = useRef(resumeSession?.sessionXp ?? 0);
   const streakDaysRef = useRef(0);
   const totalXpRef = useRef<number | null>(null);
@@ -563,14 +597,112 @@ export function PracticeQuiz({
     }
   }
 
-  function continueToNext() {
+  function selectQuestionFeedback(
+    feedback: "positive" | "negative",
+  ) {
+    if (state.status !== "active" || !state.submitted) {
+      return;
+    }
+    setState((current) =>
+      current.status === "active"
+        ? {
+            ...current,
+            questionFeedback: {
+              ...current.questionFeedback,
+              feedback,
+            },
+          }
+        : current,
+    );
+  }
+
+  function toggleQuestionFeedbackIssue(issue: QuestionFeedbackIssue) {
+    if (state.status !== "active" || !state.submitted) {
+      return;
+    }
+    setState((current) => {
+      if (current.status !== "active") {
+        return current;
+      }
+      const issueCodes = current.questionFeedback.issueCodes.includes(issue)
+        ? current.questionFeedback.issueCodes.filter((item) => item !== issue)
+        : [...current.questionFeedback.issueCodes, issue];
+      return {
+        ...current,
+        questionFeedback: {
+          ...current.questionFeedback,
+          issueCodes,
+          detailSubmitted: false,
+        },
+      };
+    });
+  }
+
+  function setQuestionFeedbackOtherText(otherText: string) {
+    if (state.status !== "active" || !state.submitted) {
+      return;
+    }
+    setState((current) =>
+      current.status === "active"
+        ? {
+            ...current,
+            questionFeedback: {
+              ...current.questionFeedback,
+              otherText,
+              detailSubmitted: false,
+            },
+          }
+        : current,
+    );
+  }
+
+  function submitQuestionFeedbackDetails() {
+    if (
+      state.status !== "active" ||
+      !state.submitted ||
+      state.questionFeedback.feedback !== "negative"
+    ) {
+      return;
+    }
+    setState((current) =>
+      current.status === "active"
+        ? {
+            ...current,
+            questionFeedback: {
+              ...current.questionFeedback,
+              detailSubmitted: true,
+            },
+          }
+        : current,
+    );
+  }
+
+  async function continueToNext() {
     if (
       state.status !== "active" ||
       !submittedAnswer.trim() ||
       !state.submitted ||
-      !state.saved
+      !state.saved ||
+      feedbackSavingRef.current
     ) {
       return;
+    }
+
+    feedbackSavingRef.current = true;
+    const questionFeedback = state.questionFeedback;
+    try {
+      if (questionFeedback.feedback && attemptIdRef.current) {
+        await saveQuestionFeedback({
+          attemptId: attemptIdRef.current,
+          eventId,
+          questionId: question.id,
+          feedback: questionFeedback.feedback,
+          issueCodes: questionFeedback.issueCodes,
+          otherText: questionFeedback.otherText,
+        });
+      }
+    } catch {
+      // Feedback is optional and must not block the next question.
     }
 
     const hintUsed = attemptUsedAHint(state.revealedHint, state.revealedHint2);
@@ -589,6 +721,7 @@ export function PracticeQuiz({
       previouslyAnsweredQuestionIdsRef.current.push(record.questionId);
     }
     attemptIdRef.current = null;
+    feedbackSavingRef.current = false;
 
     if (isLast) {
       setState(finishSet(nextRecords, nextHistory, state.attemptCount));
@@ -634,6 +767,12 @@ export function PracticeQuiz({
       saving: false,
       attemptCount: state.attemptCount,
       xpAward: null,
+      questionFeedback: {
+        feedback: null,
+        issueCodes: [],
+        otherText: "",
+        detailSubmitted: false,
+      },
     });
   }
 
@@ -878,6 +1017,13 @@ export function PracticeQuiz({
                   ) : null}
                 </div>
               ) : null}
+              <QuestionFeedbackPanel
+                feedback={state.questionFeedback}
+                onSelectFeedback={selectQuestionFeedback}
+                onToggleIssue={toggleQuestionFeedbackIssue}
+                onOtherTextChange={setQuestionFeedbackOtherText}
+                onSubmitDetails={submitQuestionFeedbackDetails}
+              />
               <button
                 type="button"
                 onClick={continueToNext}
@@ -891,6 +1037,99 @@ export function PracticeQuiz({
         </div>
       </div>
     </section>
+  );
+}
+
+function QuestionFeedbackPanel({
+  feedback,
+  onSelectFeedback,
+  onToggleIssue,
+  onOtherTextChange,
+  onSubmitDetails,
+}: {
+  feedback: QuestionFeedbackState;
+  onSelectFeedback: (feedback: "positive" | "negative") => void;
+  onToggleIssue: (issue: QuestionFeedbackIssue) => void;
+  onOtherTextChange: (text: string) => void;
+  onSubmitDetails: () => void;
+}) {
+  return (
+    <div className="rounded-2xl border border-stone-200/80 bg-surface px-3 py-3">
+      <p className="text-sm font-semibold text-ink">How was this question?</p>
+      <div
+        className="mt-2 flex gap-2"
+        role="group"
+        aria-label="Question feedback"
+      >
+        <button
+          type="button"
+          aria-label="This question was helpful"
+          aria-pressed={feedback.feedback === "positive"}
+          onClick={() => onSelectFeedback("positive")}
+          className={`min-h-11 min-w-14 rounded-xl border px-3 text-lg transition ${
+            feedback.feedback === "positive"
+              ? "border-teal bg-teal/10"
+              : "border-stone-200 bg-parchment hover:border-teal/50"
+          }`}
+        >
+          👍
+        </button>
+        <button
+          type="button"
+          aria-label="This question needs feedback"
+          aria-pressed={feedback.feedback === "negative"}
+          onClick={() => onSelectFeedback("negative")}
+          className={`min-h-11 min-w-14 rounded-xl border px-3 text-lg transition ${
+            feedback.feedback === "negative"
+              ? "border-rose-300 bg-rose-50"
+              : "border-stone-200 bg-parchment hover:border-rose-300"
+          }`}
+        >
+          👎
+        </button>
+      </div>
+      {feedback.feedback === "negative" ? (
+        <div className="mt-3 space-y-2">
+          <p className="text-sm font-semibold text-ink">What seems wrong?</p>
+          <div className="space-y-2">
+            {QUESTION_FEEDBACK_OPTIONS.map((option) => (
+              <label
+                key={option.value}
+                className="flex min-h-10 items-center gap-2 rounded-xl border border-stone-200 bg-parchment px-3 py-2 text-sm text-ink"
+              >
+                <input
+                  type="checkbox"
+                  checked={feedback.issueCodes.includes(option.value)}
+                  onChange={() => onToggleIssue(option.value)}
+                  className="h-4 w-4 accent-teal"
+                />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+          {feedback.issueCodes.includes("other") ? (
+            <label className="block text-sm text-stone-700">
+              <span className="font-medium">
+                Anything else you&apos;d like us to know?
+              </span>
+              <input
+                type="text"
+                value={feedback.otherText}
+                onChange={(event) => onOtherTextChange(event.target.value)}
+                className="mt-1 min-h-10 w-full rounded-xl border border-stone-200 bg-parchment px-3 py-2 text-sm text-ink outline-none focus:border-teal focus:ring-2 focus:ring-teal/20"
+              />
+            </label>
+          ) : null}
+          <button
+            type="button"
+            onClick={onSubmitDetails}
+            className="min-h-10 rounded-full border border-stone-300 px-4 py-2 text-sm font-semibold text-ink hover:border-teal hover:bg-parchment"
+          >
+            Submit
+          </button>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
