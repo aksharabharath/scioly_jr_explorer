@@ -2,6 +2,7 @@
 
 import { BadgeCelebration } from "@/components/BadgeCelebration";
 import {
+  BARE_BONES_BADGE_IDS,
   BADGE_DEFINITIONS,
   definitionsForIds,
   formatBadgeProgress,
@@ -20,33 +21,8 @@ type BadgeShelfProps = {
 
 const GROUPS: Array<{ title: string; ids: readonly BadgeId[] }> = [
   {
-    title: "Firsts",
-    ids: ["first-try", "first-discovery"],
-  },
-  {
-    title: "Field work",
-    ids: [
-      "event-explorer",
-      "three-event-explorer",
-      "tricky-topic-tamer",
-      "practice-regular",
-      "question-crusher",
-      "curious-mind",
-    ],
-  },
-  {
-    title: "Field sites",
-    ids: [
-      "water-watcher",
-      "entomologist",
-      "body-explorer",
-      "ecosystem-explorer",
-      "crime-scene-rookie",
-    ],
-  },
-  {
-    title: "Returning",
-    ids: ["consistent-explorer", "dedicated-explorer"],
+    title: "Expedition badges",
+    ids: BARE_BONES_BADGE_IDS,
   },
 ];
 
@@ -108,8 +84,7 @@ export function BadgeShelf({
         Your discoveries
       </h1>
       <p className="mt-1 text-sm text-stone-600">
-        Bright tiles are badges you own. Muted tiles are goals — each one shows
-        how close you are.
+        Complete expeditions to unlock these badges.
       </p>
       {empty ? (
         <p className="journal-panel mt-4 rounded-2xl px-4 py-3 text-sm text-stone-600">
@@ -144,6 +119,9 @@ export function BadgeShelf({
           </div>
         ))}
       </div>
+      <p className="mt-6 text-sm font-medium text-stone-500">
+        More badges coming!
+      </p>
       </section>
     </>
   );

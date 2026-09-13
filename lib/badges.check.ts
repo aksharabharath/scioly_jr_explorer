@@ -133,16 +133,16 @@ check(
   !hintedRecovery.includes("tricky-topic-tamer"),
 );
 
-const fiveSessions = Array.from(
-  { length: 5 * PRACTICE_SET_SIZE },
+const tenSessions = Array.from(
+  { length: 10 * PRACTICE_SET_SIZE },
   (_, index) =>
     attempt("ento-q1", {
       sessionId: `set-${Math.floor(index / PRACTICE_SET_SIZE)}`,
     }),
 );
 check(
-  "five finished sets unlock Practice Regular",
-  earned(fiveSessions).includes("practice-regular"),
+  "ten finished sets unlock Ten Expeditions",
+  earned(tenSessions).includes("practice-regular"),
 );
 
 const fiftyUngrouped = Array.from({ length: 50 }, () =>
@@ -387,13 +387,13 @@ check(
   }) === "2 / 3 events explored",
 );
 check(
-  "Practice Regular shelf copy uses expeditions",
+  "Ten Expeditions shelf copy uses expeditions",
   formatBadgeProgress({
     id: "practice-regular",
     current: 3,
-    required: 5,
+    required: 10,
     noun: "expedition",
-  }) === "3 / 5 expeditions",
+  }) === "3 / 10 expeditions",
 );
 check(
   "Consistent Explorer shelf copy uses days",

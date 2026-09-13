@@ -16,6 +16,7 @@ export default async function OnboardingEventsPage() {
     getEvents(),
     getMySelectedEventIds(),
   ]);
+  const studentEvents = events.filter((event) => event.kind !== "build");
 
   if (selectedIds.length > 0) {
     redirect("/");
@@ -35,7 +36,7 @@ export default async function OnboardingEventsPage() {
           <EventRequestForm />
         </div>
         <EventSelectionForm
-          events={events}
+          events={studentEvents}
           initialSelectedIds={[]}
           submitLabel="Continue"
           description="Water Quality, Ecology, Entomology, Anatomy & Physiology, and Crime Busters are ready. Choose at least one."

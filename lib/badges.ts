@@ -52,6 +52,11 @@ export type BadgeInput = {
   streakDays?: number;
 };
 
+export const BARE_BONES_BADGE_IDS = [
+  "first-discovery",
+  "practice-regular",
+] as const satisfies readonly BadgeId[];
+
 const EVENT_SET_BADGES: Array<{
   id: BadgeId;
   eventId: string;
@@ -102,9 +107,9 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   },
   {
     id: "practice-regular",
-    name: "Practice Regular",
-    description: "You finished 5 full practice sessions.",
-    requirement: "Finish 5 full practice expeditions",
+    name: "Ten Expeditions",
+    description: "You finished 10 full practice expeditions.",
+    requirement: "Finish 10 full practice expeditions",
     emoji: "📅",
   },
   {
@@ -294,7 +299,7 @@ export function getBadgeProgress(input: BadgeInput): BadgeProgress[] {
     cappedProgress("event-explorer", eventsTried, 2, "event"),
     cappedProgress("three-event-explorer", eventsTried, 3, "event"),
     cappedProgress("tricky-topic-tamer", tamedTopic, 1, "topic"),
-    cappedProgress("practice-regular", finishedSets, 5, "expedition"),
+    cappedProgress("practice-regular", finishedSets, 10, "expedition"),
     cappedProgress("question-crusher", attempts.length, 50, "question"),
     cappedProgress("curious-mind", attempts.length, 100, "question"),
   ];
@@ -340,7 +345,7 @@ export function getEarnedBadgeIds(input: BadgeInput): BadgeId[] {
   if (tamedATrickyTopic(attempts, questions)) {
     earned.push("tricky-topic-tamer");
   }
-  if (finishedSets >= 5) {
+  if (finishedSets >= 10) {
     earned.push("practice-regular");
   }
   if (attempts.length >= 50) {

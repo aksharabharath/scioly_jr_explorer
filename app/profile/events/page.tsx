@@ -15,6 +15,7 @@ export default async function ProfileEventsPage() {
     getEvents(),
     getMySelectedEventIds(),
   ]);
+  const studentEvents = events.filter((event) => event.kind !== "build");
 
   return (
     <main className="flex flex-1 flex-col">
@@ -30,7 +31,7 @@ export default async function ProfileEventsPage() {
           <EventRequestForm />
         </div>
         <EventSelectionForm
-          events={events}
+          events={studentEvents}
           initialSelectedIds={selectedIds}
           submitLabel="Save field sites"
           description="Keep at least one ready field site selected. Expeditions you already finished stay saved."

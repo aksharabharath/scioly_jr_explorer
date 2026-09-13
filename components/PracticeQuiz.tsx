@@ -4,6 +4,7 @@ import { savePracticeAttempt } from "@/app/practice/actions";
 import { ExpeditionRewardsOverlay } from "@/components/ExpeditionRewardsOverlay";
 import { TrickyTopicsEmpty } from "@/components/TrickyTopicsEmpty";
 import { PromptWithTerms } from "@/components/PromptWithTerms";
+import { QuickFeedback } from "@/components/QuickFeedback";
 import { XpAwardFeedback } from "@/components/XpAwardFeedback";
 import { glossaryForEvent } from "@/lib/mock/glossary";
 import {
@@ -16,6 +17,7 @@ import {
   type PracticeMode,
 } from "@/lib/learning/adaptive";
 import {
+  BARE_BONES_BADGE_IDS,
   definitionsForIds,
   getNewlyEarnedBadgesFromAttempts,
   toSessionBadgeAttempts,
@@ -25,7 +27,6 @@ import {
 } from "@/lib/badges";
 import {
   attemptUsedAHint,
-  authoredSecondHint,
   missedAnswerContrast,
   recommendNextStep,
   summarizePractice,
@@ -290,7 +291,6 @@ export function PracticeQuiz({
   const badgeAttemptsRef = useRef(priorBadgeAttempts);
   const baselineXpRef = useRef(initialXp);
   const baselineStreakRef = useRef(initialStreakDays);
-  const clueRegionId = useId();
   const wordingHelpRegionId = useId();
   const [wordingHelpQuestionId, setWordingHelpQuestionId] = useState<
     string | null
@@ -427,7 +427,11 @@ export function PracticeQuiz({
         sessionXp={state.sessionXp}
         streakDays={state.streakDays}
         totalXp={state.totalXp}
-        newlyEarned={definitionsForIds(state.newlyEarnedIds)}
+        newlyEarned={definitionsForIds(
+          state.newlyEarnedIds.filter((id) =>
+            BARE_BONES_BADGE_IDS.includes(id as (typeof BARE_BONES_BADGE_IDS)[number]),
+          ),
+        )}
         leveledUpTo={state.leveledUpTo}
         streakMilestone={state.streakMilestone}
         dailyMissionComplete={state.dailyMissionComplete}
@@ -625,7 +629,6 @@ export function PracticeQuiz({
       : null;
 
   const hasImage = Boolean(question.imageSrc);
-  const secondHint = authoredSecondHint(question);
   const hintUsed = attemptUsedAHint(state.revealedHint, state.revealedHint2);
   const wordingHelp = question.wordingHelp?.trim() ?? "";
   const glossary = glossaryForEvent(question.eventId);
@@ -666,6 +669,7 @@ export function PracticeQuiz({
               glossary={glossary}
             />
           </div>
+          <QuickFeedback key={`question-${question.id}`} label="Question" />
           {question.imageSrc ? (
             <figure className="mt-3 overflow-hidden rounded-2xl border border-stone-200/80 bg-parchment">
               {/* Local public JPEGs (and any other static imageSrc); next/image is not required. */}
@@ -768,28 +772,6 @@ export function PracticeQuiz({
                   ) : null}
                 </div>
               ) : null}
-              {!state.revealedHint ||
-              (secondHint && !state.revealedHint2) ? (
-                <button
-                  type="button"
-                  aria-expanded={state.revealedHint}
-                  aria-controls={clueRegionId}
-                  onClick={() =>
-                    setState(
-                      state.revealedHint
-                        ? {
-                            ...state,
-                            revealedHint: true,
-                            revealedHint2: true,
-                          }
-                        : { ...state, revealedHint: true },
-                    )
-                  }
-                  className="text-sm font-medium text-teal underline-offset-4 hover:underline"
-                >
-                  {state.revealedHint ? "Another clue" : "Need a hint?"}
-                </button>
-              ) : null}
               <button
                 type="button"
                 onClick={checkAnswer}
@@ -798,25 +780,6 @@ export function PracticeQuiz({
               >
                 Check answer
               </button>
-            </div>
-          ) : null}
-
-          {state.revealedHint && !state.submitted ? (
-            <div
-              id={clueRegionId}
-              className="mt-2 space-y-2"
-              aria-live="polite"
-            >
-              <p className="rounded-2xl border border-stone-200 bg-amber-50 px-4 py-2.5 text-sm leading-relaxed text-amber-950">
-                <span className="font-semibold">Clue </span>
-                {question.hint}
-              </p>
-              {state.revealedHint2 && secondHint ? (
-                <p className="rounded-2xl border border-stone-200 bg-amber-50 px-4 py-2.5 text-sm leading-relaxed text-amber-950">
-                  <span className="font-semibold">Clue </span>
-                  {secondHint}
-                </p>
-              ) : null}
             </div>
           ) : null}
 
@@ -845,12 +808,10 @@ export function PracticeQuiz({
               <p className="text-sm leading-snug text-stone-700">
                 {question.explanation}
               </p>
-              {!isCorrect && !state.revealedHint ? (
-                <p className="text-sm leading-snug text-stone-600">
-                  <span className="font-semibold text-ink">Hint: </span>
-                  {question.hint}
-                </p>
-              ) : null}
+              <QuickFeedback
+                key={`answer-${question.id}`}
+                label="Answer and explanation"
+              />
               {state.saved && state.xpAward ? (
                 <XpAwardFeedback
                   attemptXp={state.xpAward.attemptXp}
@@ -1043,7 +1004,7 @@ function ResultsCard({
           onClick={onMoveOn}
           className="rounded-full bg-teal-dark px-5 py-2.5 text-center text-sm font-semibold text-parchment hover:bg-teal"
         >
-          Move on to next expedition
+          Go on to next expedition in {eventName}
         </button>
         {hasRemediation ? (
           <button
@@ -1051,7 +1012,7 @@ function ResultsCard({
             onClick={onRemediate}
             className="rounded-full border border-stone-200 px-5 py-2.5 text-center text-sm font-semibold text-ink hover:bg-parchment"
           >
-            Try this expedition again — Work on tricky topics
+            Work on tricky topics
           </button>
         ) : null}
         <Link

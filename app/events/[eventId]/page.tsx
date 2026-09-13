@@ -1,27 +1,15 @@
-import {
-  EventNotebookCallout,
-  EventStrongestTopic,
-} from "@/components/EventHomeNotes";
+import { EventNotebookCallout } from "@/components/EventHomeNotes";
 import { EventIcon } from "@/components/EventIcon";
 import { EventPracticeProgress } from "@/components/EventPracticeProgress";
-import { EventTrickyTopics } from "@/components/EventTrickyTopics";
 import { ExplorerTrail } from "@/components/ExplorerTrail";
-import { getCurrentUser } from "@/lib/auth/session";
-import {
-  eventHomeCallout,
-  recentMissCountForTopic,
-  strongestTopicsForEventHome,
-  trickyTopicsForEventHome,
-} from "@/lib/event-home-notes";
+import { eventHomeCallout } from "@/lib/event-home-notes";
 import { completedSessionCountForEvent } from "@/lib/expeditions";
 import { fieldSiteSubtitle, fieldSiteTint } from "@/lib/field-sites";
-import { toLearningAttempts } from "@/lib/learning/adaptive";
 import { getAllQuestions, getEventPageData } from "@/lib/mock/curriculum";
 import { isStudentCatalogEventId } from "@/lib/mock/events";
 import {
   getMyGamification,
   getMyPracticeAttempts,
-  getMyRecentPracticeAttempts,
   latestInProgressPracticeSessionForEvent,
 } from "@/lib/practice-attempts";
 import { calculateEventProgress } from "@/lib/progress";
@@ -62,16 +50,11 @@ export default async function EventPage({ params }: EventRouteProps) {
   }
 
   const { event, overview, topics, hasPractice } = data;
-  const user = await getCurrentUser();
-  const [attempts, recentAttempts, questions, gamification] = await Promise.all([
+  const [attempts, questions, gamification] = await Promise.all([
     getMyPracticeAttempts(),
-    getMyRecentPracticeAttempts(),
     getAllQuestions(),
     getMyGamification(),
   ]);
-  const eventQuestions = questions.filter(
-    (question) => question.eventId === event.id,
-  );
   const eventProgress = calculateEventProgress(
     event.id,
     attempts,
@@ -91,31 +74,6 @@ export default async function EventPage({ params }: EventRouteProps) {
     attempts,
     questions,
   ) !== null;
-  const topicNames = new Map(topics.map((topic) => [topic.id, topic.name]));
-  const learningHistory = toLearningAttempts(recentAttempts, eventQuestions);
-  const trickyTopics =
-    user && hasPractice
-      ? trickyTopicsForEventHome(learningHistory).flatMap((topicId) => {
-          const name = topicNames.get(topicId);
-          if (!name) {
-            return [];
-          }
-          return [
-            {
-              id: topicId,
-              name,
-              recentMisses: recentMissCountForTopic(learningHistory, topicId),
-            },
-          ];
-        })
-      : [];
-  const strongestTopicNames =
-    user && hasPractice
-      ? strongestTopicsForEventHome(learningHistory).flatMap((topicId) => {
-          const name = topicNames.get(topicId);
-          return name ? [name] : [];
-        })
-      : [];
   const callout = eventHomeCallout({
     eventName: event.name,
     streakDays: gamification.streakDays,
@@ -191,11 +149,6 @@ export default async function EventPage({ params }: EventRouteProps) {
                 <EventNotebookCallout title={callout.title} body={callout.body} />
               </div>
 
-              <div className="grid gap-3 lg:grid-cols-2 lg:items-stretch">
-                <EventStrongestTopic topicNames={strongestTopicNames} />
-                <EventTrickyTopics topics={trickyTopics} />
-              </div>
-
               <div className="journal-panel rounded-3xl p-3 sm:p-4">
                 <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
                   Ready for an expedition?
@@ -212,21 +165,12 @@ export default async function EventPage({ params }: EventRouteProps) {
                       ? "Continue expedition"
                       : "Start expedition"}
                   </Link>
-                  {trickyTopics.length > 0 ? (
-                    <Link
-                      href={`/events/${event.id}/practice?mode=weak`}
-                      className="inline-flex min-h-11 justify-center rounded-full border border-stone-200 px-5 py-2.5 text-sm font-semibold text-ink hover:bg-parchment"
-                    >
-                      Revisit tricky topics
-                    </Link>
-                  ) : (
-                    <Link
-                      href={`/events/${event.id}/practice`}
-                      className="inline-flex min-h-11 justify-center rounded-full border border-stone-200 px-5 py-2.5 text-sm font-semibold text-ink hover:bg-parchment"
-                    >
-                      Keep exploring
-                    </Link>
-                  )}
+                  <Link
+                    href={`/events/${event.id}/practice`}
+                    className="inline-flex min-h-11 justify-center rounded-full border border-stone-200 px-5 py-2.5 text-sm font-semibold text-ink hover:bg-parchment"
+                  >
+                    Keep exploring
+                  </Link>
                 </div>
               </div>
             </>
