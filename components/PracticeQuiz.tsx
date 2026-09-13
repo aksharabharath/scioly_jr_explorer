@@ -4,7 +4,6 @@ import { savePracticeAttempt } from "@/app/practice/actions";
 import { ExpeditionRewardsOverlay } from "@/components/ExpeditionRewardsOverlay";
 import { TrickyTopicsEmpty } from "@/components/TrickyTopicsEmpty";
 import { PromptWithTerms } from "@/components/PromptWithTerms";
-import { QuickFeedback } from "@/components/QuickFeedback";
 import { XpAwardFeedback } from "@/components/XpAwardFeedback";
 import { glossaryForEvent } from "@/lib/mock/glossary";
 import {
@@ -669,7 +668,6 @@ export function PracticeQuiz({
               glossary={glossary}
             />
           </div>
-          <QuickFeedback key={`question-${question.id}`} label="Question" />
           {question.imageSrc ? (
             <figure className="mt-3 overflow-hidden rounded-2xl border border-stone-200/80 bg-parchment">
               {/* Local public JPEGs (and any other static imageSrc); next/image is not required. */}
@@ -808,10 +806,6 @@ export function PracticeQuiz({
               <p className="text-sm leading-snug text-stone-700">
                 {question.explanation}
               </p>
-              <QuickFeedback
-                key={`answer-${question.id}`}
-                label="Answer and explanation"
-              />
               {state.saved && state.xpAward ? (
                 <XpAwardFeedback
                   attemptXp={state.xpAward.attemptXp}
