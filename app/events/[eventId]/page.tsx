@@ -13,7 +13,6 @@ import {
   latestInProgressPracticeSessionForEvent,
 } from "@/lib/practice-attempts";
 import { calculateEventProgress } from "@/lib/progress";
-import { hasEventRules } from "@/lib/event-rules";
 import { requireSelectedEvent } from "@/lib/student-events";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -49,7 +48,7 @@ export default async function EventPage({ params }: EventRouteProps) {
     notFound();
   }
 
-  const { event, overview, topics, hasPractice } = data;
+  const { event, topics, hasPractice } = data;
   const [attempts, questions, gamification] = await Promise.all([
     getMyPracticeAttempts(),
     getAllQuestions(),
@@ -82,9 +81,6 @@ export default async function EventPage({ params }: EventRouteProps) {
   });
   const site = fieldSiteSubtitle(event.id);
   const tint = fieldSiteTint(event.id);
-  const rulesHref = hasEventRules(event.id)
-    ? `/events/${event.id}/rules`
-    : null;
 
   return (
     <main className="flex flex-1 flex-col">
@@ -114,19 +110,6 @@ export default async function EventPage({ params }: EventRouteProps) {
                 ) : null}
               </div>
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-stone-600 sm:text-base">
-              {overview}
-            </p>
-            {rulesHref ? (
-              <p className="mt-3">
-                <Link
-                  href={rulesHref}
-                  className="text-sm font-medium text-teal underline-offset-4 hover:underline"
-                >
-                  Event Rules & Overview
-                </Link>
-              </p>
-            ) : null}
           </div>
 
           {!event.unlocked ? (
