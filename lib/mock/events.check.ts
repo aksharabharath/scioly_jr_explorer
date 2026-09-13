@@ -46,13 +46,13 @@ check(
 );
 check("entomology is in the catalog", catalog.includes("entomology"));
 check(
-  "Water Quality, Ecology, Entomology, A&P, and Crime Busters are selectable for MVP practice",
+  "Water Quality, Ecology, Entomology, A&P, Codebusters, and Crime Busters are selectable for MVP practice",
   getSelectableEventIds().join(",") ===
-    "water-quality,ecology,entomology,anatomy-physiology,crime-busters",
+    "water-quality,ecology,entomology,anatomy-physiology,codebusters,crime-busters",
 );
 check(
-  "four catalog events are locked",
-  MOCK_EVENTS.filter((event) => !event.unlocked).length === 4,
+  "three catalog events are locked",
+  MOCK_EVENTS.filter((event) => !event.unlocked).length === 3,
 );
 check(
   "astronomy is not a student catalog event",
@@ -86,6 +86,18 @@ check(
       crime.unlocked === true &&
       eventStatusLabel(crime) === "Practice" &&
       isPlayablePracticeEvent(crime)
+    );
+  })(),
+);
+check(
+  "Codebusters is unlocked and labeled Practice",
+  (() => {
+    const codebusters = MOCK_EVENTS.find((event) => event.id === "codebusters");
+    return (
+      codebusters !== undefined &&
+      codebusters.unlocked === true &&
+      eventStatusLabel(codebusters) === "Practice" &&
+      isPlayablePracticeEvent(codebusters)
     );
   })(),
 );
@@ -137,11 +149,11 @@ for (const event of MOCK_EVENTS) {
 }
 
 check(
-  "Water Quality, Ecology, Entomology, A&P, and Crime Busters are the playable catalog events",
+  "Water Quality, Ecology, Entomology, A&P, Codebusters, and Crime Busters are the playable catalog events",
   MOCK_EVENTS.filter(isPlayablePracticeEvent)
     .map((event) => event.id)
     .join(",") ===
-    "water-quality,ecology,entomology,anatomy-physiology,crime-busters",
+    "water-quality,ecology,entomology,anatomy-physiology,codebusters,crime-busters",
 );
 
 async function run() {

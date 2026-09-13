@@ -65,6 +65,7 @@ const eligibilitySample: Question = {
 async function run() {
   const entomology = await getQuestionsForEvent("entomology");
   const astronomy = await getQuestionsForEvent("astronomy");
+  const codebusters = await getQuestionsForEvent("codebusters");
   const allQuestions = await getAllQuestions();
   const allowedTopics = new Set<string>(ENTOMOLOGY_TOPIC_IDS);
   const fullEntomology = allQuestions.filter(
@@ -402,6 +403,10 @@ async function run() {
     "Water Quality is in EVENTS_WITH_QUESTION_BANKS",
     (EVENTS_WITH_QUESTION_BANKS as readonly string[]).includes("water-quality"),
   );
+  check(
+    "Codebusters is in EVENTS_WITH_QUESTION_BANKS",
+    (EVENTS_WITH_QUESTION_BANKS as readonly string[]).includes("codebusters"),
+  );
 
   for (const eventId of BUILD_EVENT_IDS) {
     check(`${eventId} has no quiz practice`, !eventHasPractice(eventId));
@@ -411,9 +416,13 @@ async function run() {
     );
   }
 
+  const codebustersPractice = await getPracticePageData("codebusters");
   check(
-    "locked quiz events cannot enter /practice",
-    (await getPracticePageData("codebusters")) === null,
+    "Codebusters practice page loads the registered live bank",
+    codebusters.length === 40 &&
+      codebustersPractice?.event.id === "codebusters" &&
+      codebustersPractice.questions.length === 40 &&
+      codebustersPractice.questions.every(isLivePracticeQuestion),
   );
 
   const entomologyPractice = await getPracticePageData("entomology");

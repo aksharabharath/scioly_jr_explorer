@@ -109,9 +109,9 @@ check(
 
 const selectable = getSelectableEventIds();
 check(
-  "selectable ids are Water Quality, Ecology, Entomology, A&P, and Crime Busters",
+  "selectable ids are Water Quality, Ecology, Entomology, A&P, Codebusters, and Crime Busters",
   selectable.join(",") ===
-    "water-quality,ecology,entomology,anatomy-physiology,crime-busters",
+    "water-quality,ecology,entomology,anatomy-physiology,codebusters,crime-busters",
 );
 const lockedSave = normalizeEventSelection(["hovercraft"], selectable);
 check(
@@ -119,19 +119,19 @@ check(
   !lockedSave.ok && lockedSave.error === "invalid",
 );
 const lockedQuiz = normalizeEventSelection(
-  ["codebusters", "entomology"],
+  ["hovercraft", "entomology"],
   selectable,
 );
 check(
-  "locked quiz events cannot be saved",
+  "locked events cannot be saved",
   !lockedQuiz.ok && lockedQuiz.error === "invalid",
 );
 const unavailableBanks = normalizeEventSelection(
-  ["codebusters"],
+  ["hovercraft"],
   selectable,
 );
 check(
-  "locked quiz events cannot be saved on their own",
+  "locked events cannot be saved on their own",
   !unavailableBanks.ok,
 );
 const ecologyOnly = normalizeEventSelection(["ecology"], selectable);
@@ -162,8 +162,9 @@ const crimeBustersOnly = normalizeEventSelection(
   selectable,
 );
 check("Crime Busters can be saved alone", crimeBustersOnly.ok);
-const fivePlayable = normalizeEventSelection(
+const sixPlayable = normalizeEventSelection(
   [
+    "codebusters",
     "crime-busters",
     "anatomy-physiology",
     "water-quality",
@@ -173,14 +174,14 @@ const fivePlayable = normalizeEventSelection(
   selectable,
 );
 check(
-  "Water Quality, Ecology, Entomology, A&P, and Crime Busters can be saved together",
-  fivePlayable.ok,
+  "Water Quality, Ecology, Entomology, A&P, Codebusters, and Crime Busters can be saved together",
+  sixPlayable.ok,
 );
-if (fivePlayable.ok) {
+if (sixPlayable.ok) {
   check(
     "saved playable events keep catalog order",
-    fivePlayable.eventIds.join(",") ===
-      "water-quality,ecology,entomology,anatomy-physiology,crime-busters",
+    sixPlayable.eventIds.join(",") ===
+    "water-quality,ecology,entomology,anatomy-physiology,codebusters,crime-busters",
   );
 }
 

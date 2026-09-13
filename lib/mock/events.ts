@@ -8,7 +8,7 @@
  * for development and checks. Students never see it in selection or Your Events.
  *
  * MVP selectable events: Water Quality, Ecology, Entomology, Anatomy &
- * Physiology, and Crime Busters. Other catalog events stay Coming later.
+ * Physiology, Codebusters, and Crime Busters. Other catalog events stay Coming later.
  */
 import type { ScienceEvent } from "@/lib/types";
 
@@ -71,8 +71,7 @@ export const MOCK_EVENTS: ScienceEvent[] = [
     eventLevel: 1,
     topicMastery: "learning",
     progressPercent: 0,
-    unlocked: false,
-    unlockHint: "Coming later",
+    unlocked: true,
   },
   {
     id: "crime-busters",
@@ -200,6 +199,7 @@ export const EVENTS_WITH_QUESTION_BANKS = [
   "anatomy-physiology",
   "water-quality",
   "ecology",
+  "codebusters",
   "crime-busters",
 ] as const;
 

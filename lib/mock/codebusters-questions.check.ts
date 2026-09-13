@@ -8,6 +8,7 @@ import {
   MOCK_CODEBUSTERS_QUESTIONS,
   type CodebustersCognitiveDemand,
 } from "@/lib/mock/codebusters-questions";
+import { isQuestionAnswerCorrect } from "@/lib/practice";
 
 const failures: string[] = [];
 
@@ -63,8 +64,6 @@ const expectedAnswers: Record<string, string> = {
 const byTopic: Record<string, number> = {};
 const byDifficulty = { 1: 0, 2: 0, 3: 0 };
 const byDemand: Record<string, number> = {};
-const correctLetter: Record<string, number> = { a: 0, b: 0, c: 0, d: 0 };
-
 for (const question of questions) {
   check(
     `${question.id} uses event codebusters`,
@@ -80,25 +79,40 @@ for (const question of questions) {
     `${question.id} has a non-empty explanation`,
     question.explanation.trim().length > 0,
   );
-  check(`${question.id} has exactly 4 choices`, question.choices.length === 4);
+  check(
+    `${question.id} is open-ended`,
+    question.answerMode === "open-ended",
+  );
+  check(`${question.id} exposes no choices`, question.choices.length === 0);
+  check(
+    `${question.id} has accepted answers`,
+    question.acceptedAnswers !== undefined &&
+      question.acceptedAnswers.length > 0 &&
+      question.acceptedAnswers.every((answer) => answer.trim().length > 0),
+  );
   check(`${question.id} is text-only`, question.imageRequired === false);
 
-  const choiceIds = question.choices.map((choice) => choice.id);
   check(
-    `${question.id} uses choice IDs a–d`,
-    choiceIds.join("") === "abcd",
+    `${question.id} has a canonical answer`,
+    question.correctChoiceId.trim().length > 0 &&
+      question.acceptedAnswers?.includes(question.correctChoiceId) === true,
   );
   check(
-    `${question.id} has unique choice IDs`,
-    new Set(choiceIds).size === 4,
+    `${question.id} accepts its canonical answer with casing/space variation`,
+    isQuestionAnswerCorrect(
+      question,
+      `  ${question.correctChoiceId.toUpperCase()}  `,
+    ),
   );
+  for (const acceptedAnswer of question.acceptedAnswers ?? []) {
+    check(
+      `${question.id} accepts ${acceptedAnswer}`,
+      isQuestionAnswerCorrect(question, acceptedAnswer),
+    );
+  }
   check(
-    `${question.id} has exactly one correct choice`,
-    choiceIds.filter((id) => id === question.correctChoiceId).length === 1,
-  );
-  check(
-    `${question.id} has unique choice text`,
-    new Set(question.choices.map((choice) => choice.text.trim())).size === 4,
+    `${question.id} rejects an unrelated typed answer`,
+    !isQuestionAnswerCorrect(question, "not the answer"),
   );
   check(
     `${question.id} difficulty is 1, 2, or 3`,
@@ -124,13 +138,10 @@ for (const question of questions) {
     question.verificationStatus === "verified",
   );
 
-  const correctText =
-    question.choices.find((choice) => choice.id === question.correctChoiceId)
-      ?.text ?? "";
   if (expectedAnswers[question.id]) {
     check(
       `${question.id} keeps its independently checked answer`,
-      correctText.includes(expectedAnswers[question.id]),
+      question.correctChoiceId.includes(expectedAnswers[question.id]),
     );
   }
 
@@ -138,8 +149,6 @@ for (const question of questions) {
   byDifficulty[question.difficulty] += 1;
   byDemand[question.cognitiveDemand] =
     (byDemand[question.cognitiveDemand] ?? 0) + 1;
-  correctLetter[question.correctChoiceId] =
-    (correctLetter[question.correctChoiceId] ?? 0) + 1;
 }
 
 for (const topicId of CODEBUSTERS_TOPIC_IDS) {
@@ -161,6 +170,6 @@ console.log(
     `topics={${Object.entries(byTopic)
       .map(([key, value]) => `${key}:${value}`)
       .join(",")}}`,
-    `correct={a:${correctLetter.a},b:${correctLetter.b},c:${correctLetter.c},d:${correctLetter.d}}`,
+    "answerMode=open-ended",
   ].join(" "),
 );

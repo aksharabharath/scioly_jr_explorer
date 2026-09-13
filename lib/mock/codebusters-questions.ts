@@ -32,7 +32,14 @@ export type CodebustersCognitiveDemand =
 
 export type CodebustersSourceType = "rules-derived";
 
-export type CodebustersQuestion = Question & {
+export type CodebustersQuestion = Omit<
+  Question,
+  "choices" | "correctChoiceId" | "answerMode" | "acceptedAnswers"
+> & {
+  choices: [];
+  correctChoiceId: string;
+  answerMode: "open-ended";
+  acceptedAnswers: string[];
   topicId: CodebustersTopicId;
   cognitiveDemand: CodebustersCognitiveDemand;
   sourceType: CodebustersSourceType;
@@ -43,6 +50,19 @@ export type CodebustersQuestion = Question & {
 };
 
 const EVENT_ID = CODEBUSTERS_EVENT_ID;
+
+const OPEN_ANSWER_ALIASES: Record<string, string[]> = {
+  "cbus-q1": ["A/B", "a and b"],
+  "cbus-q5": ["I and J and U and V", "I/J, U/V"],
+  "cbus-q10": ["KEYKEYKE", "KEY KEY KE"],
+  "cbus-q18": ["MEETATNOON"],
+  "cbus-q23": ["07"],
+  "cbus-q24": ["05"],
+  "cbus-q26": ["03"],
+  "cbus-q27": ["04"],
+  "cbus-q31": ["A B"],
+  "cbus-q40": ["05"],
+};
 
 function cbus(input: {
   id: string;
@@ -62,13 +82,14 @@ function cbus(input: {
     topicId: input.topicId,
     prompt: input.prompt,
     difficulty: input.difficulty,
-    choices: [
-      { id: "a", text: input.choiceTexts[0] },
-      { id: "b", text: input.choiceTexts[1] },
-      { id: "c", text: input.choiceTexts[2] },
-      { id: "d", text: input.choiceTexts[3] },
+    choices: [] as [],
+    correctChoiceId:
+      input.choiceTexts[["a", "b", "c", "d"].indexOf(input.correctChoiceId)],
+    answerMode: "open-ended" as const,
+    acceptedAnswers: [
+      input.choiceTexts[["a", "b", "c", "d"].indexOf(input.correctChoiceId)],
+      ...(OPEN_ANSWER_ALIASES[input.id] ?? []),
     ],
-    correctChoiceId: input.correctChoiceId,
     hint: input.hint,
     explanation: input.explanation,
     cognitiveDemand: input.cognitiveDemand,
@@ -173,7 +194,7 @@ export const MOCK_CODEBUSTERS_QUESTIONS: CodebustersQuestion[] = [
     topicId: "baconian",
     difficulty: 2,
     prompt:
-      "Which plaintext is represented by the Baconian groups BABAA AAAAA BAAAA ABABB?",
+      "Decode the Baconian groups BABAA AAAAA BAAAA ABABB. What plaintext do they make?",
     choiceTexts: ["WARM", "WORM", "FARM", "WARE"],
     correctChoiceId: "a",
     hint: "Decode BABAA, AAAAA, BAAAA, and ABABB separately.",
@@ -223,7 +244,7 @@ export const MOCK_CODEBUSTERS_QUESTIONS: CodebustersQuestion[] = [
     topicId: "porta",
     difficulty: 2,
     prompt:
-      "A Porta message has eight letters and uses the keyword KEY. Which keyword letters align with message positions 1 through 8?",
+      "A Porta message has eight letters and uses the keyword KEY. Write the keyword letters aligned with message positions 1 through 8.",
     choiceTexts: [
       "K E Y K Y E K Y",
       "K E Y K E Y K E",
@@ -349,7 +370,7 @@ export const MOCK_CODEBUSTERS_QUESTIONS: CodebustersQuestion[] = [
     id: "cbus-q17",
     topicId: "aristocrat",
     difficulty: 1,
-    prompt: "Which rule applies to an aristocrat's letter substitution?",
+    prompt: "State the rule that applies to an aristocrat's letter substitution.",
     choiceTexts: [
       "A letter cannot decipher to itself.",
       "Every word must have the same number of letters.",
@@ -415,7 +436,7 @@ export const MOCK_CODEBUSTERS_QUESTIONS: CodebustersQuestion[] = [
     topicId: "cryptanalysis-strategy",
     difficulty: 2,
     prompt:
-      "In an aristocrat, the ciphertext letter X appears twice. Which statement must be true?",
+      "In an aristocrat, the ciphertext letter X appears twice. What must be true?",
     choiceTexts: [
       "The two X positions represent different plaintext letters.",
       "X always represents the plaintext letter E.",
@@ -495,7 +516,7 @@ export const MOCK_CODEBUSTERS_QUESTIONS: CodebustersQuestion[] = [
     topicId: "cryptarithm",
     difficulty: 2,
     prompt:
-      "In the equation A + B = C, A=6 and C=9. Which digit must B represent?",
+      "In the equation A + B = C, A=6 and C=9. What digit must B represent?",
     choiceTexts: ["2", "3", "4", "5"],
     correctChoiceId: "b",
     hint: "Find the missing addend by subtracting A from C.",
@@ -659,7 +680,7 @@ export const MOCK_CODEBUSTERS_QUESTIONS: CodebustersQuestion[] = [
     id: "cbus-q37",
     topicId: "caesar-atbash",
     difficulty: 1,
-    prompt: "Which Atbash pair is correct?",
+    prompt: "Give one correct Atbash letter pair.",
     choiceTexts: ["A↔Z", "B↔C", "M↔N", "D↔W only in Caesar"],
     correctChoiceId: "a",
     hint: "Pair the first letter with the last, then continue inward.",
@@ -673,7 +694,7 @@ export const MOCK_CODEBUSTERS_QUESTIONS: CodebustersQuestion[] = [
     topicId: "cryptanalysis-strategy",
     difficulty: 2,
     prompt:
-      "Which clue best separates Atbash from a Caesar cipher when the method is unknown?",
+      "What clue best separates Atbash from a Caesar cipher when the method is unknown?",
     choiceTexts: [
       "Atbash always uses a repeating keyword, while Caesar uses five-symbol groups.",
       "Atbash uses addition, while Caesar uses subtraction only.",
@@ -732,6 +753,8 @@ export function codebustersQuestionToPracticeQuestion(
     prompt: question.prompt,
     choices: question.choices,
     correctChoiceId: question.correctChoiceId,
+    answerMode: question.answerMode,
+    acceptedAnswers: question.acceptedAnswers,
     explanation: question.explanation,
     hint: question.hint,
     difficulty: question.difficulty,
