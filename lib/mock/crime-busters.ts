@@ -8,7 +8,7 @@ import { CRIME_BUSTERS_EVENT_ID } from "@/lib/mock/crime-busters-questions";
 import type { Topic } from "@/lib/types";
 
 export const MOCK_CRIME_BUSTERS_OVERVIEW =
-  "Use printed 2027 lists and sourced forensic and chemistry facts. Image identification is not in this MVP.";
+  "Use printed 2027 lists and sourced forensic and chemistry facts. Image-dependent practice stays held out until reviewed assets exist.";
 
 export const MOCK_CRIME_BUSTERS_TOPICS: Topic[] = [
   {
@@ -48,6 +48,14 @@ export const MOCK_CRIME_BUSTERS_TOPICS: Topic[] = [
     eventId: CRIME_BUSTERS_EVENT_ID,
     name: "Lab safety",
     shortDescription: "Printed 2027 safety notes for test chemicals.",
+    topicMastery: "learning",
+    progressPercent: 0,
+  },
+  {
+    id: "overall-analysis",
+    eventId: CRIME_BUSTERS_EVENT_ID,
+    name: "Overall analysis",
+    shortDescription: "Connect a suspect, motive, and evidence to a conclusion.",
     topicMastery: "learning",
     progressPercent: 0,
   },

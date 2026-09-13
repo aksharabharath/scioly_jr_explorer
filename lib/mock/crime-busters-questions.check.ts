@@ -11,6 +11,7 @@ import {
   type CrimeBustersCognitiveDemand,
   type CrimeBustersSourceType,
 } from "@/lib/mock/crime-busters-questions";
+import { isQuestionAnswerCorrect } from "@/lib/practice";
 
 const failures: string[] = [];
 
@@ -41,14 +42,14 @@ const allowedSources = new Set<CrimeBustersSourceType>([
 ]);
 const questions = MOCK_CRIME_BUSTERS_QUESTIONS;
 
-check("bank has 44 questions", questions.length === 44);
+check("bank has 50 questions", questions.length === 50);
 
 const ids = questions.map((question) => question.id);
 check("question IDs are unique", new Set(ids).size === ids.length);
 check(
-  "IDs are cb-q1 through cb-q44 with no gaps",
+  "IDs are cb-q1 through cb-q50 with no gaps",
   ids.join(",") ===
-    Array.from({ length: 44 }, (_, index) => `cb-q${index + 1}`).join(","),
+    Array.from({ length: 50 }, (_, index) => `cb-q${index + 1}`).join(","),
 );
 
 const prompts = questions.map((question) => question.prompt.trim());
@@ -62,7 +63,7 @@ const byDifficulty = { 1: 0, 2: 0, 3: 0 };
 const bySource: Record<string, number> = {};
 const byDemand: Record<string, number> = {};
 const byVerification: Record<string, number> = {};
-const correctLetter: Record<string, number> = { a: 0, b: 0, c: 0, d: 0 };
+const answerLength: Record<string, number> = {};
 
 for (const question of questions) {
   check(
@@ -79,34 +80,54 @@ for (const question of questions) {
     question.explanation.trim().length > 0,
   );
   check(`${question.id} has a non-empty hint`, question.hint.trim().length > 0);
-  check(`${question.id} has exactly 4 choices`, question.choices.length === 4);
+  check(
+    `${question.id} is open-ended`,
+    question.answerMode === "open-ended",
+  );
+  check(`${question.id} exposes no choices`, question.choices.length === 0);
+  check(
+    `${question.id} has accepted answers`,
+    question.acceptedAnswers !== undefined &&
+      question.acceptedAnswers.length > 0 &&
+      question.acceptedAnswers.every((answer) => answer.trim().length > 0),
+  );
   if (question.imageRequired) {
     check(
       `${question.id} has imageBrief`,
       question.imageBrief.trim().length > 0,
     );
-    check(
-      `${question.id} has a public crime-busters JPEG path`,
-      question.imageSrc.startsWith("/crime-busters/") &&
-        question.imageSrc.endsWith(".jpg"),
-    );
-    check(
-      `${question.id} image file exists`,
-      existsSync(join(process.cwd(), "public", question.imageSrc.slice(1))),
-    );
-    check(
-      `${question.id} has image alt text`,
-      question.imageAlt.trim().length > 0,
-    );
-    const leak = /loop|whorl|arch|tented|ulnar|radial|central pocket/i;
-    check(
-      `${question.id} image alt does not name the pattern family`,
-      !leak.test(question.imageAlt),
-    );
-    check(
-      `${question.id} image credit does not name the pattern family`,
-      !leak.test(question.imageCredit ?? ""),
-    );
+    if (question.verificationStatus === "verified") {
+      check(
+        `${question.id} has a public crime-busters JPEG path`,
+        typeof question.imageSrc === "string" &&
+          question.imageSrc.startsWith("/crime-busters/") &&
+          question.imageSrc.endsWith(".jpg"),
+      );
+      check(
+        `${question.id} image file exists`,
+        typeof question.imageSrc === "string" &&
+          existsSync(join(process.cwd(), "public", question.imageSrc.slice(1))),
+      );
+      check(
+        `${question.id} has image alt text`,
+        typeof question.imageAlt === "string" &&
+          question.imageAlt.trim().length > 0,
+      );
+      const leak = /loop|whorl|arch|tented|ulnar|radial|central pocket/i;
+      check(
+        `${question.id} image alt does not name the pattern family`,
+        typeof question.imageAlt === "string" && !leak.test(question.imageAlt),
+      );
+      check(
+        `${question.id} image credit does not name the pattern family`,
+        !leak.test(question.imageCredit ?? ""),
+      );
+    } else {
+      check(
+        `${question.id} held-out image item has no placeholder asset`,
+        question.imageSrc === undefined && question.imageAlt === undefined,
+      );
+    }
   } else {
     check(`${question.id} is text-only`, question.imageRequired === false);
   }
@@ -120,15 +141,27 @@ for (const question of questions) {
     !question.prompt.includes("[IMAGE REQUIRED:"),
   );
 
-  const choiceIds = question.choices.map((choice) => choice.id);
   check(
-    `${question.id} has unique choice IDs`,
-    new Set(choiceIds).size === 4,
+    `${question.id} has a canonical answer`,
+    question.correctChoiceId.trim().length > 0 &&
+      question.acceptedAnswers?.includes(question.correctChoiceId) === true,
   );
-  check(`${question.id} uses choice IDs a–d`, choiceIds.join("") === "abcd");
   check(
-    `${question.id} has exactly one correct choice`,
-    choiceIds.filter((id) => id === question.correctChoiceId).length === 1,
+    `${question.id} accepts its canonical answer with casing/space variation`,
+    isQuestionAnswerCorrect(
+      question,
+      `  ${question.correctChoiceId.toUpperCase()}  `,
+    ),
+  );
+  for (const acceptedAnswer of question.acceptedAnswers ?? []) {
+    check(
+      `${question.id} accepts ${acceptedAnswer}`,
+      isQuestionAnswerCorrect(question, acceptedAnswer),
+    );
+  }
+  check(
+    `${question.id} rejects an unrelated typed answer`,
+    !isQuestionAnswerCorrect(question, "not the answer"),
   );
   check(
     `${question.id} difficulty is 1, 2, or 3`,
@@ -136,18 +169,6 @@ for (const question of questions) {
       question.difficulty === 2 ||
       question.difficulty === 3,
   );
-
-  const choiceTexts = question.choices.map((choice) => choice.text.trim());
-  check(
-    `${question.id} choice texts are unique`,
-    new Set(choiceTexts).size === 4,
-  );
-  for (const choice of question.choices) {
-    check(
-      `${question.id} choice ${choice.id} has text`,
-      choice.text.trim().length > 0,
-    );
-  }
 
   check(
     `${question.id} has an allowed cognitiveDemand`,
@@ -174,10 +195,7 @@ for (const question of questions) {
     );
   }
 
-  const correctText =
-    question.choices
-      .find((choice) => choice.id === question.correctChoiceId)
-      ?.text.toLowerCase() ?? "";
+  const correctText = question.correctChoiceId.toLowerCase();
   check(
     `${question.id} does not key Central Pocket as a whorl family`,
     !(
@@ -192,8 +210,8 @@ for (const question of questions) {
   bySource[question.sourceType] = (bySource[question.sourceType] ?? 0) + 1;
   byDemand[question.cognitiveDemand] =
     (byDemand[question.cognitiveDemand] ?? 0) + 1;
-  correctLetter[question.correctChoiceId] =
-    (correctLetter[question.correctChoiceId] ?? 0) + 1;
+  const answerSize = question.acceptedAnswers?.length ?? 0;
+  answerLength[answerSize] = (answerLength[answerSize] ?? 0) + 1;
   byVerification[question.verificationStatus] =
     (byVerification[question.verificationStatus] ?? 0) + 1;
 }
@@ -202,22 +220,36 @@ for (const topicId of CRIME_BUSTERS_TOPIC_IDS) {
   check(`${topicId} has at least one question`, (byTopic[topicId] ?? 0) >= 1);
 }
 
-check(
-  "no items remain draft",
-  questions.every((question) => question.verificationStatus !== "draft"),
-);
 const imageItems = questions.filter((question) => question.imageRequired);
-check("text MVP remains q1–q40", questions.slice(0, 40).every((question) => question.imageRequired === false));
-check("IM4 image slice is q41–q44", imageItems.length === 4 && imageItems.every((question) => {
+check(
+  "verified non-image items stay text-only",
+  questions
+    .filter((question) => question.verificationStatus === "verified")
+    .filter((question) => !["cb-q41", "cb-q42", "cb-q43", "cb-q44"].includes(question.id))
+    .every((question) => question.imageRequired === false),
+);
+check(
+  "IM4 image slice is q41–q44",
+  imageItems.filter((question) => question.verificationStatus === "verified").length === 4 &&
+    imageItems.filter((question) => question.verificationStatus === "verified").every((question) => {
   const number = Number(question.id.replace("cb-q", ""));
   return number >= 41 && number <= 44;
-}));
+    }),
+);
+check(
+  "held-out image scope items are q46–q50",
+  imageItems.filter((question) => question.verificationStatus !== "verified").length === 5 &&
+    imageItems.filter((question) => question.verificationStatus !== "verified").every((question) => {
+      const number = Number(question.id.replace("cb-q", ""));
+      return number >= 46 && number <= 50;
+    }),
+);
 check("safety topic is at most 3 items", (byTopic.safety ?? 0) <= 3);
 check(
-  "no q45+ items",
+  "no q51+ items",
   questions.every((question) => {
     const number = Number(question.id.replace("cb-q", ""));
-    return number >= 1 && number <= 44;
+    return number >= 1 && number <= 50;
   }),
 );
 
@@ -241,7 +273,9 @@ console.log(
     `topics={${Object.entries(byTopic)
       .map(([key, value]) => `${key}:${value}`)
       .join(",")}}`,
-    `correct={a:${correctLetter.a},b:${correctLetter.b},c:${correctLetter.c},d:${correctLetter.d}}`,
+    `acceptedAnswerCounts={${Object.entries(answerLength)
+      .map(([key, value]) => `${key}:${value}`)
+      .join(",")}}`,
     `verification={${Object.entries(byVerification)
       .map(([key, value]) => `${key}:${value}`)
       .join(",")}}`,

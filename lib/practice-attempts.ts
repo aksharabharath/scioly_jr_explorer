@@ -10,6 +10,7 @@ import {
   WEAK_TOPIC_ATTEMPT_WINDOW,
 } from "@/lib/learning/adaptive";
 import { getQuestionById } from "@/lib/mock/curriculum";
+import { isQuestionAnswerCorrect } from "@/lib/practice";
 import { createClient } from "@/lib/supabase/server";
 import type { Question } from "@/lib/types";
 
@@ -205,10 +206,14 @@ export async function insertPracticeAttempt(
   }
 
   const question = await getQuestionById(input.questionId);
-  const selected = question?.choices.find(
-    (choice) => choice.id === input.selectedOptionId,
-  );
-  if (!question || !selected) {
+  const submittedAnswer = input.selectedOptionId.trim();
+  const selected =
+    question?.answerMode === "open-ended"
+      ? submittedAnswer
+      : question?.choices.find(
+          (choice) => choice.id === input.selectedOptionId,
+        )?.id;
+  if (!question || !selected || !submittedAnswer) {
     return { ok: false, error: "That question could not be saved." };
   }
 
@@ -220,8 +225,8 @@ export async function insertPracticeAttempt(
       p_attempt_id: input.attemptId,
       p_session_id: input.sessionId,
       p_question_id: question.id,
-      p_selected_option_id: selected.id,
-      p_is_correct: selected.id === question.correctChoiceId,
+      p_selected_option_id: submittedAnswer,
+      p_is_correct: isQuestionAnswerCorrect(question, submittedAnswer),
       p_hint_used: input.hintUsed === true,
       p_practice_date: practiceDate,
     },

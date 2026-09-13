@@ -1,6 +1,6 @@
 # Crime Busters 2027 — MVP Question Bank Blueprint
 
-**Planning only.** Do not write questions, IDs, choices, or `verificationStatus` in this pass. Do not change `lib/mock/*`. Do not unlock `crime-busters`.
+**Planning baseline.** Phase 4 authoring and Phase 5 QA are complete for the current MVP. Future additions must follow this blueprint and remain evidence-gated.
 
 | File | Role |
 |---|---|
@@ -19,11 +19,11 @@ Jr. Explorer live practice is **text-first**. Official Crime Busters is largely 
 | Metric | Value |
 |---|---|
 | Planning **ceiling** | **40–50** |
-| Evidence-supported MVP | **~36–44** |
+| Evidence-supported MVP | **~40–45** |
 | Stop if authoring stays list-only | **~30–36** |
-| Image-required in this MVP | **0** |
+| Image-required in this MVP | **9** (4 live, 5 held out) |
 
-**Do not force the count.** Prefer ~40 trustworthy items over 50 padded ones.
+**Do not force the count.** The current 50-item source bank includes five held-out image-dependent scope items; the live pool remains 45.
 
 Contest ~45 minutes and score **weights** are logistics (`V-G1`, `V-G4`), not bank size.
 
@@ -186,7 +186,7 @@ When real licensed assets exist later, image slots can leave the hold-out set. U
 
 - **~30–36** if the first bank stays strictly T1-RULES list literacy plus a few formulas.
 - **~36–44** if ulnar/radial, arch/loop/whorl **defs**, human-vs-animal hair, RHS soil properties, starch–iodine, and carbonate–acid are used carefully.
-- **50** only with extra **verified** list-distinction items, not new lab results or pH values.
+- **50** is acceptable here because five items are explicitly held out for missing image/data stimuli; they are not counted as live padding.
 
 A verified ~38 is better than an invented 45.
 
@@ -196,9 +196,9 @@ Known blockers that shrink the bank if authoring is strict: `HR8`, `HR-FIB`, `HR
 
 ## 8. Next step
 
-**Phase 4 complete:** draft bank in `lib/mock/crime-busters-questions.ts` (cb-q1–cb-q40). Next: Phase 5 QA.
+**Phase 4 and Phase 5 complete:** `lib/mock/crime-busters-questions.ts` contains `cb-q1`–`cb-q50`; 45 are verified/live-eligible and five remain `needs-review` until image/data blockers are resolved.
 
-Do not write additional questions in this phase.
+Do not add additional questions until the held-out image/data blockers are resolved.
 
 ---
 

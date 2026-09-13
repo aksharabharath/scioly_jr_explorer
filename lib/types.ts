@@ -111,6 +111,8 @@ export type AnswerChoice = {
   text: string;
 };
 
+export type QuestionAnswerMode = "multiple-choice" | "open-ended";
+
 /** Shared kid-friendly vocabulary. Referenced from questions by `id`. */
 export type GlossaryEntry = {
   id: string;
@@ -133,6 +135,12 @@ export type Question = {
   prompt: string;
   choices: AnswerChoice[];
   correctChoiceId: string;
+  /**
+   * Open-ended items keep a canonical answer in `correctChoiceId` for
+   * persistence compatibility and list equivalent spellings here.
+   */
+  answerMode?: QuestionAnswerMode;
+  acceptedAnswers?: string[];
   explanation: string;
   hint: string;
   /**

@@ -1,9 +1,8 @@
 /**
- * Crime Busters 2027 question bank — cb-q1–cb-q44.
+ * Crime Busters 2027 question bank — cb-q1–cb-q50.
  *
- * cb-q1–cb-q40 are the text-first MVP. cb-q41–cb-q44 are the IM4
- * pattern-family image slice. Facts stay inside T1-RULES and inspected
- * quotes in docs/events/crime_busters/EVIDENCE_MATRIX_2027.md.
+ * cb-q1–cb-q45 are evidence-supported text items. cb-q46–cb-q50
+ * are needs-review image-dependent scope items with no placeholder assets.
  *
  * Registered in curriculum.ts. Unlocked for shared live practice.
  */
@@ -21,6 +20,7 @@ export const CRIME_BUSTERS_TOPIC_IDS = [
   "soil",
   "chemical",
   "safety",
+  "overall-analysis",
 ] as const;
 
 export type CrimeBustersTopicId = (typeof CRIME_BUSTERS_TOPIC_IDS)[number];
@@ -43,7 +43,14 @@ export type CrimeBustersSourceType =
   | "libretexts"
   | "commons";
 
-type CrimeBustersBase = Question & {
+type CrimeBustersBase = Omit<
+  Question,
+  "choices" | "correctChoiceId" | "answerMode" | "acceptedAnswers"
+> & {
+  choices: [];
+  correctChoiceId: string;
+  answerMode: "open-ended";
+  acceptedAnswers: string[];
   topicId: CrimeBustersTopicId;
   cognitiveDemand: CrimeBustersCognitiveDemand;
   sourceType: CrimeBustersSourceType;
@@ -56,8 +63,8 @@ export type CrimeBustersQuestion =
   | (CrimeBustersBase & {
       imageRequired: true;
       imageBrief: string;
-      imageSrc: string;
-      imageAlt: string;
+      imageSrc?: string;
+      imageAlt?: string;
       imageCredit?: string;
     })
   | (CrimeBustersBase & {
@@ -66,6 +73,41 @@ export type CrimeBustersQuestion =
     });
 
 const EVENT_ID = CRIME_BUSTERS_EVENT_ID;
+
+const OPEN_ANSWER_ALIASES: Record<string, string[]> = {
+  "cb-q1": ["loops whorls and arches"],
+  "cb-q2": ["ulnar radial central pocket"],
+  "cb-q3": ["plain accidental double loop"],
+  "cb-q4": ["plain tented"],
+  "cb-q6": ["ulnar loop"],
+  "cb-q7": ["radius and ulna"],
+  "cb-q8": ["pass out on the same side", "same side"],
+  "cb-q9": ["ridges flow out the other side with a rise or wave"],
+  "cb-q10": ["recurve delta ridge count"],
+  "cb-q11": ["ridge ending and bifurcation"],
+  "cb-q12": ["epidermis and dermis"],
+  "cb-q14": ["cuticle cortex and medulla"],
+  "cb-q15": ["less than one third of the shaft width"],
+  "cb-q16": ["imbricate flattened scales"],
+  "cb-q20": ["cellulose"],
+  "cb-q22": ["mixtures of clay sand and silt"],
+  "cb-q27": ["two different listed items", "a soil type and a powder"],
+  "cb-q28": ["sodium chloride", "table salt"],
+  "cb-q29": ["sucrose", "table sugar"],
+  "cb-q30": ["sodium bicarbonate", "sodium hydrogen carbonate"],
+  "cb-q31": ["calcium carbonate", "chalk"],
+  "cb-q32": ["hydrogen peroxide"],
+  "cb-q34": ["an antacid"],
+  "cb-q35": ["bluish black", "blue black"],
+  "cb-q36": ["carbon dioxide", "co2", "CO₂"],
+  "cb-q37": ["iodine hcl distilled water"],
+  "cb-q38": ["isopropanol", "isopropyl alcohol"],
+  "cb-q39": ["sodium hypochlorite", "liquid bleach", "bleach"],
+  "cb-q40": ["do not consume", "do not eat or drink"],
+  "cb-q45": [
+    "the suspect motive all evidence pieces and why each piece incriminates the suspect",
+  ],
+};
 
 function cb(
   input: {
@@ -86,8 +128,8 @@ function cb(
     | {
         imageRequired: true;
         imageBrief: string;
-        imageSrc: string;
-        imageAlt: string;
+        imageSrc?: string;
+        imageAlt?: string;
         imageCredit?: string;
       }
     | { imageRequired?: false }
@@ -99,13 +141,14 @@ function cb(
     topicId: input.topicId,
     prompt: input.prompt,
     difficulty: input.difficulty,
-    choices: [
-      { id: "a" as const, text: input.choiceTexts[0] },
-      { id: "b" as const, text: input.choiceTexts[1] },
-      { id: "c" as const, text: input.choiceTexts[2] },
-      { id: "d" as const, text: input.choiceTexts[3] },
+    choices: [] as [],
+    correctChoiceId:
+      input.choiceTexts[["a", "b", "c", "d"].indexOf(input.correctChoiceId)],
+    answerMode: "open-ended" as const,
+    acceptedAnswers: [
+      input.choiceTexts[["a", "b", "c", "d"].indexOf(input.correctChoiceId)],
+      ...(OPEN_ANSWER_ALIASES[input.id] ?? []),
     ],
-    correctChoiceId: input.correctChoiceId,
     hint: input.hint,
     explanation: input.explanation,
     cognitiveDemand: input.cognitiveDemand,
@@ -120,8 +163,8 @@ function cb(
       ...base,
       imageRequired: true,
       imageBrief: input.imageBrief,
-      imageSrc: input.imageSrc,
-      imageAlt: input.imageAlt,
+      ...(input.imageSrc ? { imageSrc: input.imageSrc } : {}),
+      ...(input.imageAlt ? { imageAlt: input.imageAlt } : {}),
       ...(input.imageCredit ? { imageCredit: input.imageCredit } : {}),
     };
   }
@@ -134,7 +177,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 1,
     prompt:
-      "Fingerprints are grouped into three main pattern families. Which set is that?",
+      "Name the three main fingerprint pattern families.",
     choiceTexts: [
       "Waves, spirals, and tents",
       "Loops, Whorls, and Arches",
@@ -156,7 +199,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 1,
     prompt:
-      "Under Loops, which subtype names are listed?",
+      "Name the subtype names listed under Loops.",
     choiceTexts: [
       "Ulnar, Radial, and Central Pocket",
       "Plain, Accidental, and Double Loop",
@@ -178,7 +221,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 1,
     prompt:
-      "Under Whorls, which subtype names are listed?",
+      "Name the subtype names listed under Whorls.",
     choiceTexts: [
       "Ulnar, Radial, and Central Pocket",
       "Plain and Tented",
@@ -200,7 +243,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "fingerprints",
     difficulty: 1,
     prompt:
-      "Under Arches, which subtype names are listed?",
+      "Name the subtype names listed under Arches.",
     choiceTexts: [
       "Ulnar and Radial",
       "Accidental and Double Loop",
@@ -220,23 +263,23 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
   cb({
     id: "cb-q5",
     topicId: "fingerprints",
-    difficulty: 1,
+    difficulty: 2,
     prompt:
-      "Fingerprint impressions are grouped into which three pattern types?",
+      "During a Crime Busters investigation, which comparison is explicitly part of Fingerprint Analysis?",
     choiceTexts: [
-      "Cores, deltas, and minutiae",
-      "Arches, loops, and whorls",
-      "Latent, patent, and plastic",
-      "Radial, ulnar, and tented",
+      "Compare crime-scene prints with prints from the suspects",
+      "Compare the crime-scene print with the soil pH only",
+      "Compare the suspect list with the fiber list",
+      "Compare the powder formulas with the fingerprint families",
     ],
-    correctChoiceId: "b",
-    hint: "The three broad types come first, then subclasses inside each.",
+    correctChoiceId: "a",
+    hint: "Look at the first numbered skill under Fingerprint Analysis.",
     explanation:
-      "NIST states that patterns are divided into three types: arches, loops, and whorls. That matches the three 2027 family names.",
-    cognitiveDemand: "recognition",
-    sourceType: "nist",
-    sourceNote: "NIST Pattern Classification; E-CB-001.",
-    evidenceIds: ["E-CB-001"],
+      "The rules explicitly require students to identify and compare fingerprints from the crime scene with those of the suspects. The other comparisons are not the stated fingerprint task.",
+    cognitiveDemand: "application",
+    sourceType: "rules-derived",
+    sourceNote: "RULES_2027.md Fingerprint Analysis §1.1; RS3.",
+    evidenceIds: ["RS3"],
     verificationStatus: "verified",
   }),
   cb({
@@ -352,23 +395,23 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
   cb({
     id: "cb-q11",
     topicId: "fingerprints",
-    difficulty: 3,
+    difficulty: 2,
     prompt:
-      "A plain whorl has one or more ridges that make a complete circuit and two deltas. What is true of an imaginary line between those deltas?",
+      "Which pair is identified by NIST as fingerprint minutiae in the inspected source?",
     choiceTexts: [
-      "The line never comes near the inner pattern",
-      "At least one recurving ridge within the inner pattern area is cut or touched",
-      "No recurving ridge in the inner pattern area is touched or cut",
-      "The line must pass through both cores",
+      "Ridge endings and bifurcations",
+      "Cores and ink pressure",
+      "Loops and whorls",
+      "Skin and hair follicles",
     ],
-    correctChoiceId: "b",
-    hint: "Use the NIST plain-whorl sentence about the imaginary line and the inner pattern area.",
+    correctChoiceId: "a",
+    hint: "Choose the two major ridge features named in the minutiae source.",
     explanation:
-      "NIST: a plain whorl has two deltas, between which, when an imaginary line is drawn, at least one recurving ridge within the inner pattern area is cut or touched. The ‘no inner recurve touched’ wording is NIST’s central-pocket-loop definition and is not used as a family-classification item here.",
-    cognitiveDemand: "distinction",
+      "The inspected NIST source identifies ridge endings and bifurcations as minutiae. A bifurcation is where one ridge splits into two; the source does not establish the other choices as this pair.",
+    cognitiveDemand: "recognition",
     sourceType: "nist",
-    sourceNote: "E-CB-008. Do not key Central Pocket as a whorl (HR8).",
-    evidenceIds: ["E-CB-008"],
+    sourceNote: "NIST AFIS training — Minutiae; E-CB-013, E-CB-014.",
+    evidenceIds: ["E-CB-013", "E-CB-014"],
     verificationStatus: "verified",
   }),
   cb({
@@ -594,23 +637,23 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
   cb({
     id: "cb-q22",
     topicId: "soil",
-    difficulty: 1,
+    difficulty: 2,
     prompt:
-      "The soil type that is high in peat is listed as which name?",
+      "How are loams typically described in the inspected soil source?",
     choiceTexts: [
-      "Muck",
-      "Peaty",
-      "Humus",
-      "Compost",
+      "As mixtures of clay, sand, and silt that avoid the extremes of each",
+      "As soils made only of peat and leaf mould",
+      "As soils that are always alkaline because they contain lime",
+      "As soils with no mineral particles and no moisture",
     ],
-    correctChoiceId: "b",
-    hint: "Match the exact adjective on the six-name list.",
+    correctChoiceId: "a",
+    hint: "Think of a balanced mixture rather than one extreme soil property.",
     explanation:
-      "The 2027 list prints Peaty. RHS describes peat soils as very high in organic matter and moisture. Muck, humus, and compost are not official list names.",
-    cognitiveDemand: "recognition",
-    sourceType: "rules-derived",
-    sourceNote: "V-S1; RHS peat soils E-CB-030.",
-    evidenceIds: ["V-S1", "E-CB-030"],
+      "The RHS source describes loams as mixtures of clay, sand, and silt that avoid the extremes of each type. The official rules use the related event-list name Loamy.",
+    cognitiveDemand: "application",
+    sourceType: "rhs-soil",
+    sourceNote: "RHS Soil types; E-CB-029. Official event spelling: Loamy (V-S2).",
+    evidenceIds: ["E-CB-029", "V-S2"],
     verificationStatus: "verified",
   }),
   cb({
@@ -860,7 +903,7 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
     topicId: "chemical",
     difficulty: 2,
     prompt:
-      "Besides industrial uses, calcium carbonate is also used as which of the following?",
+      "Name one sourced use of calcium carbonate besides industrial uses.",
     choiceTexts: [
       "A bleach active ingredient",
       "An antacid",
@@ -1105,6 +1148,148 @@ export const MOCK_CRIME_BUSTERS_QUESTIONS: CrimeBustersQuestion[] = [
       "Tented-arch photo used only as Arch-family ID. Enter one side, central rise, exit the other; no complete circuit.",
     imageCredit: "Photo: Metrónomo. CC BY-SA 4.0. Wikimedia Commons.",
   }),
+  cb({
+    id: "cb-q45",
+    topicId: "overall-analysis",
+    difficulty: 2,
+    prompt:
+      "Name the four elements required in a final Crime Busters analysis paragraph.",
+    choiceTexts: [
+      "The suspect, the motive, all evidence pieces, and why each piece incriminates the suspect",
+      "Only the suspect's name and the fastest test result",
+      "Only the chemical formulas and the time the team finished",
+      "The soil type, the team score, and the number of participants",
+    ],
+    correctChoiceId: "a",
+    hint: "Use every element named in the Overall Analysis rule.",
+    explanation:
+      "The rules require the paragraph to name the suspect, give the motive, name all pieces of evidence, and explain why each piece incriminates the suspect. The other choices leave out required parts or add unrelated logistics.",
+    cognitiveDemand: "application",
+    sourceType: "rules-derived",
+    sourceNote: "RULES_2027.md Overall Analysis; RS14.",
+    evidenceIds: ["RS14"],
+    verificationStatus: "verified",
+  }),
+  cb({
+    id: "cb-q46",
+    topicId: "fingerprints",
+    difficulty: 3,
+    prompt:
+      "A crime-scene print and several suspect prints are provided. Which conclusion is supported only after comparing the observable ridge details in the images?",
+    choiceTexts: [
+      "Which suspect's print matches the crime-scene print",
+      "Which soil type has the most organic matter",
+      "Which liquid has the lowest pH",
+      "Which fiber class is synthetic",
+    ],
+    correctChoiceId: "a",
+    hint: "This item requires the missing crime-scene and suspect print stimulus.",
+    explanation:
+      "The rules require students to identify and compare crime-scene fingerprints with suspect fingerprints. The comparison cannot be verified or made live here until appropriate print images are sourced and reviewed.",
+    cognitiveDemand: "multi-step",
+    sourceType: "rules-derived",
+    sourceNote: "RULES_2027.md Fingerprint Analysis §1.1; RS3; image asset IM1 needed.",
+    evidenceIds: ["RS3"],
+    verificationStatus: "needs-review",
+    imageRequired: true,
+    imageBrief: "Side-by-side crime-scene and suspect prints with comparable ridge details.",
+  }),
+  cb({
+    id: "cb-q47",
+    topicId: "fingerprints",
+    difficulty: 3,
+    prompt:
+      "Which marked feature should a student identify when a fingerprint image shows one ridge splitting into two?",
+    choiceTexts: [
+      "A bifurcation",
+      "A plain arch",
+      "A soil horizon",
+      "A hair medulla",
+    ],
+    correctChoiceId: "a",
+    hint: "The image must show the marked ridge feature; a text definition alone is not the intended task.",
+    explanation:
+      "NIST describes a bifurcation as the location where a ridge starts to split into two. A live version still needs a suitable marked-print image so the student can identify the feature visually.",
+    cognitiveDemand: "application",
+    sourceType: "nist",
+    sourceNote: "NIST AFIS training — Minutiae; E-CB-014; image asset IM2 needed.",
+    evidenceIds: ["E-CB-014"],
+    verificationStatus: "needs-review",
+    imageRequired: true,
+    imageBrief: "Fingerprint close-up with a single bifurcation clearly marked.",
+  }),
+  cb({
+    id: "cb-q48",
+    topicId: "hair-fiber",
+    difficulty: 3,
+    prompt:
+      "Which conclusion could a student make from a sourced microscopic hair image showing a narrow, irregular medulla?",
+    choiceTexts: [
+      "It is consistent with the general human-hair description in the inspected source",
+      "It must be squirrel hair",
+      "It must be a synthetic fiber",
+      "It must be a soil sample",
+    ],
+    correctChoiceId: "a",
+    hint: "The current source distinguishes human hair from animal hair generally, not among the four animal species.",
+    explanation:
+      "The DOJ source describes human hair as typically having a medulla less than one-third of the shaft width with an amorphous irregular appearance. It does not support identifying dog, cat, squirrel, or mouse from that feature alone.",
+    cognitiveDemand: "distinction",
+    sourceType: "doj-hair",
+    sourceNote: "DOJ hair examination documentation; E-CB-020; image asset IM5 needed.",
+    evidenceIds: ["E-CB-020"],
+    verificationStatus: "needs-review",
+    imageRequired: true,
+    imageBrief: "Microscopic hair cross-section or shaft view with the medulla-width diagnostic visible.",
+  }),
+  cb({
+    id: "cb-q49",
+    topicId: "hair-fiber",
+    difficulty: 3,
+    prompt:
+      "Which fiber conclusion should remain held out until the image diagnostic and class terminology are reviewed?",
+    choiceTexts: [
+      "Mapping one of the six named fibers to animal, vegetable, or synthetic from a micrograph",
+      "Recognizing that cotton is one of the six listed fibers",
+      "Recognizing that silk is one of the six listed fibers",
+      "Recognizing that nylon is one of the six listed fibers",
+    ],
+    correctChoiceId: "a",
+    hint: "The rules require microscopic distinctions, but the evidence matrix records unresolved class terminology.",
+    explanation:
+      "The rules require microscopic fiber distinctions, while the available sources do not yet verify all six diagnostics or resolve the event's animal/vegetable/synthetic terminology. The image and classification evidence must be reviewed before this item can go live.",
+    cognitiveDemand: "distinction",
+    sourceType: "rules-derived",
+    sourceNote: "RULES_2027.md Hair/Fiber Analysis; RS8; IM6 and HR-FIB.",
+    evidenceIds: ["RS8"],
+    verificationStatus: "needs-review",
+    imageRequired: true,
+    imageBrief: "Microscopic fiber comparison showing the diagnostic feature used for classification.",
+  }),
+  cb({
+    id: "cb-q50",
+    topicId: "soil",
+    difficulty: 3,
+    prompt:
+      "Which soil identification question requires a real sample or reviewed sample image before it can be live?",
+    choiceTexts: [
+      "Which of the six listed soil types matches the observed texture and sample properties",
+      "Which six soil names are printed in the rules",
+      "Which soil type is called Loamy in the official list",
+      "Which soil type is described as sandy in a source",
+    ],
+    correctChoiceId: "a",
+    hint: "The competition asks students to identify soil types using provided samples.",
+    explanation:
+      "The rules require identification of the six soil types using provided samples. A live Jr. Explorer item needs a real, reviewed sample image or equivalent stimulus; this bank does not create a placeholder.",
+    cognitiveDemand: "multi-step",
+    sourceType: "rules-derived",
+    sourceNote: "RULES_2027.md Soil Analysis; RS9; image asset IM7 needed.",
+    evidenceIds: ["RS9"],
+    verificationStatus: "needs-review",
+    imageRequired: true,
+    imageBrief: "Reviewed soil sample image or equivalent stimulus with observable properties.",
+  }),
 ];
 
 /** Map to the shared Question shape. Keeps verificationStatus for live-practice filtering. */
@@ -1118,6 +1303,8 @@ export function crimeBustersQuestionToPracticeQuestion(
     prompt: question.prompt,
     choices: question.choices,
     correctChoiceId: question.correctChoiceId,
+    answerMode: question.answerMode,
+    acceptedAnswers: question.acceptedAnswers,
     explanation: question.explanation,
     hint: question.hint,
     difficulty: question.difficulty,

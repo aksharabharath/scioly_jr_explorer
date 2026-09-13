@@ -26,6 +26,7 @@ import {
 } from "@/lib/badges";
 import {
   attemptUsedAHint,
+  isQuestionAnswerCorrect,
   missedAnswerContrast,
   recommendNextStep,
   summarizePractice,
@@ -83,6 +84,7 @@ type ActiveQuizState = {
   askedIds: string[];
   sessionTopics: string[];
   selectedChoiceId: string | null;
+  typedAnswer: string;
   revealedHint: boolean;
   revealedHint2: boolean;
   submitted: boolean;
@@ -215,6 +217,7 @@ function beginSet(
     askedIds: [...askedIds, question.id],
     sessionTopics: [...sessionTopics, question.topicId],
     selectedChoiceId: null,
+    typedAnswer: "",
     revealedHint: false,
     revealedHint2: false,
     submitted: false,
@@ -445,7 +448,14 @@ export function PracticeQuiz({
   ).length;
   const isLast =
     state.records.length + 1 >= plannedTotal || remainingInBank === 0;
-  const isCorrect = state.selectedChoiceId === question.correctChoiceId;
+  const submittedAnswer =
+    question.answerMode === "open-ended"
+      ? state.typedAnswer
+      : state.selectedChoiceId ?? "";
+  const isCorrect =
+    question.answerMode === "open-ended"
+      ? isQuestionAnswerCorrect(question, submittedAnswer)
+      : state.selectedChoiceId === question.correctChoiceId;
 
   function selectChoice(choiceId: string) {
     if (state.status !== "active" || state.submitted) {
@@ -454,10 +464,17 @@ export function PracticeQuiz({
     setState({ ...state, selectedChoiceId: choiceId });
   }
 
+  function setTypedAnswer(value: string) {
+    if (state.status !== "active" || state.submitted) {
+      return;
+    }
+    setState({ ...state, typedAnswer: value });
+  }
+
   async function checkAnswer() {
     // Duplicate protection (UI): ignore extra Check answer clicks.
     // The server still uses the same attemptId + unique award row.
-    if (state.status !== "active" || !state.selectedChoiceId) {
+    if (state.status !== "active" || !submittedAnswer.trim()) {
       return;
     }
     if (state.saved) {
@@ -471,7 +488,7 @@ export function PracticeQuiz({
     }
 
     savingRef.current = true;
-    const selectedChoiceId = state.selectedChoiceId;
+    const selectedChoiceId = submittedAnswer;
     if (!attemptIdRef.current) {
       attemptIdRef.current = crypto.randomUUID();
     }
@@ -549,7 +566,7 @@ export function PracticeQuiz({
   function continueToNext() {
     if (
       state.status !== "active" ||
-      !state.selectedChoiceId ||
+      !submittedAnswer.trim() ||
       !state.submitted ||
       !state.saved
     ) {
@@ -559,8 +576,8 @@ export function PracticeQuiz({
     const hintUsed = attemptUsedAHint(state.revealedHint, state.revealedHint2);
     const record: AnswerRecord = {
       questionId: question.id,
-      selectedChoiceId: state.selectedChoiceId,
-      isCorrect: state.selectedChoiceId === question.correctChoiceId,
+      selectedChoiceId: submittedAnswer,
+      isCorrect,
       hintUsed,
     };
     const attempt = attemptFromQuestion(question, record.isCorrect, hintUsed);
@@ -606,6 +623,7 @@ export function PracticeQuiz({
       askedIds: [...state.askedIds, nextQuestion.id],
       sessionTopics: [...state.sessionTopics, nextQuestion.topicId],
       selectedChoiceId: null,
+      typedAnswer: "",
       revealedHint: false,
       revealedHint2: false,
       submitted: false,
@@ -690,9 +708,29 @@ export function PracticeQuiz({
           <div
             className={state.submitted ? "space-y-1.5" : "space-y-2"}
             role="group"
-            aria-label="Answer choices"
+            aria-label={
+              question.answerMode === "open-ended"
+                ? "Type your answer"
+                : "Answer choices"
+            }
           >
-            {question.choices.map((choice) => {
+            {question.answerMode === "open-ended" ? (
+              <input
+                type="text"
+                value={state.typedAnswer}
+                onChange={(event) => setTypedAnswer(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    void checkAnswer();
+                  }
+                }}
+                disabled={state.submitted}
+                aria-label="Your answer"
+                placeholder="Type your answer"
+                className="min-h-12 w-full rounded-2xl border border-stone-200 bg-parchment px-4 py-3 text-base text-ink outline-none transition placeholder:text-stone-400 focus:border-teal focus:ring-2 focus:ring-teal/20 disabled:bg-stone-100"
+              />
+            ) : question.choices.map((choice) => {
               const selected = state.selectedChoiceId === choice.id;
               const correctChoice = choice.id === question.correctChoiceId;
               let choiceClass =
@@ -773,7 +811,7 @@ export function PracticeQuiz({
               <button
                 type="button"
                 onClick={checkAnswer}
-                disabled={!state.selectedChoiceId || state.submitted}
+                disabled={!submittedAnswer.trim() || state.submitted}
                 className="min-h-11 w-full rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment transition enabled:hover:bg-teal disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Check answer

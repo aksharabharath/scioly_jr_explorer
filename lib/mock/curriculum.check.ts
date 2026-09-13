@@ -94,28 +94,40 @@ async function run() {
   const fullCrime = allQuestions.filter(
     (question) => question.eventId === "crime-busters",
   );
-  check(
-    "Crime Busters registered bank has 44 questions",
-    fullCrime.length === 44 && MOCK_CRIME_BUSTERS_QUESTIONS.length === 44,
+  const fullCodebusters = allQuestions.filter(
+    (question) => question.eventId === "codebusters",
   );
   check(
-    "Crime Busters items are verified",
-    fullCrime.every(
-      (question) => question.verificationStatus === "verified",
-    ),
+    "Crime Busters registered bank has 50 questions",
+    fullCrime.length === 50 && MOCK_CRIME_BUSTERS_QUESTIONS.length === 50,
   );
   check(
-    "Crime Busters q1–q40 stay text-only",
-    fullCrime.slice(0, 40).every((question) => question.imageRequired === false),
+    "Crime Busters has 45 verified live-eligible items",
+    fullCrime.filter((question) => question.verificationStatus === "verified").length ===
+      45,
+  );
+  check(
+    "Crime Busters verified non-image items stay text-only",
+    fullCrime
+      .filter(
+        (question) =>
+          question.verificationStatus === "verified" &&
+          !["cb-q41", "cb-q42", "cb-q43", "cb-q44"].includes(question.id),
+      )
+      .every((question) => question.imageRequired === false),
   );
   check(
     "Crime Busters q41–q44 are live image items",
-    fullCrime.slice(40).every(
+    fullCrime
+      .filter((question) =>
+        ["cb-q41", "cb-q42", "cb-q43", "cb-q44"].includes(question.id),
+      )
+      .every(
       (question) =>
         question.imageRequired === true &&
         questionHasPracticeImage(question) &&
         isLivePracticeQuestion(question),
-    ),
+      ),
   );
   const fullEcology = allQuestions.filter(
     (question) => question.eventId === "ecology",
@@ -158,11 +170,11 @@ async function run() {
   );
   const crimeLive = await getQuestionsForEvent("crime-busters");
   check(
-    "live Crime Busters filter is the 44-question verified bank",
-    crimeLive.length === 44 &&
+    "live Crime Busters filter is the 45-question verified bank",
+    crimeLive.length === 45 &&
       crimeLive.every(isLivePracticeQuestion) &&
       crimeLive.map((question) => question.id).join(",") ===
-        Array.from({ length: 44 }, (_, index) => `cb-q${index + 1}`).join(","),
+        Array.from({ length: 45 }, (_, index) => `cb-q${index + 1}`).join(","),
   );
   const ecologyLive = await getQuestionsForEvent("ecology");
   check(
@@ -180,6 +192,7 @@ async function run() {
         fullAnatomy.length +
         fullWater.length +
         fullCrime.length +
+        fullCodebusters.length +
         fullEcology.length,
   );
   check(
@@ -434,7 +447,7 @@ async function run() {
     crimePage !== null &&
       crimePage.event.unlocked === true &&
       crimePage.hasPractice === true &&
-      crimePage.topics.length === 5,
+      crimePage.topics.length === 6,
   );
   const crimePractice = await getPracticePageData("crime-busters");
   check(
@@ -442,7 +455,7 @@ async function run() {
     crimePractice !== null &&
       crimePractice.event.id === "crime-busters" &&
       crimePractice.event.unlocked === true &&
-      crimePractice.questions.length === 44 &&
+      crimePractice.questions.length === 45 &&
       crimePractice.questions.every(isLivePracticeQuestion),
   );
   const ecologyPage = await getEventPageData("ecology");
