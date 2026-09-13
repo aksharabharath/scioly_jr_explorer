@@ -4,6 +4,7 @@
  */
 import {
   BADGE_DEFINITIONS,
+  badgeIdsForSelectedEvents,
   definitionsForIds,
   formatBadgeProgress,
   getBadgeProgress,
@@ -60,6 +61,16 @@ function earned(attempts: BadgeProgressAttempt[]): BadgeId[] {
   return getEarnedBadgeIds({ attempts, questions });
 }
 
+function completedSession(
+  questionId: string,
+  sessionId: string,
+  correct = true,
+): BadgeProgressAttempt[] {
+  return Array.from({ length: PRACTICE_SET_SIZE }, () =>
+    attempt(questionId, { sessionId, isCorrect: correct }),
+  );
+}
+
 const questions = [
   question("ento-q1", "entomology", "taxonomy"),
   question("ento-q2", "entomology", "taxonomy"),
@@ -68,13 +79,26 @@ const questions = [
   question("wq-q1", "water-quality", "macros"),
   question("ap-q1", "anatomy-physiology", "skin"),
   question("cb-q1", "crime-busters", "fingerprints"),
+  question("code-q1", "codebusters", "ciphers"),
 ];
 
-check("there are 15 preset badges", BADGE_DEFINITIONS.length === 15);
+check("there are 16 preset badges", BADGE_DEFINITIONS.length === 16);
 check(
   "preset ids are stable",
   BADGE_DEFINITIONS.map((badge) => badge.id).join(",") ===
-    "first-try,first-discovery,event-explorer,three-event-explorer,tricky-topic-tamer,practice-regular,question-crusher,curious-mind,water-watcher,entomologist,body-explorer,ecosystem-explorer,crime-scene-rookie,consistent-explorer,dedicated-explorer",
+    "first-try,first-discovery,three-event-explorer,junior-scientist,tricky-topic-tamer,practice-regular,water-watcher,entomologist,body-explorer,ecosystem-explorer,crime-scene-rookie,codebusters-explorer,consistent-explorer,dedicated-explorer,perfect-expedition,science-starter",
+);
+check(
+  "selected events show only their event badges",
+  badgeIdsForSelectedEvents(["entomology", "ecology", "water-quality"]).join(
+    ",",
+  ) ===
+    "first-discovery,three-event-explorer,junior-scientist,water-watcher,entomologist,ecosystem-explorer,consistent-explorer,perfect-expedition,science-starter,practice-regular",
+);
+check(
+  "Codebusters has a definition but is hidden when unselected",
+  !badgeIdsForSelectedEvents(["entomology"]).includes("codebusters-explorer") &&
+    BADGE_DEFINITIONS.some((badge) => badge.id === "codebusters-explorer"),
 );
 
 const none = earned([]);
@@ -107,12 +131,12 @@ check(
 
 const twoEvents = earned([attempt("ento-q1"), attempt("astro-q1")]);
 check(
-  "two historical events unlock Event Explorer, including Astronomy",
-  twoEvents.includes("event-explorer"),
+  "two incomplete historical events do not unlock Junior Scientist",
+  !twoEvents.includes("junior-scientist"),
 );
 check(
-  "one event does not unlock Event Explorer",
-  !first.includes("event-explorer"),
+  "one incomplete event does not unlock Junior Scientist",
+  !first.includes("junior-scientist"),
 );
 
 const tamed = earned([
@@ -145,35 +169,12 @@ check(
   earned(tenSessions).includes("practice-regular"),
 );
 
-const fiftyUngrouped = Array.from({ length: 50 }, () =>
-  attempt("ento-q1", { sessionId: null }),
-);
-const crusher = earned(fiftyUngrouped);
-check(
-  "50 saved attempts unlock Question Crusher",
-  crusher.includes("question-crusher"),
-);
-check(
-  "50 ungrouped attempts do not unlock Practice Regular",
-  !crusher.includes("practice-regular"),
-);
-check(
-  "50 attempts is not Curious Mind yet",
-  !crusher.includes("curious-mind"),
-);
-
-const hundred = Array.from({ length: 100 }, () =>
-  attempt("ento-q1", { sessionId: null }),
-);
-check(
-  "100 saved attempts unlock Curious Mind",
-  earned(hundred).includes("curious-mind"),
-);
-
 const firstSessionNew = getNewlyEarnedBadges([], discovery);
 check(
   "first completed session newly earns First Try and First Discovery together",
-  firstSessionNew.join(",") === "first-try,first-discovery",
+  firstSessionNew.includes("first-try") &&
+    firstSessionNew.includes("first-discovery") &&
+    firstSessionNew.includes("perfect-expedition"),
 );
 
 const secondSession = Array.from({ length: PRACTICE_SET_SIZE }, () =>
@@ -188,19 +189,13 @@ check(
 const afterSecondEvent = earned([
   ...fullSession,
   ...secondSession,
-  attempt("astro-q1"),
+  ...completedSession("astro-q1", "astro-set"),
 ]);
 check(
-  "practicing a second event newly earns Event Explorer",
-  getNewlyEarnedBadges(afterSecond, afterSecondEvent).join(",") ===
-    "event-explorer",
-);
-
-const beforeFifty = earned(Array.from({ length: 49 }, () => attempt("ento-q1")));
-const afterFifty = earned(Array.from({ length: 50 }, () => attempt("ento-q1")));
-check(
-  "crossing 50 questions newly earns Question Crusher",
-  getNewlyEarnedBadges(beforeFifty, afterFifty).includes("question-crusher"),
+  "a third completed expedition newly earns Explorer",
+  getNewlyEarnedBadges(afterSecond, afterSecondEvent).includes(
+    "three-event-explorer",
+  ),
 );
 
 const multipleAtOnce = getNewlyEarnedBadges(
@@ -211,24 +206,24 @@ check(
   "multiple unlocks from one session stay in one newly-earned list",
   multipleAtOnce.includes("first-try") &&
     multipleAtOnce.includes("first-discovery") &&
-    multipleAtOnce.includes("event-explorer"),
+    !multipleAtOnce.includes("junior-scientist"),
 );
 check(
   "definitionsForIds keeps preset order",
-  definitionsForIds(["event-explorer", "first-try"])
+  definitionsForIds(["three-event-explorer", "first-try"])
     .map((badge) => badge.id)
-    .join(",") === "first-try,event-explorer",
+    .join(",") === "first-try,three-event-explorer",
 );
 
 const threeEvents = earned([
-  attempt("ento-q1"),
-  attempt("eco-q1"),
-  attempt("wq-q1"),
+  ...completedSession("ento-q1", "ento-complete"),
+  ...completedSession("eco-q1", "eco-complete"),
+  ...completedSession("wq-q1", "wq-complete"),
 ]);
 check(
   "three events unlock Explorer",
   threeEvents.includes("three-event-explorer") &&
-    threeEvents.includes("event-explorer"),
+    threeEvents.includes("junior-scientist"),
 );
 check(
   "two events do not unlock Explorer",
@@ -250,6 +245,29 @@ check(
   "five Water Quality sets do not unlock Entomologist",
   !earned(fiveWq).includes("entomologist"),
 );
+const fiveCodebusters = Array.from(
+  { length: 5 * PRACTICE_SET_SIZE },
+  (_, index) =>
+    attempt("code-q1", {
+      sessionId: `cb-${Math.floor(index / PRACTICE_SET_SIZE)}`,
+    }),
+);
+check(
+  "five Codebusters sets unlock the defined Codebusters badge",
+  earned(fiveCodebusters).includes("codebusters-explorer"),
+);
+check(
+  "an incomplete imperfect expedition does not unlock Perfect Expedition",
+  !earned(
+    completedSession("ento-q1", "imperfect", false),
+  ).includes("perfect-expedition"),
+);
+check(
+  "25 answered questions unlock Science Starter",
+  earned(
+    Array.from({ length: 25 }, () => attempt("ento-q1", { sessionId: null })),
+  ).includes("science-starter"),
+);
 
 check(
   "a 7-day streak unlocks Consistent Explorer",
@@ -260,8 +278,8 @@ check(
   }).includes("consistent-explorer"),
 );
 check(
-  "a 6-day streak does not unlock Consistent Explorer",
-  !getEarnedBadgeIds({
+  "a 6-day streak unlocks On a Roll",
+  getEarnedBadgeIds({
     attempts: [attempt("ento-q1")],
     questions,
     streakDays: 6,
@@ -295,45 +313,16 @@ check(
     BADGE_DEFINITIONS.length,
 );
 check(
-  "new student Curious Mind is 0 / 100 questions",
-  emptyProgress.get("curious-mind")?.current === 0 &&
-    emptyProgress.get("curious-mind")?.required === 100 &&
-    emptyProgress.get("curious-mind")?.noun === "question",
-);
-check(
   "new student First Expedition is 0 / 1 expedition",
   emptyProgress.get("first-discovery")?.current === 0 &&
     emptyProgress.get("first-discovery")?.required === 1,
 );
 
-const fiftyProgress = progressFor(fiftyUngrouped);
+const oneEventProgress = progressFor(fullSession);
 check(
-  "50 attempts show Question Crusher complete and capped",
-  fiftyProgress.get("question-crusher")?.current === 50 &&
-    fiftyProgress.get("question-crusher")?.required === 50,
-);
-check(
-  "50 attempts show Curious Mind as 50 / 100",
-  fiftyProgress.get("curious-mind")?.current === 50 &&
-    fiftyProgress.get("curious-mind")?.required === 100,
-);
-
-const hundredProgress = progressFor(hundred);
-check(
-  "100 attempts cap Curious Mind at 100 / 100",
-  hundredProgress.get("curious-mind")?.current === 100 &&
-    hundredProgress.get("curious-mind")?.required === 100,
-);
-check(
-  "100 attempts keep Question Crusher capped at 50",
-  hundredProgress.get("question-crusher")?.current === 50,
-);
-
-const oneEventProgress = progressFor([attempt("ento-q1")]);
-check(
-  "one event is 1 / 2 toward Event Explorer",
-  oneEventProgress.get("event-explorer")?.current === 1 &&
-    oneEventProgress.get("event-explorer")?.required === 2,
+  "one completed expedition is 1 / 3 toward Explorer",
+  oneEventProgress.get("three-event-explorer")?.current === 1 &&
+    oneEventProgress.get("three-event-explorer")?.required === 3,
 );
 
 const fiveWqProgress = progressFor(fiveWq);
@@ -350,9 +339,9 @@ check(
 
 const sixDayProgress = progressFor([attempt("ento-q1")], 6);
 check(
-  "a 6-day streak is 6 / 7 toward Consistent Explorer",
-  sixDayProgress.get("consistent-explorer")?.current === 6 &&
-    sixDayProgress.get("consistent-explorer")?.required === 7,
+  "a 6-day streak is capped at 3 / 3 toward On a Roll",
+  sixDayProgress.get("consistent-explorer")?.current === 3 &&
+    sixDayProgress.get("consistent-explorer")?.required === 3,
 );
 check(
   "a 6-day streak is 6 / 30 toward Dedicated Explorer",
@@ -369,22 +358,13 @@ check(
 );
 
 check(
-  "Curious Mind shelf copy uses questions answered",
-  formatBadgeProgress({
-    id: "curious-mind",
-    current: 56,
-    required: 100,
-    noun: "question",
-  }) === "56 / 100 questions answered",
-);
-check(
-  "Explorer shelf copy uses events explored",
+  "Explorer shelf copy uses expeditions",
   formatBadgeProgress({
     id: "three-event-explorer",
     current: 2,
     required: 3,
-    noun: "event",
-  }) === "2 / 3 events explored",
+    noun: "expedition",
+  }) === "2 / 3 expeditions",
 );
 check(
   "Ten Expeditions shelf copy uses expeditions",
@@ -396,18 +376,13 @@ check(
   }) === "3 / 10 expeditions",
 );
 check(
-  "Consistent Explorer shelf copy uses days",
+  "On a Roll shelf copy uses days",
   formatBadgeProgress({
     id: "consistent-explorer",
     current: 5,
-    required: 7,
+    required: 3,
     noun: "day",
-  }) === "5 / 7 days",
-);
-check(
-  "formatted progress still uses capped current / required",
-  formatBadgeProgress(hundredProgress.get("curious-mind")!) ===
-    "100 / 100 questions answered",
+  }) === "5 / 3 days",
 );
 
 if (failures.length > 0) {

@@ -9,24 +9,26 @@ import {
   completedSessionCount,
   completedSessionCountForEvent,
 } from "@/lib/expeditions";
+import { PRACTICE_SET_SIZE } from "@/lib/learning/adaptive";
 import type { Question } from "@/lib/types";
 
 export type BadgeId =
   | "first-try"
   | "first-discovery"
-  | "event-explorer"
   | "three-event-explorer"
+  | "junior-scientist"
   | "tricky-topic-tamer"
   | "practice-regular"
-  | "question-crusher"
-  | "curious-mind"
   | "water-watcher"
   | "entomologist"
   | "body-explorer"
   | "ecosystem-explorer"
   | "crime-scene-rookie"
+  | "codebusters-explorer"
   | "consistent-explorer"
-  | "dedicated-explorer";
+  | "dedicated-explorer"
+  | "perfect-expedition"
+  | "science-starter";
 
 export type BadgeDefinition = {
   id: BadgeId;
@@ -54,10 +56,21 @@ export type BadgeInput = {
 
 export const BARE_BONES_BADGE_IDS = [
   "first-discovery",
+  "three-event-explorer",
+  "junior-scientist",
+  "water-watcher",
+  "entomologist",
+  "body-explorer",
+  "ecosystem-explorer",
+  "crime-scene-rookie",
+  "codebusters-explorer",
+  "consistent-explorer",
+  "perfect-expedition",
+  "science-starter",
   "practice-regular",
 ] as const satisfies readonly BadgeId[];
 
-const EVENT_SET_BADGES: Array<{
+export const EVENT_SET_BADGES: Array<{
   id: BadgeId;
   eventId: string;
   sets: number;
@@ -67,7 +80,22 @@ const EVENT_SET_BADGES: Array<{
   { id: "body-explorer", eventId: "anatomy-physiology", sets: 5 },
   { id: "ecosystem-explorer", eventId: "ecology", sets: 5 },
   { id: "crime-scene-rookie", eventId: "crime-busters", sets: 5 },
+  { id: "codebusters-explorer", eventId: "codebusters", sets: 5 },
 ];
+
+export const EVENT_BADGE_IDS = EVENT_SET_BADGES.map(
+  (badge) => badge.id,
+) as readonly BadgeId[];
+
+export function badgeIdsForSelectedEvents(
+  selectedEventIds: readonly string[],
+): BadgeId[] {
+  const selected = new Set(selectedEventIds);
+  return BARE_BONES_BADGE_IDS.filter((id) => {
+    const eventId = EVENT_SET_BADGES.find((badge) => badge.id === id)?.eventId;
+    return !eventId || selected.has(eventId);
+  });
+}
 
 export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   {
@@ -85,18 +113,18 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
     emoji: "🔎",
   },
   {
-    id: "event-explorer",
-    name: "Event Explorer",
-    description: "You practiced 2 different events.",
-    requirement: "Practice 2 different events",
-    emoji: "🗺️",
-  },
-  {
     id: "three-event-explorer",
     name: "Explorer",
-    description: "You practiced 3 different events.",
-    requirement: "Practice 3 different events",
+    description: "You completed 3 expeditions total.",
+    requirement: "Complete 3 expeditions",
     emoji: "🧭",
+  },
+  {
+    id: "junior-scientist",
+    name: "Junior Scientist",
+    description: "You completed expeditions in 3 different events.",
+    requirement: "Complete an expedition in 3 different events",
+    emoji: "🧪",
   },
   {
     id: "tricky-topic-tamer",
@@ -107,65 +135,58 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
   },
   {
     id: "practice-regular",
-    name: "Ten Expeditions",
-    description: "You finished 10 full practice expeditions.",
-    requirement: "Finish 10 full practice expeditions",
+    name: "Trailblazer",
+    description: "You completed 10 expeditions total.",
+    requirement: "Complete 10 expeditions",
     emoji: "📅",
   },
   {
-    id: "question-crusher",
-    name: "Question Crusher",
-    description: "You tried 50 practice questions.",
-    requirement: "Answer 50 practice questions",
-    emoji: "📚",
-  },
-  {
-    id: "curious-mind",
-    name: "Curious Mind",
-    description: "You tried 100 practice questions.",
-    requirement: "Answer 100 practice questions",
-    emoji: "🧠",
-  },
-  {
     id: "water-watcher",
-    name: "Water Watcher",
+    name: "Water Quality Explorer",
     description: "You finished 5 Water Quality expeditions.",
     requirement: "Complete 5 Water Quality expeditions",
     emoji: "💧",
   },
   {
     id: "entomologist",
-    name: "Entomologist",
+    name: "Entomology Explorer",
     description: "You finished 5 Entomology expeditions.",
     requirement: "Complete 5 Entomology expeditions",
     emoji: "🐛",
   },
   {
     id: "body-explorer",
-    name: "Body Explorer",
+    name: "Anatomy & Physiology Explorer",
     description: "You finished 5 Anatomy & Physiology expeditions.",
     requirement: "Complete 5 Anatomy & Physiology expeditions",
     emoji: "🫀",
   },
   {
     id: "ecosystem-explorer",
-    name: "Ecosystem Explorer",
+    name: "Ecology Explorer",
     description: "You finished 5 Ecology expeditions.",
     requirement: "Complete 5 Ecology expeditions",
     emoji: "🌱",
   },
   {
     id: "crime-scene-rookie",
-    name: "Crime Scene Rookie",
+    name: "Crime Busters Explorer",
     description: "You finished 5 Crime Busters expeditions.",
     requirement: "Complete 5 Crime Busters expeditions",
     emoji: "🔬",
   },
   {
+    id: "codebusters-explorer",
+    name: "Codebusters Explorer",
+    description: "You finished 5 Codebusters expeditions.",
+    requirement: "Complete 5 Codebusters expeditions",
+    emoji: "🔐",
+  },
+  {
     id: "consistent-explorer",
-    name: "Consistent Explorer",
-    description: "You reached a 7-day practice streak.",
-    requirement: "Reach a 7-day streak",
+    name: "On a Roll",
+    description: "You practiced on 3 consecutive days.",
+    requirement: "Practice on 3 consecutive days",
     emoji: "🔥",
   },
   {
@@ -175,25 +196,72 @@ export const BADGE_DEFINITIONS: BadgeDefinition[] = [
     requirement: "Reach a 30-day streak",
     emoji: "🌟",
   },
+  {
+    id: "perfect-expedition",
+    name: "Perfect Expedition",
+    description: "You completed an expedition with every answer correct.",
+    requirement: "Complete an expedition with every answer correct",
+    emoji: "🏅",
+  },
+  {
+    id: "science-starter",
+    name: "Science Starter",
+    description: "You answered 25 practice questions.",
+    requirement: "Answer 25 practice questions",
+    emoji: "🔭",
+  },
 ];
 
 export function getBadgeDefinitions(): BadgeDefinition[] {
   return BADGE_DEFINITIONS;
 }
 
-function distinctEventCount(
+function completedEventCount(
   attempts: BadgeProgressAttempt[],
   questions: Question[],
 ): number {
   const byId = new Map(questions.map((question) => [question.id, question]));
-  const eventIds = new Set<string>();
+  const sessions = new Map<string, Set<string>>();
   for (const attempt of attempts) {
-    const question = byId.get(attempt.questionId);
-    if (question) {
-      eventIds.add(question.eventId);
+    if (!attempt.sessionId) {
+      continue;
+    }
+    const eventId = byId.get(attempt.questionId)?.eventId;
+    if (!eventId) {
+      continue;
+    }
+    const events = sessions.get(attempt.sessionId) ?? new Set<string>();
+    events.add(eventId);
+    sessions.set(attempt.sessionId, events);
+  }
+
+  const completedEvents = new Set<string>();
+  for (const [sessionId, events] of sessions) {
+    const count = attempts.filter(
+      (attempt) => attempt.sessionId === sessionId,
+    ).length;
+    if (count >= PRACTICE_SET_SIZE) {
+      events.forEach((eventId) => completedEvents.add(eventId));
     }
   }
-  return eventIds.size;
+  return completedEvents.size;
+}
+
+function hasPerfectExpedition(attempts: BadgeProgressAttempt[]): boolean {
+  const sessions = new Map<string, BadgeProgressAttempt[]>();
+  for (const attempt of attempts) {
+    if (!attempt.sessionId) {
+      continue;
+    }
+    const rows = sessions.get(attempt.sessionId) ?? [];
+    rows.push(attempt);
+    sessions.set(attempt.sessionId, rows);
+  }
+  return [...sessions.values()].some(
+    (rows) =>
+      rows.length >= PRACTICE_SET_SIZE &&
+      rows.every((attempt) => attempt.isCorrect),
+  );
 }
 
 function tamedATrickyTopic(
@@ -290,18 +358,16 @@ export function getBadgeProgress(input: BadgeInput): BadgeProgress[] {
   const { attempts, questions } = input;
   const streakDays = Math.max(0, Math.floor(input.streakDays ?? 0));
   const finishedSets = completedSessionCount(attempts);
-  const eventsTried = distinctEventCount(attempts, questions);
+  const completedEvents = completedEventCount(attempts, questions);
   const tamedTopic = tamedATrickyTopic(attempts, questions) ? 1 : 0;
 
   const progress: BadgeProgress[] = [
     cappedProgress("first-try", attempts.length, 1, "question"),
     cappedProgress("first-discovery", finishedSets, 1, "expedition"),
-    cappedProgress("event-explorer", eventsTried, 2, "event"),
-    cappedProgress("three-event-explorer", eventsTried, 3, "event"),
+    cappedProgress("three-event-explorer", finishedSets, 3, "expedition"),
+    cappedProgress("junior-scientist", completedEvents, 3, "event"),
     cappedProgress("tricky-topic-tamer", tamedTopic, 1, "topic"),
     cappedProgress("practice-regular", finishedSets, 10, "expedition"),
-    cappedProgress("question-crusher", attempts.length, 50, "question"),
-    cappedProgress("curious-mind", attempts.length, 100, "question"),
   ];
 
   for (const spec of EVENT_SET_BADGES) {
@@ -316,8 +382,15 @@ export function getBadgeProgress(input: BadgeInput): BadgeProgress[] {
   }
 
   progress.push(
-    cappedProgress("consistent-explorer", streakDays, 7, "day"),
+    cappedProgress("consistent-explorer", streakDays, 3, "day"),
     cappedProgress("dedicated-explorer", streakDays, 30, "day"),
+    cappedProgress(
+      "perfect-expedition",
+      hasPerfectExpedition(attempts) ? 1 : 0,
+      1,
+      "expedition",
+    ),
+    cappedProgress("science-starter", attempts.length, 25, "question"),
   );
 
   return progress;
@@ -328,7 +401,7 @@ export function getEarnedBadgeIds(input: BadgeInput): BadgeId[] {
   const streakDays = Math.max(0, Math.floor(input.streakDays ?? 0));
   const earned: BadgeId[] = [];
   const finishedSets = completedSessionCount(attempts);
-  const eventsTried = distinctEventCount(attempts, questions);
+  const completedEvents = completedEventCount(attempts, questions);
 
   if (attempts.length >= 1) {
     earned.push("first-try");
@@ -336,23 +409,17 @@ export function getEarnedBadgeIds(input: BadgeInput): BadgeId[] {
   if (finishedSets >= 1) {
     earned.push("first-discovery");
   }
-  if (eventsTried >= 2) {
-    earned.push("event-explorer");
-  }
-  if (eventsTried >= 3) {
+  if (finishedSets >= 3) {
     earned.push("three-event-explorer");
+  }
+  if (completedEvents >= 3) {
+    earned.push("junior-scientist");
   }
   if (tamedATrickyTopic(attempts, questions)) {
     earned.push("tricky-topic-tamer");
   }
   if (finishedSets >= 10) {
     earned.push("practice-regular");
-  }
-  if (attempts.length >= 50) {
-    earned.push("question-crusher");
-  }
-  if (attempts.length >= 100) {
-    earned.push("curious-mind");
   }
   for (const spec of EVENT_SET_BADGES) {
     if (
@@ -362,11 +429,17 @@ export function getEarnedBadgeIds(input: BadgeInput): BadgeId[] {
       earned.push(spec.id);
     }
   }
-  if (streakDays >= 7) {
+  if (streakDays >= 3) {
     earned.push("consistent-explorer");
   }
   if (streakDays >= 30) {
     earned.push("dedicated-explorer");
+  }
+  if (hasPerfectExpedition(attempts)) {
+    earned.push("perfect-expedition");
+  }
+  if (attempts.length >= 25) {
+    earned.push("science-starter");
   }
 
   return earned;

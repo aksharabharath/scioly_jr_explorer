@@ -4,6 +4,7 @@ import { BadgeCelebration } from "@/components/BadgeCelebration";
 import {
   BARE_BONES_BADGE_IDS,
   BADGE_DEFINITIONS,
+  badgeIdsForSelectedEvents,
   definitionsForIds,
   formatBadgeProgress,
   type BadgeDefinition,
@@ -17,6 +18,7 @@ type BadgeShelfProps = {
   progress: readonly BadgeProgress[];
   newlyEarnedIds?: readonly BadgeId[];
   accountId?: string;
+  selectedEventIds: readonly string[];
 };
 
 const GROUPS: Array<{ title: string; ids: readonly BadgeId[] }> = [
@@ -31,9 +33,13 @@ export function BadgeShelf({
   progress,
   newlyEarnedIds = [],
   accountId,
+  selectedEventIds,
 }: BadgeShelfProps) {
   const earned = new Set(earnedIds);
   const byId = new Map(progress.map((row) => [row.id, row]));
+  const visibleBadgeIds = new Set(
+    badgeIdsForSelectedEvents(selectedEventIds),
+  );
   const empty = earnedIds.length === 0;
   const [celebrationIds, setCelebrationIds] = useState<BadgeId[]>([]);
 
@@ -99,7 +105,7 @@ export function BadgeShelf({
               {group.title}
             </h3>
             <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {group.ids.map((id) => {
+              {group.ids.filter((id) => visibleBadgeIds.has(id)).map((id) => {
                 const badge = BADGE_DEFINITIONS.find((item) => item.id === id);
                 const row = byId.get(id);
                 if (!badge || !row) {

@@ -19,7 +19,7 @@ export const dynamic = "force-dynamic";
 
 export default async function BadgesPage() {
   const user = await requireUser();
-  await requireEventSelection();
+  const selectedEventIds = await requireEventSelection();
   const [attempts, questions, gamification] = await Promise.all([
     getMyPracticeAttempts(),
     getAllQuestions(),
@@ -78,6 +78,7 @@ export default async function BadgesPage() {
           progress={badgeProgress}
           newlyEarnedIds={newlyEarnedBadgeIds}
           accountId={user.id}
+          selectedEventIds={selectedEventIds}
         />
       </div>
     </main>
