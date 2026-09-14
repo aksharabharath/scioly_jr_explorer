@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type NavItem = {
   href: string;
@@ -149,6 +149,15 @@ export function SiteNav() {
 
 function GlobalFeedbackWindow({ onClose }: { onClose: () => void }) {
   const [otherText, setOtherText] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  useEffect(() => {
+    if (!submitted) {
+      return;
+    }
+    const timeoutId = window.setTimeout(onClose, 1600);
+    return () => window.clearTimeout(timeoutId);
+  }, [onClose, submitted]);
 
   return (
     <div
@@ -190,6 +199,11 @@ function GlobalFeedbackWindow({ onClose }: { onClose: () => void }) {
           />
         </label>
         <div className="mt-4 flex justify-end gap-2">
+          {submitted ? (
+            <p className="mr-auto self-center text-sm font-semibold text-teal-dark" aria-live="polite">
+              Feedback has been received, thanks!
+            </p>
+          ) : null}
           <button
             type="button"
             onClick={onClose}
@@ -199,7 +213,7 @@ function GlobalFeedbackWindow({ onClose }: { onClose: () => void }) {
           </button>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => setSubmitted(true)}
             className="rounded-full bg-teal-dark px-4 py-2 text-sm font-semibold text-parchment hover:bg-teal"
           >
             Submit feedback
