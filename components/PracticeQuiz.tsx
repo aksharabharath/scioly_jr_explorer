@@ -329,6 +329,8 @@ export function PracticeQuiz({
   const [wordingHelpQuestionId, setWordingHelpQuestionId] = useState<
     string | null
   >(null);
+  const [feedbackWindowOpen, setFeedbackWindowOpen] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState<string | null>(null);
   const activeQuestionId =
     state.status === "active" ? state.question.id : "";
   const wordingHelpOpen = wordingHelpQuestionId === activeQuestionId;
@@ -706,8 +708,7 @@ export function PracticeQuiz({
   function submitQuestionFeedbackDetails() {
     if (
       state.status !== "active" ||
-      !state.submitted ||
-      state.questionFeedback.feedback !== "negative"
+      !state.submitted
     ) {
       return;
     }
@@ -724,6 +725,41 @@ export function PracticeQuiz({
     );
   }
 
+  function submitExpeditionFeedback(
+    issueCodes: QuestionFeedbackIssue[],
+    otherText: string,
+  ) {
+    if (state.status !== "active") {
+      return;
+    }
+    const trimmedOtherText = otherText.trim();
+    const nextIssueCodes: QuestionFeedbackIssue[] =
+      trimmedOtherText && !issueCodes.includes("other")
+        ? [...issueCodes, "other"]
+        : issueCodes;
+    setState((current) =>
+      current.status === "active"
+        ? {
+            ...current,
+            questionFeedback: {
+              ...current.questionFeedback,
+              feedback:
+                nextIssueCodes.length > 0 || trimmedOtherText
+                  ? "negative"
+                  : current.questionFeedback.feedback,
+              issueCodes: nextIssueCodes,
+              otherText: trimmedOtherText,
+              detailSubmitted: false,
+            },
+          }
+        : current,
+    );
+    setFeedbackWindowOpen(false);
+    if (nextIssueCodes.length > 0 || trimmedOtherText) {
+      setFeedbackMessage("Thanks for the feedback!");
+    }
+  }
+
   async function continueToNext() {
     if (
       state.status !== "active" ||
@@ -737,14 +773,20 @@ export function PracticeQuiz({
 
     feedbackSavingRef.current = true;
     const questionFeedback = state.questionFeedback;
+    const hasReason =
+      questionFeedback.issueCodes.length > 0 ||
+      questionFeedback.otherText.trim().length > 0;
+    const feedbackForSave = hasReason
+      ? "negative"
+      : questionFeedback.feedback;
     try {
-      if (questionFeedback.feedback && attemptIdRef.current) {
+      if (feedbackForSave && attemptIdRef.current) {
         await saveQuestionFeedback({
           attemptId: attemptIdRef.current,
           eventId,
           questionId: question.id,
           questionVersionId: question.questionVersionId,
-          feedback: questionFeedback.feedback,
+          feedback: feedbackForSave,
           issueCodes: questionFeedback.issueCodes,
           otherText: questionFeedback.otherText,
         });
@@ -832,10 +874,33 @@ export function PracticeQuiz({
   return (
     <section className="journal-panel rounded-3xl p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="font-medium text-stone-700">
-          Question {sessionNumber} of {plannedTotal}
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="font-medium text-stone-700">
+            Question {sessionNumber} of {plannedTotal}
+          </p>
+          {feedbackMessage ? (
+            <span className="text-xs font-medium text-teal-dark">
+              {feedbackMessage}
+            </span>
+          ) : null}
+        </div>
+        {state.submitted ? (
+          <button
+            type="button"
+            onClick={() => setFeedbackWindowOpen(true)}
+            className="rounded-full border border-stone-200 px-3 py-1.5 text-xs font-semibold text-ink hover:border-teal hover:bg-parchment"
+          >
+            Feedback
+          </button>
+        ) : null}
       </div>
+      {feedbackWindowOpen && state.status === "active" && state.submitted ? (
+        <ExpeditionFeedbackWindow
+          feedback={state.questionFeedback}
+          onClose={() => setFeedbackWindowOpen(false)}
+          onSubmit={submitExpeditionFeedback}
+        />
+      ) : null}
       <div
         className="mt-2 h-1.5 overflow-hidden rounded-full bg-stone-200"
         role="progressbar"
@@ -1093,6 +1158,115 @@ export function PracticeQuiz({
   );
 }
 
+function ExpeditionFeedbackWindow({
+  feedback,
+  onClose,
+  onSubmit,
+}: {
+  feedback: QuestionFeedbackState;
+  onClose: () => void;
+  onSubmit: (
+    issueCodes: QuestionFeedbackIssue[],
+    otherText: string,
+  ) => void;
+}) {
+  const [issueCodes, setIssueCodes] = useState<QuestionFeedbackIssue[]>(
+    feedback.issueCodes,
+  );
+  const [otherText, setOtherText] = useState(feedback.otherText);
+
+  function toggleIssue(issue: QuestionFeedbackIssue) {
+    setIssueCodes((current) =>
+      current.includes(issue)
+        ? current.filter((item) => item !== issue)
+        : [...current, issue],
+    );
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center bg-ink/20 p-4 pt-20"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="expedition-feedback-heading"
+    >
+      <div className="w-full max-w-lg rounded-3xl border border-stone-200 bg-surface p-4 shadow-xl sm:p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2
+              id="expedition-feedback-heading"
+              className="font-display text-xl font-semibold text-ink"
+            >
+              Feedback
+            </h2>
+            <p className="mt-1 text-sm text-stone-600">
+              Help us make Jr. Explorer better.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close feedback"
+            className="rounded-full px-2 py-1 text-xl leading-none text-stone-500 hover:bg-parchment hover:text-ink"
+          >
+            ×
+          </button>
+        </div>
+
+        <div className="mt-4">
+          <p className="text-sm font-semibold text-ink">What seems wrong?</p>
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            {QUESTION_FEEDBACK_OPTIONS.map((option) => (
+              <label
+                key={option.value}
+                className="flex min-h-10 items-center gap-2 rounded-xl border border-stone-200 bg-parchment px-3 py-2 text-sm text-ink"
+              >
+                <input
+                  type="checkbox"
+                  checked={issueCodes.includes(option.value)}
+                  onChange={() => toggleIssue(option.value)}
+                  className="h-4 w-4 accent-teal"
+                />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {issueCodes.includes("other") ? (
+          <label className="mt-4 block text-sm text-stone-700">
+            <span className="font-semibold text-ink">Anything else?</span>
+            <textarea
+              value={otherText}
+              onChange={(event) => setOtherText(event.target.value)}
+              rows={4}
+              placeholder="What could we improve? Tell us about anything that surprised you, didn’t work the way you expected, or would make Jr. Explorer more useful or fun to use."
+              className="mt-1 w-full resize-y rounded-2xl border border-stone-200 bg-parchment px-3 py-2 text-sm text-ink outline-none placeholder:text-stone-400 focus:border-teal focus:ring-2 focus:ring-teal/20"
+            />
+          </label>
+        ) : null}
+
+        <div className="mt-4 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full border border-stone-200 px-4 py-2 text-sm font-semibold text-ink hover:bg-parchment"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => onSubmit(issueCodes, otherText)}
+            className="rounded-full bg-teal-dark px-4 py-2 text-sm font-semibold text-parchment hover:bg-teal"
+          >
+            Submit feedback
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function QuestionFeedbackPanel({
   feedback,
   onSelectFeedback,
@@ -1141,8 +1315,7 @@ function QuestionFeedbackPanel({
           👎
         </button>
       </div>
-      {feedback.feedback === "negative" ? (
-        <div className="mt-3 space-y-2">
+      <div className="mt-3 space-y-2">
           <p className="text-sm font-semibold text-ink">What seems wrong?</p>
           <div className="space-y-2">
             {QUESTION_FEEDBACK_OPTIONS.map((option) => (
@@ -1180,8 +1353,7 @@ function QuestionFeedbackPanel({
           >
             Submit
           </button>
-        </div>
-      ) : null}
+      </div>
     </div>
   );
 }
