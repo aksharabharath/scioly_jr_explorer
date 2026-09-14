@@ -138,7 +138,6 @@ export default async function EventPage({ params }: EventRouteProps) {
               <EventProgressDashboard
                 eventName={event.name}
                 questionsAnswered={questionsAnswered}
-                accuracyPercent={eventProgress.accuracyPercent}
                 expeditionsCompleted={expeditionsCompleted}
                 activeDays={activeDays}
                 expeditionEntries={expeditionEntries}

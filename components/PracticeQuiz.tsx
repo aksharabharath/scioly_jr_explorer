@@ -881,6 +881,17 @@ export function PracticeQuiz({
               ) : null}
             </figure>
           ) : null}
+          {state.submitted ? (
+            <div className="mt-3 max-w-sm">
+              <QuestionFeedbackPanel
+                feedback={state.questionFeedback}
+                onSelectFeedback={selectQuestionFeedback}
+                onToggleIssue={toggleQuestionFeedbackIssue}
+                onOtherTextChange={setQuestionFeedbackOtherText}
+                onSubmitDetails={submitQuestionFeedbackDetails}
+              />
+            </div>
+          ) : null}
         </div>
 
         <div>
@@ -1066,13 +1077,6 @@ export function PracticeQuiz({
                   ) : null}
                 </div>
               ) : null}
-              <QuestionFeedbackPanel
-                feedback={state.questionFeedback}
-                onSelectFeedback={selectQuestionFeedback}
-                onToggleIssue={toggleQuestionFeedbackIssue}
-                onOtherTextChange={setQuestionFeedbackOtherText}
-                onSubmitDetails={submitQuestionFeedbackDetails}
-              />
               <button
                 type="button"
                 onClick={continueToNext}

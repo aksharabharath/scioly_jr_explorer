@@ -3,7 +3,6 @@ import type { ExpeditionLogEntry } from "@/lib/expeditions";
 type EventProgressDashboardProps = {
   eventName: string;
   questionsAnswered: number;
-  accuracyPercent: number | null;
   expeditionsCompleted: number;
   activeDays: number;
   expeditionEntries: ExpeditionLogEntry[];
@@ -14,7 +13,6 @@ type EventProgressDashboardProps = {
 export function EventProgressDashboard({
   eventName,
   questionsAnswered,
-  accuracyPercent,
   expeditionsCompleted,
   activeDays,
   expeditionEntries,
@@ -41,13 +39,9 @@ export function EventProgressDashboard({
         >
           Your progress
         </h2>
-        <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
           <Stat label="Expeditions completed" value={expeditionsCompleted} />
           <Stat label="Questions answered" value={questionsAnswered} />
-          <Stat
-            label="Accuracy"
-            value={accuracyPercent == null ? "—" : `${accuracyPercent}%`}
-          />
           <Stat label="Active days" value={activeDays} />
         </dl>
       </section>
@@ -105,18 +99,18 @@ function ActivityCalendar({
   return (
     <section
       aria-labelledby="activity-calendar-heading"
-      className="journal-panel rounded-3xl p-3 sm:p-4"
+      className="journal-panel rounded-3xl p-3"
     >
       <h2
         id="activity-calendar-heading"
-        className="font-display text-lg font-semibold tracking-tight text-ink"
+        className="font-display text-base font-semibold tracking-tight text-ink"
       >
         Expedition days
       </h2>
-      <p className="mt-1 text-sm text-stone-600">{monthLabel}</p>
-      <div className="mt-3 grid grid-cols-7 gap-1 text-center text-xs">
+      <p className="mt-0.5 text-xs text-stone-600">{monthLabel}</p>
+      <div className="mt-2 grid grid-cols-7 gap-0.5 text-center text-[11px]">
         {["S", "M", "T", "W", "T", "F", "S"].map((day, index) => (
-          <span key={`${day}-${index}`} className="py-1 font-semibold text-stone-500">
+          <span key={`${day}-${index}`} className="py-0.5 font-semibold text-stone-500">
             {day}
           </span>
         ))}
@@ -144,7 +138,7 @@ function ActivityCalendar({
           );
         })}
       </div>
-      <p className="mt-3 text-xs text-stone-500">
+      <p className="mt-2 text-[11px] text-stone-500">
         Teal days mark a completed expedition.
       </p>
     </section>
@@ -159,8 +153,8 @@ function AccuracyTrend({
   entries: ExpeditionLogEntry[];
 }) {
   const width = 320;
-  const height = 130;
-  const padding = 22;
+  const height = 112;
+  const padding = 18;
   const points = entries.map((entry, index) => {
     const accuracy = Math.round(
       (entry.correctAnswers / Math.max(1, entry.questionsAnswered)) * 100,
@@ -177,27 +171,31 @@ function AccuracyTrend({
   return (
     <section
       aria-labelledby="accuracy-trend-heading"
-      className="journal-panel rounded-3xl p-3 sm:p-4"
+      className="journal-panel rounded-3xl p-3"
     >
       <h2
         id="accuracy-trend-heading"
-        className="font-display text-lg font-semibold tracking-tight text-ink"
+        className="font-display text-base font-semibold tracking-tight text-ink"
       >
         Your Accuracy
       </h2>
-      <p className="mt-1 text-sm text-stone-600">
+      <p className="mt-0.5 text-xs text-stone-600">
         Recent {eventName} Expeditions
       </p>
       {points.length === 0 ? (
-        <p className="mt-6 rounded-2xl bg-parchment/80 px-3 py-4 text-sm text-stone-600">
+        <p className="mt-3 rounded-2xl bg-parchment/80 px-3 py-3 text-sm text-stone-600">
           Complete an Expedition to start your trend.
+        </p>
+      ) : points.length === 1 ? (
+        <p className="mt-3 flex min-h-28 items-center justify-center rounded-2xl bg-parchment/80 px-3 text-center text-sm text-stone-600">
+          Keep practicing to track your progress!
         </p>
       ) : (
         <svg
           viewBox={`0 0 ${width} ${height}`}
           role="img"
           aria-label="Accuracy across recent Expeditions"
-          className="mt-3 h-36 w-full"
+          className="mt-3 h-28 w-full"
         >
           <line
             x1={padding}
