@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 type NavItem = {
   href: string;
@@ -97,36 +98,114 @@ function NavIcon({ name }: { name: NavItem["icon"] }) {
 
 export function SiteNav() {
   const pathname = usePathname() ?? "";
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   return (
-    <nav
-      aria-label="Main"
-      className="min-w-0 flex-1 max-[479px]:basis-full"
+    <>
+      <nav
+        aria-label="Main"
+        className="min-w-0 flex-1 max-[479px]:basis-full"
+      >
+        <ul className="flex min-w-0 flex-wrap items-center justify-end gap-0.5 sm:flex-nowrap sm:gap-1 max-[479px]:justify-between">
+          {ITEMS.map((item) => {
+            const active = item.match(pathname);
+            return (
+              <li key={item.href} className="shrink-0">
+                <Link
+                  href={item.href}
+                  aria-label={item.label}
+                  aria-current={active ? "page" : undefined}
+                  className={`inline-flex min-h-12 items-center gap-1.5 rounded-md px-2.5 py-2.5 text-[13px] font-medium outline-none transition-colors max-[479px]:px-1.5 max-[479px]:text-[11px] sm:min-h-11 sm:px-3 sm:py-2.5 sm:text-sm focus-visible:ring-2 focus-visible:ring-teal ${
+                    active
+                      ? "bg-parchment font-semibold text-teal-dark shadow-[inset_0_-2px_0_0_var(--teal)]"
+                      : "text-stone-600 hover:bg-parchment hover:text-ink"
+                  }`}
+                >
+                  <NavIcon name={item.icon} />
+                  <span className="hidden min-[480px]:inline max-[479px]:inline">
+                    {item.label}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+          <li className="shrink-0">
+            <button
+              type="button"
+              onClick={() => setFeedbackOpen(true)}
+              className="inline-flex min-h-12 items-center rounded-md px-2.5 py-2.5 text-[13px] font-medium text-stone-600 outline-none transition-colors hover:bg-parchment hover:text-ink focus-visible:ring-2 focus-visible:ring-teal max-[479px]:px-1.5 max-[479px]:text-[11px] sm:min-h-11 sm:px-3 sm:py-2.5 sm:text-sm"
+            >
+              <span>Feedback</span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+      {feedbackOpen ? (
+        <GlobalFeedbackWindow onClose={() => setFeedbackOpen(false)} />
+      ) : null}
+    </>
+  );
+}
+
+function GlobalFeedbackWindow({ onClose }: { onClose: () => void }) {
+  const [otherText, setOtherText] = useState("");
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-start justify-center bg-ink/20 p-4 pt-20"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="global-feedback-heading"
     >
-      <ul className="flex min-w-0 flex-wrap items-center justify-end gap-0.5 sm:flex-nowrap sm:gap-1 max-[479px]:justify-between">
-        {ITEMS.map((item) => {
-          const active = item.match(pathname);
-          return (
-            <li key={item.href} className="shrink-0">
-              <Link
-                href={item.href}
-                aria-label={item.label}
-                aria-current={active ? "page" : undefined}
-                className={`inline-flex min-h-12 items-center gap-1.5 rounded-md px-2.5 py-2.5 text-[13px] font-medium outline-none transition-colors max-[479px]:px-1.5 max-[479px]:text-[11px] sm:min-h-11 sm:px-3 sm:py-2.5 sm:text-sm focus-visible:ring-2 focus-visible:ring-teal ${
-                  active
-                    ? "bg-parchment font-semibold text-teal-dark shadow-[inset_0_-2px_0_0_var(--teal)]"
-                    : "text-stone-600 hover:bg-parchment hover:text-ink"
-                }`}
-              >
-                <NavIcon name={item.icon} />
-                <span className="hidden min-[480px]:inline max-[479px]:inline">
-                  {item.label}
-                </span>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </nav>
+      <div className="w-full max-w-lg rounded-3xl border border-stone-200 bg-surface p-4 shadow-xl sm:p-5">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h2
+              id="global-feedback-heading"
+              className="font-display text-xl font-semibold text-ink"
+            >
+              Feedback
+            </h2>
+            <p className="mt-1 text-sm text-stone-600">
+              Help us make Jr. Explorer better.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close feedback"
+            className="rounded-full px-2 py-1 text-xl leading-none text-stone-500 hover:bg-parchment hover:text-ink"
+          >
+            ×
+          </button>
+        </div>
+        <label className="mt-4 block text-sm text-stone-700">
+          <span className="font-semibold text-ink">Anything else?</span>
+          <textarea
+            value={otherText}
+            onChange={(event) => setOtherText(event.target.value)}
+            rows={4}
+            placeholder="What could we improve? Tell us about anything that surprised you, didn’t work the way you expected, or would make Jr. Explorer more useful or fun to use."
+            className="mt-1 w-full resize-y rounded-2xl border border-stone-200 bg-parchment px-3 py-2 text-sm text-ink outline-none placeholder:text-stone-400 focus:border-teal focus:ring-2 focus:ring-teal/20"
+          />
+        </label>
+        <div className="mt-4 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full border border-stone-200 px-4 py-2 text-sm font-semibold text-ink hover:bg-parchment"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-full bg-teal-dark px-4 py-2 text-sm font-semibold text-parchment hover:bg-teal"
+          >
+            Submit feedback
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
