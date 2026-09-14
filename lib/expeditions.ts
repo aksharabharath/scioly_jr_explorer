@@ -10,8 +10,7 @@ import {
   localCalendarDate,
 } from "@/lib/gamification";
 import { PRACTICE_SET_SIZE } from "@/lib/learning/adaptive";
-import { isLivePracticeQuestion } from "@/lib/mock/curriculum";
-import type { Question } from "@/lib/types";
+import type { QuestionReference } from "@/lib/types";
 
 export type ExpeditionAttempt = {
   questionId: string;
@@ -49,7 +48,7 @@ export function completedSessionCount(attempts: ExpeditionAttempt[]): number {
 export function completedSessionCountForEvent(
   eventId: string,
   attempts: ExpeditionAttempt[],
-  questions: Question[],
+  questions: QuestionReference[],
 ): number {
   const byId = new Map(questions.map((question) => [question.id, question]));
   const counts = new Map<string, number>();
@@ -75,15 +74,14 @@ export function completedSessionCountForEvent(
 export function uniqueQuestionsPracticed(
   eventId: string,
   attempts: ExpeditionAttempt[],
-  questions: Question[],
+  questions: QuestionReference[],
 ): number {
   const byId = new Map(questions.map((question) => [question.id, question]));
   const ids = new Set<string>();
   for (const attempt of attempts) {
     const question = byId.get(attempt.questionId);
     if (
-      question?.eventId === eventId &&
-      isLivePracticeQuestion(question)
+      question?.eventId === eventId
     ) {
       ids.add(attempt.questionId);
     }
@@ -126,7 +124,7 @@ export function hasCompletedExpeditionOnLocalDate(
 
 export function expeditionLogEntries(
   attempts: ExpeditionAttempt[],
-  questions: Question[],
+  questions: QuestionReference[],
   eventNameById: Record<string, string>,
   limit = 8,
 ): ExpeditionLogEntry[] {
@@ -317,7 +315,7 @@ function completeSessionIdSet(attempts: ExpeditionAttempt[]): Set<string> {
 
 function majorityEventId(
   rows: ExpeditionAttempt[],
-  byId: Map<string, Question>,
+  byId: Map<string, QuestionReference>,
 ): string | null {
   const tallies = new Map<string, number>();
   for (const row of rows) {

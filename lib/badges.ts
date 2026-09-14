@@ -10,7 +10,7 @@ import {
   completedSessionCountForEvent,
 } from "@/lib/expeditions";
 import { PRACTICE_SET_SIZE } from "@/lib/learning/adaptive";
-import type { Question } from "@/lib/types";
+import type { QuestionReference } from "@/lib/types";
 
 export type BadgeId =
   | "first-try"
@@ -50,7 +50,7 @@ export type BadgeProgressAttempt = {
 
 export type BadgeInput = {
   attempts: BadgeProgressAttempt[];
-  questions: Question[];
+  questions: QuestionReference[];
   streakDays?: number;
 };
 
@@ -218,7 +218,7 @@ export function getBadgeDefinitions(): BadgeDefinition[] {
 
 function completedEventCount(
   attempts: BadgeProgressAttempt[],
-  questions: Question[],
+  questions: QuestionReference[],
 ): number {
   const byId = new Map(questions.map((question) => [question.id, question]));
   const sessions = new Map<string, Set<string>>();
@@ -266,7 +266,7 @@ function hasPerfectExpedition(attempts: BadgeProgressAttempt[]): boolean {
 
 function tamedATrickyTopic(
   attempts: BadgeProgressAttempt[],
-  questions: Question[],
+  questions: QuestionReference[],
 ): boolean {
   const byId = new Map(questions.map((question) => [question.id, question]));
   const firstMiss = new Map<string, number>();
@@ -458,7 +458,7 @@ export function getNewlyEarnedBadges(
 export function getNewlyEarnedBadgesFromAttempts(
   beforeAttempts: BadgeProgressAttempt[],
   afterAttempts: BadgeProgressAttempt[],
-  questions: Question[],
+  questions: QuestionReference[],
   streakDaysBefore = 0,
   streakDaysAfter = 0,
 ): BadgeId[] {

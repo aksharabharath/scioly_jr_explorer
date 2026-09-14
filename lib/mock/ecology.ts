@@ -4,8 +4,9 @@
  * Question text lives in ecology-questions.ts.
  * The catalog event is unlocked and uses the shared practice route.
  */
-import { ECOLOGY_EVENT_ID } from "@/lib/mock/ecology-questions";
 import type { Topic } from "@/lib/types";
+
+const ECOLOGY_EVENT_ID = "ecology";
 
 export const MOCK_ECOLOGY_OVERVIEW =
   "Learn how living things interact with each other and with their environment.";

@@ -2,7 +2,7 @@
  * Progress calculation checks.
  * Run: npx tsx lib/progress.check.ts
  */
-import { MOCK_ASTRONOMY_QUESTIONS as astronomy } from "@/lib/mock/astronomy";
+import { MOCK_ASTRONOMY_QUESTIONS as astronomy } from "@/lib/mock/astronomy-questions";
 import {
   calculateEventProgress,
   calculateOverallProgress,

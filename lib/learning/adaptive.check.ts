@@ -2,9 +2,7 @@
  * Independent checks for Adaptive Practice v1.
  * Run: npx tsx lib/learning/adaptive.check.ts
  */
-import {
-  MOCK_ASTRONOMY_QUESTIONS as bank,
-} from "@/lib/mock/astronomy";
+import { MOCK_ASTRONOMY_QUESTIONS as bank } from "@/lib/mock/astronomy-questions";
 import {
   CORRECTS_TO_CLEAR_WEAK_TOPIC,
   PRACTICE_SET_SIZE,

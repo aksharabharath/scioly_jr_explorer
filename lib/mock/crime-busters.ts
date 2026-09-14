@@ -4,8 +4,9 @@
  * Question text lives in crime-busters-questions.ts.
  * The catalog event is unlocked and uses the shared practice route.
  */
-import { CRIME_BUSTERS_EVENT_ID } from "@/lib/mock/crime-busters-questions";
 import type { Topic } from "@/lib/types";
+
+const CRIME_BUSTERS_EVENT_ID = "crime-busters";
 
 export const MOCK_CRIME_BUSTERS_OVERVIEW =
   "Use printed 2027 lists and sourced forensic and chemistry facts. Image-dependent practice stays held out until reviewed assets exist.";

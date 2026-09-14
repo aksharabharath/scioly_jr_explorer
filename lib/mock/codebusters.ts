@@ -4,8 +4,9 @@
  * Question text lives in codebusters-questions.ts.
  * The catalog event remains locked until the bank has completed playability QA.
  */
-import { CODEBUSTERS_EVENT_ID } from "@/lib/mock/codebusters-questions";
 import type { Topic } from "@/lib/types";
+
+const CODEBUSTERS_EVENT_ID = "codebusters";
 
 export const MOCK_CODEBUSTERS_OVERVIEW =
   "Learn to recognize, encode, and decode the ciphers listed in the 2027 rules.";

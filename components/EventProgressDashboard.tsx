@@ -21,8 +21,8 @@ export function EventProgressDashboard({
   calendarYear,
   calendarMonth,
 }: EventProgressDashboardProps) {
-  const recentEntries = expeditionEntries.slice(0, 10);
-  const trendEntries = [...recentEntries].reverse();
+  const recentEntries = expeditionEntries.slice(0, 3);
+  const trendEntries = [...expeditionEntries].reverse();
   const completedDates = new Set(
     expeditionEntries
       .map((entry) => localDateKey(entry.endedAt))

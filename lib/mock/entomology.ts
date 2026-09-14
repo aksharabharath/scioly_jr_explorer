@@ -4,8 +4,9 @@
  * Question text lives in entomology-questions.ts. Practice selection uses the
  * generic Question shape via entomologyQuestionToPracticeQuestion().
  */
-import { ENTOMOLOGY_EVENT_ID } from "@/lib/mock/entomology-questions";
 import type { Topic } from "@/lib/types";
+
+const ENTOMOLOGY_EVENT_ID = "entomology";
 
 export const MOCK_ENTOMOLOGY_OVERVIEW =
   "Identify listed insects and related arthropods, then connect what you see to anatomy, life cycles, and ecology.";

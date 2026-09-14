@@ -4,12 +4,12 @@ import { useLocalCalendarDate } from "@/components/useLocalCalendarDate";
 import { recentAchievements } from "@/lib/recent-achievements";
 import type { BadgeProgressAttempt } from "@/lib/badges";
 import type { DailyPracticeGoal } from "@/lib/student-preferences";
-import type { Question } from "@/lib/types";
+import type { QuestionReference } from "@/lib/types";
 import Link from "next/link";
 
 type RecentAchievementsProps = {
   attempts: BadgeProgressAttempt[];
-  questions: Question[];
+  questions: QuestionReference[];
   streakDays: number;
   dailyPracticeGoal: DailyPracticeGoal;
 };

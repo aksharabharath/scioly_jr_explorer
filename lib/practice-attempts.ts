@@ -9,9 +9,12 @@ import {
   PRACTICE_SET_SIZE,
   WEAK_TOPIC_ATTEMPT_WINDOW,
 } from "@/lib/learning/adaptive";
-import { getQuestionById } from "@/lib/mock/curriculum";
-import { isQuestionAnswerCorrect } from "@/lib/practice";
-import { createClient } from "@/lib/supabase/server";
+import { getQuestionById } from "@/lib/questions/server";
+import { isQuestionAnswerCorrect } from "@/lib/questions/answer-validation";
+import {
+  createClient,
+  createServiceRoleClient,
+} from "@/lib/supabase/server";
 import type { Question } from "@/lib/types";
 
 export type StoredPracticeAttempt = {
@@ -160,7 +163,9 @@ export async function getMyGamification(): Promise<GamificationState> {
 }
 
 export type SaveAttemptInput = {
+  eventId: string;
   questionId: string;
+  questionVersionId: string;
   selectedOptionId: string;
   hintUsed: boolean;
   attemptId: string;
@@ -171,6 +176,10 @@ export type SaveAttemptInput = {
 export type SaveAttemptResult =
   | {
       ok: true;
+      isCorrect: boolean;
+      revealedChoiceId: string | null;
+      explanation: string;
+      kidExplanation: string | null;
       attemptXp: number;
       sessionBonusXp: number;
       xp: number;
@@ -205,6 +214,26 @@ export async function insertPracticeAttempt(
     return { ok: false, error: "That question could not be saved." };
   }
 
+  const serviceClient = createServiceRoleClient();
+  const { data: expedition } = await serviceClient
+    .from("practice_expeditions")
+    .select("event_id, question_ids, question_version_ids, expires_at, finished_at")
+    .eq("id", input.sessionId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  const selectedIds = Array.isArray(expedition?.question_ids)
+    ? expedition.question_ids.map(String)
+    : [];
+  if (
+    !expedition ||
+    expedition.event_id !== input.eventId ||
+    expedition.finished_at ||
+    new Date(expedition.expires_at).getTime() <= Date.now() ||
+    !selectedIds.includes(input.questionId)
+  ) {
+    return { ok: false, error: "That expedition is no longer active." };
+  }
+
   const question = await getQuestionById(input.questionId);
   const submittedAnswer = input.selectedOptionId.trim();
   const selected =
@@ -214,6 +243,21 @@ export async function insertPracticeAttempt(
           (choice) => choice.id === input.selectedOptionId,
         )?.id;
   if (!question || !selected || !submittedAnswer) {
+    return { ok: false, error: "That question could not be saved." };
+  }
+  if (question.eventId !== input.eventId) {
+    return { ok: false, error: "That question could not be saved." };
+  }
+  const { data: version } = await serviceClient
+    .from("question_versions")
+    .select("question_id, event_id")
+    .eq("id", input.questionVersionId)
+    .maybeSingle();
+  if (
+    !version ||
+    version.question_id !== input.questionId ||
+    version.event_id !== input.eventId
+  ) {
     return { ok: false, error: "That question could not be saved." };
   }
 
@@ -252,11 +296,46 @@ export async function insertPracticeAttempt(
     };
   }
 
+  const { error: linkageError } = await serviceClient
+    .from("practice_attempts")
+    .update({
+      event_id: input.eventId,
+      question_version_id: input.questionVersionId,
+    })
+    .eq("id", input.attemptId)
+    .eq("student_id", user.id);
+  if (linkageError) {
+    return {
+      ok: false,
+      error: "Your answer was checked, but it could not be saved. Try again later.",
+    };
+  }
+
+  const { count: sessionCount } = await serviceClient
+    .from("practice_attempts")
+    .select("id", { count: "exact", head: true })
+    .eq("session_id", input.sessionId)
+    .eq("student_id", user.id);
+  if (sessionCount === 10) {
+    await serviceClient
+      .from("practice_expeditions")
+      .delete()
+      .eq("id", input.sessionId)
+      .eq("user_id", user.id);
+  }
+
   const awarded = parseAwardResult(data);
   // Keep the in-progress PracticeQuiz mounted. Its client state owns the
   // active question, review index, and session identity; refreshing the
   // practice route here would reconstruct a new quiz after every save.
-  return { ok: true, ...awarded };
+  return {
+    ok: true,
+    isCorrect: isQuestionAnswerCorrect(question, submittedAnswer),
+    revealedChoiceId: question.correctChoiceId || null,
+    explanation: question.explanation,
+    kidExplanation: question.kidExplanation ?? null,
+    ...awarded,
+  };
 }
 
 function parseAwardResult(data: unknown): {

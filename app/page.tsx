@@ -12,6 +12,7 @@ import {
 import { fieldSiteSubtitle, mostRecentPracticedEventId } from "@/lib/field-sites";
 import { explorerProfileFromGamification } from "@/lib/gamification";
 import { getAllQuestions } from "@/lib/mock/curriculum";
+import { getQuestionReferences } from "@/lib/questions/server";
 import { getDashboardData } from "@/lib/mock/explorer";
 import { getEvents, isPlayablePracticeEvent } from "@/lib/mock/events";
 import {
@@ -36,12 +37,14 @@ export default async function Home() {
   }
 
   const selectedEventIds = await requireEventSelection();
-  const [{ events }, attempts, questions, gamification] = await Promise.all([
+  const [{ events }, attempts, questions, questionReferences, gamification] =
+    await Promise.all([
     getDashboardData(),
     getMyPracticeAttempts(),
     getAllQuestions(),
+    getQuestionReferences(),
     getMyGamification(),
-  ]);
+    ]);
   const explorerWithIdentity = explorerProfileFromGamification(
     displayNameFromUser(user),
     gamification,
@@ -153,7 +156,7 @@ export default async function Home() {
         <div className="mt-6">
           <RecentAchievements
             attempts={attempts}
-            questions={questions}
+            questions={questionReferences}
             streakDays={gamification.streakDays}
             dailyPracticeGoal={dailyPracticeGoalFromUser(user)}
           />

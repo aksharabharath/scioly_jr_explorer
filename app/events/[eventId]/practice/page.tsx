@@ -1,15 +1,14 @@
 import { PracticeQuiz } from "@/components/PracticeQuiz";
 import { TrickyTopicsEmpty } from "@/components/TrickyTopicsEmpty";
 import {
-  eligibleWeakQuestions,
   hasWeakTopics,
   parsePracticeMode,
   parsePracticeTopicId,
+  topicsNeedingRevisit,
   toLearningAttempts,
 } from "@/lib/learning/adaptive";
 import { completedSessionCountForEvent } from "@/lib/expeditions";
-import { getAllQuestions, getPracticePageData } from "@/lib/mock/curriculum";
-import { isStudentCatalogEventId } from "@/lib/mock/events";
+import { getEvent, isStudentCatalogEventId } from "@/lib/mock/events";
 import {
   getMyGamification,
   getMyPracticeAttemptCount,
@@ -18,6 +17,10 @@ import {
 } from "@/lib/practice-attempts";
 import { requireSelectedEvent } from "@/lib/student-events";
 import { dailyPracticeGoalFromUser } from "@/lib/student-preferences";
+import {
+  getQuestionReferences,
+  createExpedition,
+} from "@/lib/questions/server";
 import { requireUser } from "@/lib/auth/session";
 import type { Metadata } from "next";
 import { ExplorerTrail } from "@/components/ExplorerTrail";
@@ -36,15 +39,15 @@ export async function generateMetadata({
   if (!isStudentCatalogEventId(eventId)) {
     notFound();
   }
-  const data = await getPracticePageData(eventId);
-  if (!data) {
+  const event = await getEvent(eventId);
+  if (!event || event.kind === "build" || !event.unlocked) {
     return { title: "Expedition · Jr. Explorer" };
   }
   const mode = parsePracticeMode((await searchParams).mode);
   if (mode === "weak") {
-    return { title: `Tricky Topics · ${data.event.name} · Jr. Explorer` };
+    return { title: `Tricky Topics · ${event.name} · Jr. Explorer` };
   }
-  return { title: `Expedition · ${data.event.name} · Jr. Explorer` };
+  return { title: `Expedition · ${event.name} · Jr. Explorer` };
 }
 
 export default async function PracticePage({
@@ -60,9 +63,8 @@ export default async function PracticePage({
   const search = await searchParams;
   const mode = parsePracticeMode(search.mode);
   const topicId = parsePracticeTopicId(search.topic);
-  const data = await getPracticePageData(eventId);
-
-  if (!data) {
+  const event = await getEvent(eventId);
+  if (!event || event.kind === "build" || !event.unlocked) {
     notFound();
   }
 
@@ -70,17 +72,17 @@ export default async function PracticePage({
     recentStoredAttempts,
     allStoredAttempts,
     attemptCount,
-    allQuestions,
+    questionReferences,
     gamification,
   ] = await Promise.all([
     getMyRecentPracticeAttempts(),
     getMyPracticeAttempts(),
     getMyPracticeAttemptCount(),
-    getAllQuestions(),
+    getQuestionReferences(),
     getMyGamification(),
   ]);
-  const eventQuestions = allQuestions.filter(
-    (question) => question.eventId === data.event.id,
+  const eventQuestions = questionReferences.filter(
+    (question) => question.eventId === event.id,
   );
   const priorBadgeAttempts = allStoredAttempts;
   const priorAttempts = toLearningAttempts(recentStoredAttempts, eventQuestions);
@@ -90,19 +92,27 @@ export default async function PracticePage({
     )
     .map((attempt) => attempt.questionId);
   const completedExpeditions = completedSessionCountForEvent(
-    data.event.id,
+    event.id,
     allStoredAttempts,
-    allQuestions,
+    questionReferences,
   );
-  const weakPool = eligibleWeakQuestions(data.questions, priorAttempts);
-  const practiceQuestions =
-    mode === "weak"
-      ? topicId
-        ? weakPool.filter((question) => question.topicId === topicId)
-        : weakPool
-      : data.questions;
-  const noTrickyTopics = mode === "weak" && !hasWeakTopics(priorAttempts);
-  const noTrickyQuestions = mode === "weak" && practiceQuestions.length === 0;
+  const weakTopicIds = topicsNeedingRevisit(priorAttempts);
+  const selectedWeakTopicIds =
+    topicId && weakTopicIds.includes(topicId) ? [topicId] : weakTopicIds;
+  const noTrickyTopics =
+    mode === "weak" && (!hasWeakTopics(priorAttempts) || selectedWeakTopicIds.length === 0);
+  const expedition =
+    noTrickyTopics
+      ? null
+      : await createExpedition({
+    eventId: event.id,
+          userId: user.id,
+          topicIds:
+            mode === "weak"
+              ? selectedWeakTopicIds
+              : null,
+          history: priorAttempts,
+        });
 
   return (
     <main className="flex flex-1 flex-col">
@@ -110,34 +120,36 @@ export default async function PracticePage({
         <ExplorerTrail
           crumbs={[
             { href: "/camp", label: "Base camp" },
-            { href: `/events/${data.event.id}`, label: data.event.name },
+            { href: `/events/${event.id}`, label: event.name },
             { label: mode === "weak" ? "Tricky topics" : "Expedition" },
           ]}
         />
-        {noTrickyTopics || noTrickyQuestions ? (
+        {noTrickyTopics || !expedition ? (
           <div className="mt-4">
             <TrickyTopicsEmpty
-              eventId={data.event.id}
-              eventName={data.event.name}
+              eventId={event.id}
+              eventName={event.name}
               headingLevel="h1"
             />
           </div>
         ) : (
           <div className="mt-3">
             <PracticeQuiz
-              eventId={data.event.id}
-              eventName={data.event.name}
-              questions={practiceQuestions}
+              eventId={event.id}
+              eventName={event.name}
+              questions={expedition.questions}
+              sessionId={expedition.sessionId}
               priorAttempts={priorAttempts}
               priorBadgeAttempts={priorBadgeAttempts}
               previouslyAnsweredQuestionIds={previouslyAnsweredQuestionIds}
               completedExpeditions={completedExpeditions}
-              allQuestions={allQuestions}
+              questionReferences={questionReferences}
               initialAttemptCount={attemptCount}
               initialXp={gamification.xp}
               initialStreakDays={gamification.streakDays}
               dailyPracticeGoal={dailyPracticeGoalFromUser(user)}
               mode={mode}
+              practiceTopicId={topicId}
             />
           </div>
         )}

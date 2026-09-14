@@ -3,8 +3,9 @@
  *
  * Question text lives in anatomy-physiology-questions.ts.
  */
-import { ANATOMY_PHYSIOLOGY_EVENT_ID } from "@/lib/mock/anatomy-physiology-questions";
 import type { Topic } from "@/lib/types";
+
+const ANATOMY_PHYSIOLOGY_EVENT_ID = "anatomy-physiology";
 
 export const MOCK_ANATOMY_OVERVIEW =
   "Learn how the integumentary, skeletal, and muscular systems are built and how they work together.";

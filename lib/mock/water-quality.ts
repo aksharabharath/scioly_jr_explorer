@@ -3,8 +3,9 @@
  *
  * Question text lives in water-quality-questions.ts.
  */
-import { WATER_QUALITY_EVENT_ID } from "@/lib/mock/water-quality-questions";
 import type { Topic } from "@/lib/types";
+
+const WATER_QUALITY_EVENT_ID = "water-quality";
 
 export const MOCK_WATER_QUALITY_OVERVIEW =
   "Learn about water, habitats, and what helps a stream stay healthy.";

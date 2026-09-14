@@ -6,10 +6,7 @@
  * Astronomy topics and leftover helpers so existing Astronomy practice
  * and checks still resolve.
  */
-import { MOCK_ASTRONOMY_QUESTIONS } from "@/lib/mock/astronomy-questions";
-import type { Question, Topic } from "@/lib/types";
-
-export { MOCK_ASTRONOMY_QUESTIONS };
+import type { Topic } from "@/lib/types";
 
 export const MOCK_ASTRONOMY_OVERVIEW =
   "Learn how the Sun, Moon, planets, and Earth's motion shape the sky we see every day.";
@@ -48,21 +45,3 @@ export const MOCK_ASTRONOMY_TOPICS: Topic[] = [
     progressPercent: 0,
   },
 ];
-
-/**
- * MOCK leftover: a 4-id Astronomy subset.
- * Live practice uses the full bank through curriculum.ts.
- * Nothing in app/ calls this helper.
- */
-export const MOCK_ASTRONOMY_PRACTICE_IDS = [
-  "astro-q1",
-  "astro-q4",
-  "astro-q6",
-  "astro-q9",
-] as const;
-
-export function getPracticeQuestionsSync(): Question[] {
-  return MOCK_ASTRONOMY_PRACTICE_IDS.map((id) =>
-    MOCK_ASTRONOMY_QUESTIONS.find((question) => question.id === id),
-  ).filter((question): question is Question => question !== undefined);
-}

@@ -1,8 +1,6 @@
-import { EventNotebookCallout } from "@/components/EventHomeNotes";
 import { EventIcon } from "@/components/EventIcon";
 import { EventProgressDashboard } from "@/components/EventProgressDashboard";
 import { ExplorerTrail } from "@/components/ExplorerTrail";
-import { eventHomeCallout } from "@/lib/event-home-notes";
 import {
   completedSessionCountForEvent,
   expeditionLogEntries,
@@ -90,12 +88,6 @@ export default async function EventPage({ params }: EventRouteProps) {
     attempts,
     questions,
   ) !== null;
-  const callout = eventHomeCallout({
-    eventName: event.name,
-    streakDays: gamification.streakDays,
-    expeditionsCompleted,
-    questionsAnswered,
-  });
   const site = fieldSiteSubtitle(event.id);
   const tint = fieldSiteTint(event.id);
 
@@ -143,19 +135,16 @@ export default async function EventPage({ params }: EventRouteProps) {
             </div>
           ) : hasPractice ? (
             <>
-              <div className="grid gap-3 lg:grid-cols-2 lg:items-stretch">
-                <EventProgressDashboard
-                  eventName={event.name}
-                  questionsAnswered={questionsAnswered}
-                  accuracyPercent={eventProgress.accuracyPercent}
-                  expeditionsCompleted={expeditionsCompleted}
-                  activeDays={activeDays}
-                  expeditionEntries={expeditionEntries}
-                  calendarYear={now.getFullYear()}
-                  calendarMonth={now.getMonth()}
-                />
-                <EventNotebookCallout title={callout.title} body={callout.body} />
-              </div>
+              <EventProgressDashboard
+                eventName={event.name}
+                questionsAnswered={questionsAnswered}
+                accuracyPercent={eventProgress.accuracyPercent}
+                expeditionsCompleted={expeditionsCompleted}
+                activeDays={activeDays}
+                expeditionEntries={expeditionEntries}
+                calendarYear={now.getFullYear()}
+                calendarMonth={now.getMonth()}
+              />
 
               <div className="journal-panel rounded-3xl p-3 sm:p-4">
                 <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
@@ -172,12 +161,6 @@ export default async function EventPage({ params }: EventRouteProps) {
                     {hasInProgressExpedition
                       ? "Continue expedition"
                       : "Start expedition"}
-                  </Link>
-                  <Link
-                    href={`/events/${event.id}/practice`}
-                    className="inline-flex min-h-11 justify-center rounded-full border border-stone-200 px-5 py-2.5 text-sm font-semibold text-ink hover:bg-parchment"
-                  >
-                    Keep exploring
                   </Link>
                 </div>
               </div>

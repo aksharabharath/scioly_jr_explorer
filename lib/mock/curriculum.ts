@@ -4,72 +4,39 @@
  * Event id → event-specific bank → generic Question[] → adaptive selector
  * → PracticeQuiz. Do not add event-specific selection algorithms here.
  */
-import { MOCK_ASTRONOMY_OVERVIEW, MOCK_ASTRONOMY_QUESTIONS, MOCK_ASTRONOMY_TOPICS } from "@/lib/mock/astronomy";
+import "server-only";
+
+import { MOCK_ASTRONOMY_OVERVIEW, MOCK_ASTRONOMY_TOPICS } from "@/lib/mock/astronomy";
 import { MOCK_ANATOMY_OVERVIEW, MOCK_ANATOMY_TOPICS } from "@/lib/mock/anatomy-physiology";
-import {
-  MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS,
-  anatomyPhysiologyQuestionToPracticeQuestion,
-} from "@/lib/mock/anatomy-physiology-questions";
 import { MOCK_ENTOMOLOGY_OVERVIEW, MOCK_ENTOMOLOGY_TOPICS } from "@/lib/mock/entomology";
-import {
-  MOCK_ENTOMOLOGY_QUESTIONS,
-  entomologyQuestionToPracticeQuestion,
-} from "@/lib/mock/entomology-questions";
 import {
   MOCK_WATER_QUALITY_OVERVIEW,
   MOCK_WATER_QUALITY_TOPICS,
 } from "@/lib/mock/water-quality";
 import {
-  MOCK_WATER_QUALITY_QUESTIONS,
-  waterQualityQuestionToPracticeQuestion,
-} from "@/lib/mock/water-quality-questions";
-import {
   MOCK_CRIME_BUSTERS_OVERVIEW,
   MOCK_CRIME_BUSTERS_TOPICS,
 } from "@/lib/mock/crime-busters";
 import {
-  MOCK_CRIME_BUSTERS_QUESTIONS,
-  crimeBustersQuestionToPracticeQuestion,
-} from "@/lib/mock/crime-busters-questions";
-import {
   MOCK_CODEBUSTERS_OVERVIEW,
   MOCK_CODEBUSTERS_TOPICS,
 } from "@/lib/mock/codebusters";
-import {
-  MOCK_CODEBUSTERS_QUESTIONS,
-  codebustersQuestionToPracticeQuestion,
-} from "@/lib/mock/codebusters-questions";
 import { MOCK_ECOLOGY_OVERVIEW, MOCK_ECOLOGY_TOPICS } from "@/lib/mock/ecology";
-import {
-  MOCK_ECOLOGY_QUESTIONS,
-  ecologyQuestionToPracticeQuestion,
-} from "@/lib/mock/ecology-questions";
 import { getEvent } from "@/lib/mock/events";
 import { MOCK_EXPLORER } from "@/lib/mock/explorer";
+import {
+  getAllQuestions as getAllQuestionsFromDatabase,
+  getQuestionById as getQuestionByIdFromDatabase,
+  getQuestionsForEvent as getQuestionsForEventFromDatabase,
+  isLivePracticeQuestion,
+  questionHasPracticeImage,
+} from "@/lib/questions/server";
 import type {
   ExplorerProfile,
   Question,
   ScienceEvent,
   Topic,
 } from "@/lib/types";
-
-const QUESTIONS_BY_EVENT: Record<string, Question[]> = {
-  astronomy: MOCK_ASTRONOMY_QUESTIONS,
-  entomology: MOCK_ENTOMOLOGY_QUESTIONS.map(entomologyQuestionToPracticeQuestion),
-  "anatomy-physiology": MOCK_ANATOMY_PHYSIOLOGY_QUESTIONS.map(
-    anatomyPhysiologyQuestionToPracticeQuestion,
-  ),
-  "water-quality": MOCK_WATER_QUALITY_QUESTIONS.map(
-    waterQualityQuestionToPracticeQuestion,
-  ),
-  "crime-busters": MOCK_CRIME_BUSTERS_QUESTIONS.map(
-    crimeBustersQuestionToPracticeQuestion,
-  ),
-  codebusters: MOCK_CODEBUSTERS_QUESTIONS.map(
-    codebustersQuestionToPracticeQuestion,
-  ),
-  ecology: MOCK_ECOLOGY_QUESTIONS.map(ecologyQuestionToPracticeQuestion),
-};
 
 const TOPICS_BY_EVENT: Record<string, Topic[]> = {
   astronomy: MOCK_ASTRONOMY_TOPICS,
@@ -91,38 +58,9 @@ const OVERVIEW_BY_EVENT: Record<string, string> = {
   ecology: MOCK_ECOLOGY_OVERVIEW,
 };
 
-export function questionHasPracticeImage(question: Question): boolean {
-  return (
-    typeof question.imageSrc === "string" &&
-    question.imageSrc.trim().length > 0 &&
-    typeof question.imageAlt === "string" &&
-    question.imageAlt.trim().length > 0
-  );
-}
-
-/**
- * Live practice eligibility. Banks that omit `verificationStatus` are treated
- * as verified so events that have not been through content QA stay playable.
- * Image items are live only when a sourced `imageSrc` + `imageAlt` are present.
- */
-export function isLivePracticeQuestion(question: Question): boolean {
-  const verificationStatus = question.verificationStatus ?? "verified";
-  if (verificationStatus !== "verified") {
-    return false;
-  }
-  if (question.imageRequired === true) {
-    return questionHasPracticeImage(question);
-  }
-  return true;
-}
-
-export function livePracticeQuestions(questions: Question[]): Question[] {
-  return questions.filter(isLivePracticeQuestion);
-}
-
 /** True only when a quiz event has questions eligible for live practice. */
-export function eventHasPractice(eventId: string): boolean {
-  return livePracticeQuestions(QUESTIONS_BY_EVENT[eventId] ?? []).length > 0;
+export async function eventHasPractice(eventId: string): Promise<boolean> {
+  return (await getQuestionsForEvent(eventId)).length > 0;
 }
 
 export async function getTopicsForEvent(eventId: string): Promise<Topic[]> {
@@ -130,25 +68,20 @@ export async function getTopicsForEvent(eventId: string): Promise<Topic[]> {
 }
 
 export async function getQuestionsForEvent(eventId: string): Promise<Question[]> {
-  return livePracticeQuestions(QUESTIONS_BY_EVENT[eventId] ?? []);
+  return getQuestionsForEventFromDatabase(eventId);
 }
 
-/** Full registered banks, including non-live and image-required items. */
 export async function getAllQuestions(): Promise<Question[]> {
-  return Object.values(QUESTIONS_BY_EVENT).flat();
+  return getAllQuestionsFromDatabase();
 }
 
 export async function getQuestionById(
   questionId: string,
 ): Promise<Question | undefined> {
-  for (const questions of Object.values(QUESTIONS_BY_EVENT)) {
-    const match = questions.find((question) => question.id === questionId);
-    if (match) {
-      return match;
-    }
-  }
-  return undefined;
+  return getQuestionByIdFromDatabase(questionId);
 }
+
+export { isLivePracticeQuestion, questionHasPracticeImage };
 
 export type EventPageData = {
   event: ScienceEvent;
@@ -168,7 +101,7 @@ export async function getEventPageData(
 
   const topics = await getTopicsForEvent(eventId);
   const hasPractice =
-    event.unlocked && event.kind === "quiz" && eventHasPractice(eventId);
+    event.unlocked && event.kind === "quiz" && (await eventHasPractice(eventId));
 
   return {
     event,
@@ -192,7 +125,7 @@ export async function getPracticePageData(
     return null;
   }
 
-  const questions = await getQuestionsForEvent(eventId);
+  const questions = await getQuestionsForEventFromDatabase(eventId);
   if (questions.length === 0) {
     return null;
   }

@@ -376,11 +376,14 @@ async function run() {
       (await getQuestionById(liveImageItem.id))?.id === liveImageItem.id,
   );
 
-  check("Entomology has practice", eventHasPractice("entomology"));
-  check("Astronomy still has practice", eventHasPractice("astronomy"));
-  check("Water Quality has practice", eventHasPractice("water-quality"));
-  check("Crime Busters bank is registered for live-eligible items", eventHasPractice("crime-busters"));
-  check("Ecology bank is registered for live-eligible items", eventHasPractice("ecology"));
+  check("Entomology has practice", await eventHasPractice("entomology"));
+  check("Astronomy still has practice", await eventHasPractice("astronomy"));
+  check("Water Quality has practice", await eventHasPractice("water-quality"));
+  check(
+    "Crime Busters bank is registered for live-eligible items",
+    await eventHasPractice("crime-busters"),
+  );
+  check("Ecology bank is registered for live-eligible items", await eventHasPractice("ecology"));
   check(
     "Crime Busters is in EVENTS_WITH_QUESTION_BANKS",
     (EVENTS_WITH_QUESTION_BANKS as readonly string[]).includes("crime-busters"),
@@ -389,10 +392,12 @@ async function run() {
     "Ecology is in EVENTS_WITH_QUESTION_BANKS",
     (EVENTS_WITH_QUESTION_BANKS as readonly string[]).includes("ecology"),
   );
-  check(
-    "EVENTS_WITH_QUESTION_BANKS matches registered banks",
-    EVENTS_WITH_QUESTION_BANKS.every((eventId) => eventHasPractice(eventId)),
-  );
+  for (const eventId of EVENTS_WITH_QUESTION_BANKS) {
+    check(
+      `${eventId} is registered for practice`,
+      await eventHasPractice(eventId),
+    );
+  }
   check(
     "A&P is in EVENTS_WITH_QUESTION_BANKS",
     (EVENTS_WITH_QUESTION_BANKS as readonly string[]).includes(
@@ -409,7 +414,10 @@ async function run() {
   );
 
   for (const eventId of BUILD_EVENT_IDS) {
-    check(`${eventId} has no quiz practice`, !eventHasPractice(eventId));
+    check(
+      `${eventId} has no quiz practice`,
+      !(await eventHasPractice(eventId)),
+    );
     check(
       `${eventId} cannot enter /practice`,
       (await getPracticePageData(eventId)) === null,

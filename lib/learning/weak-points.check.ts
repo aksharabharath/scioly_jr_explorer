@@ -2,9 +2,7 @@
  * Work on Weak Points checks.
  * Run: npx tsx lib/learning/weak-points.check.ts
  */
-import {
-  MOCK_ASTRONOMY_QUESTIONS as bank,
-} from "@/lib/mock/astronomy";
+import { MOCK_ASTRONOMY_QUESTIONS as bank } from "@/lib/mock/astronomy-questions";
 import {
   PRACTICE_SET_SIZE,
   eligibleWeakQuestions,

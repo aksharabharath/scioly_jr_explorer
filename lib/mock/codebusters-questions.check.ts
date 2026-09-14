@@ -8,7 +8,7 @@ import {
   MOCK_CODEBUSTERS_QUESTIONS,
   type CodebustersCognitiveDemand,
 } from "@/lib/mock/codebusters-questions";
-import { isQuestionAnswerCorrect } from "@/lib/practice";
+import { isQuestionAnswerCorrect } from "@/lib/questions/answer-validation";
 
 const failures: string[] = [];
 

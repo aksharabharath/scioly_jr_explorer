@@ -1,4 +1,9 @@
-import type { DifficultyLevel, Question } from "@/lib/types";
+import type {
+  DifficultyLevel,
+  Question,
+  PublicPracticeQuestion,
+  QuestionReference,
+} from "@/lib/types";
 
 /**
  * Adaptive Practice v1 — topic-first spaced revisit.
@@ -92,7 +97,7 @@ export function weakPracticeSetSize(eligibleCount: number): number {
 }
 
 export function attemptFromQuestion(
-  question: Question,
+  question: Pick<Question, "id" | "topicId" | "difficulty"> | PublicPracticeQuestion,
   isCorrect: boolean,
   hintUsed: boolean,
 ): LearningAttempt {
@@ -107,7 +112,7 @@ export function attemptFromQuestion(
 
 export function toLearningAttempts(
   stored: Array<{ questionId: string; isCorrect: boolean; hintUsed?: boolean }>,
-  bank: Question[],
+  bank: Array<Pick<QuestionReference, "id" | "topicId" | "difficulty">>,
 ): LearningAttempt[] {
   const byId = new Map(bank.map((question) => [question.id, question]));
   const attempts: LearningAttempt[] = [];

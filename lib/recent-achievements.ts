@@ -18,7 +18,7 @@ import {
   type DailyPracticeGoal,
 } from "@/lib/student-preferences";
 import { STREAK_MILESTONES } from "@/lib/gamification";
-import type { Question } from "@/lib/types";
+import type { QuestionReference } from "@/lib/types";
 
 export type RecentAchievement = {
   id: string;
@@ -28,7 +28,7 @@ export type RecentAchievement = {
 
 export function recentAchievements(input: {
   attempts: BadgeProgressAttempt[];
-  questions: Question[];
+  questions: QuestionReference[];
   streakDays: number;
   practiceDate: string;
   dailyPracticeGoal?: DailyPracticeGoal;

@@ -142,6 +142,11 @@ export type Question = {
   answerMode?: QuestionAnswerMode;
   acceptedAnswers?: string[];
   explanation: string;
+  /** Optional fourth-grade student-facing explanation. */
+  kidExplanation?: string | null;
+  /** Author/reviewer metadata; never shown to students. */
+  qualityFlags?: string[];
+  needsHumanReview?: boolean;
   hint: string;
   /**
    * Optional second authored clue (Apply). Shown only after the student
@@ -171,9 +176,35 @@ export type Question = {
   imageAlt?: string;
   /** Student-visible credit for CC BY / CC BY-SA practice photos. */
   imageCredit?: string;
+  imageBrief?: string;
+  cognitiveDemand?: string;
+  sourceType?: string;
+  sourceNote?: string;
+  evidenceIds?: string[];
+  taxonomyTags?: string[];
   /** Author-only. Used to decide live practice eligibility; not shown to students. */
   verificationStatus?: QuestionVerificationStatus;
 };
+
+/** Safe question data that may cross the server/client boundary. */
+export type PublicPracticeQuestion = Omit<
+  Question,
+  | "correctChoiceId"
+  | "acceptedAnswers"
+  | "explanation"
+  | "kidExplanation"
+  | "qualityFlags"
+  | "needsHumanReview"
+> & {
+  answerMode: QuestionAnswerMode;
+  questionVersionId: string;
+};
+
+/** Non-content question metadata used for progress and badge calculations. */
+export type QuestionReference = Pick<
+  Question,
+  "id" | "eventId" | "topicId" | "difficulty"
+>;
 
 export type PracticeSummary = {
   questionsAnswered: number;
