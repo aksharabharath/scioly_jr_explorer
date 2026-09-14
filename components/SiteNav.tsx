@@ -1,5 +1,6 @@
 "use client";
 
+import { saveGeneralFeedback } from "@/app/feedback/actions";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -150,6 +151,7 @@ export function SiteNav() {
 function GlobalFeedbackWindow({ onClose }: { onClose: () => void }) {
   const [otherText, setOtherText] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (!submitted) {
@@ -158,6 +160,19 @@ function GlobalFeedbackWindow({ onClose }: { onClose: () => void }) {
     const timeoutId = window.setTimeout(onClose, 1600);
     return () => window.clearTimeout(timeoutId);
   }, [onClose, submitted]);
+
+  async function submitFeedback() {
+    if (saving) {
+      return;
+    }
+    setSaving(true);
+    const result = await saveGeneralFeedback(otherText);
+    if (result.ok) {
+      setSubmitted(true);
+    } else {
+      setSaving(false);
+    }
+  }
 
   return (
     <div
@@ -213,7 +228,8 @@ function GlobalFeedbackWindow({ onClose }: { onClose: () => void }) {
           </button>
           <button
             type="button"
-            onClick={() => setSubmitted(true)}
+            onClick={submitFeedback}
+            disabled={saving}
             className="rounded-full bg-teal-dark px-4 py-2 text-sm font-semibold text-parchment hover:bg-teal"
           >
             Submit feedback
