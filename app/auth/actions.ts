@@ -35,11 +35,10 @@ export async function signUp(
   formData: FormData,
 ): Promise<AuthFormState> {
   const username = normalizeUsername(readString(formData, "username"));
-  const displayName = readString(formData, "displayName");
   const password = readString(formData, "password");
 
-  if (!username || !displayName || !password) {
-    return { error: "Please fill in your username, name, and password." };
+  if (!username || !password) {
+    return { error: "Please fill in your username and password." };
   }
 
   if (!USERNAME_PATTERN.test(username)) {
@@ -47,10 +46,6 @@ export async function signUp(
       error:
         "Username must be 3–24 characters using lowercase letters, numbers, or underscores.",
     };
-  }
-
-  if (displayName.length < 2) {
-    return { error: "Please enter a name with at least 2 letters." };
   }
 
   if (password.length < 6) {
@@ -83,7 +78,7 @@ export async function signUp(
     email_confirm: true,
     user_metadata: {
       username,
-      display_name: displayName,
+      display_name: username,
     },
   });
   if (error || !data.user) {

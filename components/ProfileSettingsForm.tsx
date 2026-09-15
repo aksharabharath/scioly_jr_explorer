@@ -14,13 +14,11 @@ import { useActionState } from "react";
 const INITIAL_STATE: ProfileFormState = {};
 
 type ProfileSettingsFormProps = {
-  displayName: string;
   username: string;
   dailyPracticeGoal: DailyPracticeGoal;
 };
 
 export function ProfileSettingsForm({
-  displayName,
   username,
   dailyPracticeGoal,
 }: ProfileSettingsFormProps) {
@@ -39,28 +37,9 @@ export function ProfileSettingsForm({
         ) : null}
         {state.saved ? (
           <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-950">
-            Saved. Your name and daily question goal are updated.
+            Saved. Your daily question goal is updated.
           </p>
         ) : null}
-
-        <div>
-          <label
-            htmlFor="displayName"
-            className="block text-sm font-medium text-ink"
-          >
-            What should we call you?
-          </label>
-          <input
-            id="displayName"
-            name="displayName"
-            type="text"
-            autoComplete="nickname"
-            required
-            minLength={2}
-            defaultValue={displayName}
-            className="mt-1 w-full rounded-2xl border border-stone-200 bg-parchment/70 px-4 py-2.5 text-ink outline-none ring-teal/30 focus:ring-2"
-          />
-        </div>
 
         <div>
           <p className="text-sm font-medium text-ink">Username</p>

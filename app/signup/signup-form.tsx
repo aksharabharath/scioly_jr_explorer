@@ -38,24 +38,6 @@ export function SignupForm() {
       </div>
 
       <div>
-        <label
-          htmlFor="displayName"
-          className="block text-sm font-medium text-ink"
-        >
-          Display name
-        </label>
-        <input
-          id="displayName"
-          name="displayName"
-          type="text"
-          autoComplete="nickname"
-          required
-          minLength={2}
-          className="mt-1 w-full rounded-2xl border border-stone-200 bg-parchment/70 px-4 py-2.5 text-ink outline-none ring-teal/30 focus:ring-2"
-        />
-      </div>
-
-      <div>
         <label htmlFor="password" className="block text-sm font-medium text-ink">
           Password
         </label>

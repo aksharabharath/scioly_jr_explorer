@@ -26,6 +26,10 @@ const FALLBACK_DISPLAY_NAME = "Explorer";
 
 /** Identity from Auth metadata. Not from mock explorer progress data. */
 export function displayNameFromUser(user: User): string {
+  const username = user.user_metadata?.username;
+  if (typeof username === "string" && username.trim()) {
+    return username.trim();
+  }
   const name = user.user_metadata?.display_name;
   if (typeof name === "string" && name.trim()) {
     return name.trim();
@@ -37,5 +41,5 @@ export function usernameFromUser(user: User): string {
   const username = user.user_metadata?.username;
   return typeof username === "string" && username.trim()
     ? username.trim()
-    : "Unknown";
+    : displayNameFromUser(user);
 }

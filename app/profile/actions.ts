@@ -15,23 +15,13 @@ export type ProfileFormState = {
   saved?: boolean;
 };
 
-function readString(formData: FormData, key: string): string {
-  const value = formData.get(key);
-  return typeof value === "string" ? value.trim() : "";
-}
-
 export async function updateStudentProfile(
   _prevState: ProfileFormState,
   formData: FormData,
 ): Promise<ProfileFormState> {
-  const displayName = readString(formData, "displayName");
   const dailyPracticeGoal = parseDailyPracticeGoal(
     formData.get("dailyPracticeGoal"),
   ) as DailyPracticeGoal;
-
-  if (displayName.length < 2) {
-    return { error: "Please enter a name with at least 2 letters." };
-  }
 
   if (!getSupabasePublicEnv()) {
     return {
@@ -48,7 +38,6 @@ export async function updateStudentProfile(
   const supabase = await createClient();
   const { error } = await supabase.auth.updateUser({
     data: {
-      display_name: displayName,
       daily_practice_goal: dailyPracticeGoal,
     },
   });

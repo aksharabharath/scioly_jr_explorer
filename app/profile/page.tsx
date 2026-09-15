@@ -1,7 +1,6 @@
 import { ExplorerProgress } from "@/components/ExplorerProgress";
 import { ProfileSettingsForm } from "@/components/ProfileSettingsForm";
 import {
-  displayNameFromUser,
   requireUser,
   usernameFromUser,
 } from "@/lib/auth/session";
@@ -19,15 +18,15 @@ export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
   const user = await requireUser();
-  const displayName = displayNameFromUser(user);
+  const username = usernameFromUser(user);
   const gamification = await getMyGamification();
-  const explorer = explorerProfileFromGamification(displayName, gamification);
+  const explorer = explorerProfileFromGamification(username, gamification);
 
   return (
     <main className="flex flex-1 flex-col">
       <div className="mx-auto w-full max-w-xl flex-1 px-4 py-5 sm:px-6">
         <h1 className="font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
-          {displayName}
+          {username}
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-stone-600">
           Your name, daily goal, and account.
@@ -54,8 +53,7 @@ export default async function ProfilePage() {
           </p>
           <div className="mt-4">
             <ProfileSettingsForm
-              displayName={displayName}
-              username={usernameFromUser(user)}
+              username={username}
               dailyPracticeGoal={dailyPracticeGoalFromUser(user)}
             />
           </div>
