@@ -129,7 +129,7 @@ export function EventSelectionForm({
                       {event.shortDescription}
                     </span>
                     <span className="mt-2 inline-block rounded-full bg-stone-200 px-2.5 py-1 text-xs font-semibold text-stone-700">
-                      {testing ? "Still in testing" : "Coming later"}
+                      {testing ? "Coming soon" : "Coming later"}
                     </span>
                   </span>
                 </span>
