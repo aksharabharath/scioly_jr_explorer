@@ -9,17 +9,11 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-type LoginPageProps = {
-  searchParams: Promise<{ error?: string; notice?: string }>;
-};
-
-export default async function LoginPage({ searchParams }: LoginPageProps) {
+export default async function LoginPage() {
   const user = await getCurrentUser();
   if (user) {
     redirect("/");
   }
-  const { error, notice } = await searchParams;
-  const confirmNotice = notice === "confirm" || error === "confirm";
 
   return (
     <main className="flex flex-1 flex-col">
@@ -34,7 +28,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <p className="mt-2 text-sm leading-relaxed text-stone-600">
             Log in to keep exploring Science Olympiad.
           </p>
-          <LoginForm confirmNotice={confirmNotice} />
+          <LoginForm />
         </section>
       </div>
     </main>

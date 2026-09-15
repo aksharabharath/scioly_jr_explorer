@@ -11,7 +11,7 @@ export function friendlyAuthError(error: AuthErrorLike | null | undefined): stri
     code === "invalid_credentials" ||
     message.includes("invalid login credentials")
   ) {
-    return "That email or password doesn't match. Try again.";
+    return "That username or password doesn't match. Try again.";
   }
 
   if (
@@ -19,11 +19,7 @@ export function friendlyAuthError(error: AuthErrorLike | null | undefined): stri
     message.includes("already registered") ||
     message.includes("user already registered")
   ) {
-    return "An account with that email already exists. Try logging in.";
-  }
-
-  if (code === "email_not_confirmed" || message.includes("email not confirmed")) {
-    return "Please check your email and confirm your account first.";
+    return "That username is already taken. Try logging in.";
   }
 
   if (
@@ -35,10 +31,6 @@ export function friendlyAuthError(error: AuthErrorLike | null | undefined): stri
         message.includes("short")))
   ) {
     return "Please choose a longer password — at least 6 characters.";
-  }
-
-  if (message.includes("invalid") && message.includes("email")) {
-    return "Please enter a real email address.";
   }
 
   if (message.includes("rate") || code.includes("over_request")) {

@@ -23,7 +23,7 @@ export default async function SignupPage() {
             Create your account
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-stone-600">
-            Ask a grown-up to use their email. You can log back in any time.
+            Choose a username and password. You can log back in any time.
           </p>
           <SignupForm />
         </section>

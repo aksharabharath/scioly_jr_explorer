@@ -3,6 +3,7 @@ import { ProfileSettingsForm } from "@/components/ProfileSettingsForm";
 import {
   displayNameFromUser,
   requireUser,
+  usernameFromUser,
 } from "@/lib/auth/session";
 import { explorerProfileFromGamification } from "@/lib/gamification";
 import { getMyGamification } from "@/lib/practice-attempts";
@@ -54,7 +55,7 @@ export default async function ProfilePage() {
           <div className="mt-4">
             <ProfileSettingsForm
               displayName={displayName}
-              email={user.email ?? null}
+              username={usernameFromUser(user)}
               dailyPracticeGoal={dailyPracticeGoalFromUser(user)}
             />
           </div>

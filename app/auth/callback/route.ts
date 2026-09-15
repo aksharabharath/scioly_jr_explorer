@@ -41,5 +41,5 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/login?notice=confirm`);
+  return NextResponse.redirect(`${origin}/login`);
 }

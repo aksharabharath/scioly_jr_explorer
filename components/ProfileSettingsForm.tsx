@@ -15,13 +15,13 @@ const INITIAL_STATE: ProfileFormState = {};
 
 type ProfileSettingsFormProps = {
   displayName: string;
-  email: string | null;
+  username: string;
   dailyPracticeGoal: DailyPracticeGoal;
 };
 
 export function ProfileSettingsForm({
   displayName,
-  email,
+  username,
   dailyPracticeGoal,
 }: ProfileSettingsFormProps) {
   const [state, action, pending] = useActionState(
@@ -63,9 +63,9 @@ export function ProfileSettingsForm({
         </div>
 
         <div>
-          <p className="text-sm font-medium text-ink">Sign-in email</p>
+          <p className="text-sm font-medium text-ink">Username</p>
           <p className="mt-1 text-sm text-stone-600">
-            {email ?? "No email on this account."}
+            {username}
           </p>
         </div>
 

@@ -6,21 +6,11 @@ import { useActionState } from "react";
 
 const INITIAL_STATE: AuthFormState = {};
 
-type LoginFormProps = {
-  confirmNotice?: boolean;
-};
-
-export function LoginForm({ confirmNotice = false }: LoginFormProps) {
+export function LoginForm() {
   const [state, action, pending] = useActionState(signIn, INITIAL_STATE);
 
   return (
     <form action={action} className="mt-6 space-y-4">
-      {confirmNotice ? (
-        <p className="rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-950">
-          Try logging in first. If that does not work, check the confirmation
-          email or ask your grown-up for help.
-        </p>
-      ) : null}
       {state.error ? (
         <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-950">
           {state.error}
@@ -28,14 +18,14 @@ export function LoginForm({ confirmNotice = false }: LoginFormProps) {
       ) : null}
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-ink">
-          Email
+        <label htmlFor="username" className="block text-sm font-medium text-ink">
+          Username
         </label>
         <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
+          id="username"
+          name="username"
+          type="text"
+          autoComplete="username"
           required
           className="mt-1 w-full rounded-2xl border border-stone-200 bg-parchment/70 px-4 py-2.5 text-ink outline-none ring-teal/30 focus:ring-2"
         />

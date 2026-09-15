@@ -45,7 +45,7 @@ export function LandingPage({ events }: LandingPageProps) {
             <p className="mt-4 max-w-xl text-base leading-relaxed text-stone-600 sm:text-lg">
               Practice elementary Science Olympiad in short 10-question
               expeditions. Explore, practice, learn, and keep exploring. A
-              grown-up’s email is all you need to start.
+              Choose a username and password to start.
             </p>
             <LandingCtas />
           </div>
@@ -113,7 +113,7 @@ export function LandingPage({ events }: LandingPageProps) {
           </h2>
           <div className="journal-panel mt-6 max-w-3xl rounded-3xl p-5 sm:p-6">
             <p className="text-sm leading-relaxed text-stone-600 sm:text-base">
-              Ask a grown-up to use their email to create an account. Jr.
+              Ask a grown-up to help you create a username and password. Jr.
               Explorer is practice—not a scored invitational. The goal is to get
               a little better each expedition.
             </p>

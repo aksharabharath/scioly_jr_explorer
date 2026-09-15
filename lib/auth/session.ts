@@ -32,3 +32,10 @@ export function displayNameFromUser(user: User): string {
   }
   return FALLBACK_DISPLAY_NAME;
 }
+
+export function usernameFromUser(user: User): string {
+  const username = user.user_metadata?.username;
+  return typeof username === "string" && username.trim()
+    ? username.trim()
+    : "Unknown";
+}

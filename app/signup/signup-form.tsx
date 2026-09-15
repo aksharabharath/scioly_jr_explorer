@@ -16,21 +16,26 @@ export function SignupForm() {
           {state.error}
         </p>
       ) : null}
-      {state.info ? (
-        <div className="rounded-2xl bg-emerald-50 px-4 py-3 text-emerald-950">
-          <p className="font-display text-lg font-semibold tracking-tight">
-            Check your inbox
-          </p>
-          <p className="mt-1 text-sm leading-relaxed">
-            We sent you a confirmation email. Open it and confirm your email
-            address to start exploring Science Olympiad.
-          </p>
-          <p className="mt-2 text-sm leading-relaxed text-emerald-900/80">
-            Can&apos;t find it? Check your spam or junk folder, or search your
-            inbox for &ldquo;Supabase&rdquo;.
-          </p>
-        </div>
-      ) : null}
+
+      <div>
+        <label htmlFor="username" className="block text-sm font-medium text-ink">
+          Username
+        </label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+          autoComplete="username"
+          required
+          minLength={3}
+          maxLength={24}
+          pattern="[a-z0-9_]{3,24}"
+          className="mt-1 w-full rounded-2xl border border-stone-200 bg-parchment/70 px-4 py-2.5 text-ink outline-none ring-teal/30 focus:ring-2"
+        />
+        <p className="mt-1 text-xs text-stone-500">
+          Use 3–24 lowercase letters, numbers, or underscores.
+        </p>
+      </div>
 
       <div>
         <label
@@ -46,20 +51,6 @@ export function SignupForm() {
           autoComplete="nickname"
           required
           minLength={2}
-          className="mt-1 w-full rounded-2xl border border-stone-200 bg-parchment/70 px-4 py-2.5 text-ink outline-none ring-teal/30 focus:ring-2"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="email" className="block text-sm font-medium text-ink">
-          Email
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
           className="mt-1 w-full rounded-2xl border border-stone-200 bg-parchment/70 px-4 py-2.5 text-ink outline-none ring-teal/30 focus:ring-2"
         />
       </div>
