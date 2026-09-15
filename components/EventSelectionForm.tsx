@@ -105,6 +105,7 @@ export function EventSelectionForm({
           const tint = fieldSiteTint(event.id);
           const site = fieldSiteSubtitle(event.id);
           const locked = !isSelectableEvent(event);
+          const testing = event.id === "codebusters";
           const isSelected = selected.has(event.id);
           const playable = isPlayablePracticeEvent(event);
 
@@ -128,7 +129,7 @@ export function EventSelectionForm({
                       {event.shortDescription}
                     </span>
                     <span className="mt-2 inline-block rounded-full bg-stone-200 px-2.5 py-1 text-xs font-semibold text-stone-700">
-                      Coming later
+                      {testing ? "Still in testing" : "Coming later"}
                     </span>
                   </span>
                 </span>

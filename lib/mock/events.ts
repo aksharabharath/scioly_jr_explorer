@@ -229,5 +229,5 @@ export function eventDashboardCta(event: ScienceEvent): string {
 }
 
 export function isSelectableEvent(event: ScienceEvent): boolean {
-  return event.unlocked === true;
+  return event.unlocked === true && event.id !== "codebusters";
 }
