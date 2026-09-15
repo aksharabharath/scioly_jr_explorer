@@ -143,26 +143,27 @@ export default async function EventPage({ params }: EventRouteProps) {
                 expeditionEntries={expeditionEntries}
                 calendarYear={now.getFullYear()}
                 calendarMonth={now.getMonth()}
+                expeditionAction={
+                  <div className="journal-panel rounded-3xl p-3 sm:p-4">
+                    <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
+                      Ready for an expedition?
+                    </h2>
+                    <p className="mt-1 text-sm text-stone-600">
+                      10 questions. Hints are there if you need them.
+                    </p>
+                    <div className="mt-4 flex flex-col gap-2">
+                      <Link
+                        href={`/events/${event.id}/practice`}
+                        className="inline-flex min-h-11 justify-center rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment hover:bg-teal"
+                      >
+                        {hasInProgressExpedition
+                          ? "Continue expedition"
+                          : "Start expedition"}
+                      </Link>
+                    </div>
+                  </div>
+                }
               />
-
-              <div className="journal-panel rounded-3xl p-3 sm:p-4">
-                <h2 className="font-display text-lg font-semibold tracking-tight text-ink">
-                  Ready for an expedition?
-                </h2>
-                <p className="mt-1 text-sm text-stone-600">
-                  10 questions. Hints are there if you need them.
-                </p>
-                <div className="mt-4 flex flex-col gap-2">
-                  <Link
-                    href={`/events/${event.id}/practice`}
-                    className="inline-flex min-h-11 justify-center rounded-full bg-teal-dark px-5 py-2.5 text-sm font-semibold text-parchment hover:bg-teal"
-                  >
-                    {hasInProgressExpedition
-                      ? "Continue expedition"
-                      : "Start expedition"}
-                  </Link>
-                </div>
-              </div>
             </>
           ) : (
             <div className="journal-panel rounded-3xl p-4 sm:p-5">

@@ -3,7 +3,7 @@
 import { saveGeneralFeedback } from "@/app/feedback/actions";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 type NavItem = {
   href: string;
@@ -134,7 +134,7 @@ export function SiteNav() {
             <button
               type="button"
               onClick={() => setFeedbackOpen(true)}
-              className="inline-flex min-h-12 items-center rounded-md px-2.5 py-2.5 text-[13px] font-medium text-stone-600 outline-none transition-colors hover:bg-parchment hover:text-ink focus-visible:ring-2 focus-visible:ring-teal max-[479px]:px-1.5 max-[479px]:text-[11px] sm:min-h-11 sm:px-3 sm:py-2.5 sm:text-sm"
+              className="inline-flex min-h-12 items-center rounded-md bg-emerald-100 px-3 py-2.5 text-[13px] font-semibold text-emerald-900 outline-none transition-colors hover:bg-emerald-200 focus-visible:ring-2 focus-visible:ring-teal max-[479px]:px-2 max-[479px]:text-[11px] sm:min-h-12 sm:px-4 sm:py-3 sm:text-sm"
             >
               <span>Feedback</span>
             </button>
@@ -152,14 +152,6 @@ function GlobalFeedbackWindow({ onClose }: { onClose: () => void }) {
   const [otherText, setOtherText] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    if (!submitted) {
-      return;
-    }
-    const timeoutId = window.setTimeout(onClose, 1600);
-    return () => window.clearTimeout(timeoutId);
-  }, [onClose, submitted]);
 
   async function submitFeedback() {
     if (saving) {
@@ -224,7 +216,7 @@ function GlobalFeedbackWindow({ onClose }: { onClose: () => void }) {
             onClick={onClose}
             className="rounded-full border border-stone-200 px-4 py-2 text-sm font-semibold text-ink hover:bg-parchment"
           >
-            Cancel
+            Close
           </button>
           <button
             type="button"

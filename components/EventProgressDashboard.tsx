@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { ExpeditionLogEntry } from "@/lib/expeditions";
 
 type EventProgressDashboardProps = {
@@ -8,6 +9,7 @@ type EventProgressDashboardProps = {
   expeditionEntries: ExpeditionLogEntry[];
   calendarYear: number;
   calendarMonth: number;
+  expeditionAction: ReactNode;
 };
 
 export function EventProgressDashboard({
@@ -18,6 +20,7 @@ export function EventProgressDashboard({
   expeditionEntries,
   calendarYear,
   calendarMonth,
+  expeditionAction,
 }: EventProgressDashboardProps) {
   const recentEntries = expeditionEntries.slice(0, 3);
   const trendEntries = [...expeditionEntries].reverse();
@@ -46,19 +49,22 @@ export function EventProgressDashboard({
         </dl>
       </section>
 
+      {expeditionAction}
+
       <div className="grid gap-3 lg:grid-cols-2">
         <ActivityCalendar
           year={calendarYear}
           month={calendarMonth}
           completedDates={completedDates}
         />
-        <AccuracyTrend eventName={eventName} entries={trendEntries} />
+        <div className="space-y-3">
+          <AccuracyTrend eventName={eventName} entries={trendEntries} />
+          <RecentExpeditions
+            totalCompleted={expeditionsCompleted}
+            entries={recentEntries}
+          />
+        </div>
       </div>
-
-      <RecentExpeditions
-        totalCompleted={expeditionsCompleted}
-        entries={recentEntries}
-      />
     </div>
   );
 }
