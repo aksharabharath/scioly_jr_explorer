@@ -9,7 +9,10 @@ import {
   PRACTICE_SET_SIZE,
   WEAK_TOPIC_ATTEMPT_WINDOW,
 } from "@/lib/learning/adaptive";
-import { getQuestionById } from "@/lib/questions/server";
+import {
+  getQuestionById,
+  QUESTION_ANSWER_VALIDATION_COLUMNS,
+} from "@/lib/questions/server";
 import { isQuestionAnswerCorrect } from "@/lib/questions/answer-validation";
 import {
   createClient,
@@ -234,7 +237,10 @@ export async function insertPracticeAttempt(
     return { ok: false, error: "That expedition is no longer active." };
   }
 
-  const question = await getQuestionById(input.questionId);
+  const question = await getQuestionById(
+    input.questionId,
+    QUESTION_ANSWER_VALIDATION_COLUMNS,
+  );
   const submittedAnswer = input.selectedOptionId.trim();
   const selected =
     question?.answerMode === "open-ended"
@@ -250,7 +256,7 @@ export async function insertPracticeAttempt(
   }
   const { data: version } = await serviceClient
     .from("question_versions")
-    .select("question_id, event_id")
+    .select("question_id, event_id, explanation, kid_explanation")
     .eq("id", input.questionVersionId)
     .maybeSingle();
   if (
@@ -332,8 +338,11 @@ export async function insertPracticeAttempt(
     ok: true,
     isCorrect: isQuestionAnswerCorrect(question, submittedAnswer),
     revealedChoiceId: question.correctChoiceId || null,
-    explanation: question.explanation,
-    kidExplanation: question.kidExplanation ?? null,
+    explanation: typeof version.explanation === "string" ? version.explanation : "",
+    kidExplanation:
+      typeof version.kid_explanation === "string"
+        ? version.kid_explanation
+        : null,
     ...awarded,
   };
 }

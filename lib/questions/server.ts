@@ -50,6 +50,15 @@ const QUESTION_COLUMNS = [
   "taxonomy_tags",
 ].join(",");
 
+export const QUESTION_ANSWER_VALIDATION_COLUMNS = [
+  "id",
+  "event_id",
+  "choices",
+  "correct_choice_id",
+  "answer_mode",
+  "accepted_answers",
+].join(",");
+
 type QuestionRow = {
   id: unknown;
   event_id: unknown;
@@ -240,12 +249,13 @@ export async function getAllQuestions(): Promise<Question[]> {
 
 export async function getQuestionById(
   questionId: string,
+  columns = QUESTION_COLUMNS,
 ): Promise<Question | undefined> {
   const supabase = createServiceRoleClient();
   for (const table of Object.values(QUESTION_TABLES)) {
     const { data, error } = await supabase
       .from(table)
-      .select(QUESTION_COLUMNS)
+      .select(columns)
       .eq("id", questionId)
       .maybeSingle();
     if (error) {

@@ -192,7 +192,6 @@ export type PublicPracticeQuestion = Omit<
   | "correctChoiceId"
   | "acceptedAnswers"
   | "explanation"
-  | "kidExplanation"
   | "qualityFlags"
   | "needsHumanReview"
 > & {
