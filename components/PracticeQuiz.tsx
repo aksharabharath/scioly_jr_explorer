@@ -1044,8 +1044,8 @@ export function PracticeQuiz({
                 </p>
               ) : null}
               <p className="text-sm leading-snug text-stone-700">
-                {state.kidExplanation ??
-                  state.explanation ??
+                {state.kidExplanation?.trim() ||
+                  state.explanation ||
                   "Reviewing this answer…"}
               </p>
               {state.saved && state.xpAward ? (

@@ -31,6 +31,7 @@ const QUESTION_COLUMNS = [
   "answer_mode",
   "accepted_answers",
   "explanation",
+  "kid_explanation",
   "hint",
   "hint_2",
   "prompt_terms",
@@ -59,6 +60,7 @@ type QuestionRow = {
   answer_mode: unknown;
   accepted_answers: unknown;
   explanation: unknown;
+  kid_explanation: unknown;
   hint: unknown;
   hint_2: unknown;
   prompt_terms: unknown;
@@ -131,6 +133,8 @@ function rowToQuestion(row: QuestionRow): Question {
     difficulty: difficultyValue(row.difficulty),
   };
 
+  const kidExplanation = stringValue(row.kid_explanation);
+  if (kidExplanation) question.kidExplanation = kidExplanation;
   const acceptedAnswers = stringArrayValue(row.accepted_answers);
   if (acceptedAnswers) {
     question.acceptedAnswers = acceptedAnswers;
@@ -404,6 +408,7 @@ function questionVersionInsert(question: Question) {
     answer_mode: question.answerMode ?? "multiple-choice",
     accepted_answers: question.acceptedAnswers ?? null,
     explanation: question.explanation,
+    kid_explanation: question.kidExplanation ?? null,
     hint: question.hint,
     hint_2: question.hint2 ?? null,
     prompt_terms: question.promptTerms ?? null,
